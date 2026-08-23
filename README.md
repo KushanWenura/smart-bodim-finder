@@ -73,7 +73,7 @@ cd backend
 php artisan queue:work --tries=3
 ```
 
-After the first dependency installation, Windows users can start all four processes in the background with one command:
+Windows users can install missing dependencies on the first run and start all four processes in the background with one command:
 
 ```powershell
 .\Run\start-all.ps1

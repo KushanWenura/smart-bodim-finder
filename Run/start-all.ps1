@@ -24,6 +24,7 @@ if (-not $pnpm) {
     if (Test-Path -LiteralPath $bundledPnpm) { $pnpm = $bundledPnpm }
 }
 
+$systemPython = (Get-Command python -ErrorAction SilentlyContinue).Source
 $python = @(
     (Join-Path $aiRoot '.venv312\Scripts\python.exe'),
     (Join-Path $aiRoot '.venv\Scripts\python.exe')
@@ -31,7 +32,47 @@ $python = @(
 
 if (-not $php) { throw 'PHP was not found. Install PHP/WAMP or add php.exe to PATH.' }
 if (-not $pnpm) { throw 'pnpm was not found. Install Node.js and run: corepack enable' }
-if (-not $python) { throw 'Python environment was not found. Follow the AI setup in README.md first.' }
+if (-not $python -and -not $systemPython) { throw 'Python 3.12 was not found. Install Python or add python.exe to PATH.' }
+
+if (-not (Test-Path -LiteralPath (Join-Path $backendRoot 'vendor\autoload.php'))) {
+    Write-Host 'First run: installing Laravel dependencies…' -ForegroundColor Cyan
+    Push-Location $backendRoot
+    try { & $php '..\tools\composer.phar' install --no-interaction --prefer-dist }
+    finally { Pop-Location }
+    if ($LASTEXITCODE -ne 0) { throw 'Composer dependency installation failed.' }
+}
+
+if (-not (Test-Path -LiteralPath (Join-Path $frontendRoot 'node_modules'))) {
+    Write-Host 'First run: installing frontend dependencies…' -ForegroundColor Cyan
+    Push-Location $frontendRoot
+    try { & $pnpm install }
+    finally { Pop-Location }
+    if ($LASTEXITCODE -ne 0) { throw 'Frontend dependency installation failed.' }
+}
+
+if (-not $python) {
+    Write-Host 'First run: creating the Python environment…' -ForegroundColor Cyan
+    & $systemPython -m venv (Join-Path $aiRoot '.venv312')
+    $python = Join-Path $aiRoot '.venv312\Scripts\python.exe'
+    & $python -m pip install -r (Join-Path $aiRoot 'requirements.txt')
+    if ($LASTEXITCODE -ne 0) { throw 'AI dependency installation failed.' }
+}
+
+$backendEnv = Join-Path $backendRoot '.env'
+if (-not (Test-Path -LiteralPath $backendEnv)) {
+    Copy-Item -LiteralPath (Join-Path $backendRoot '.env.example') -Destination $backendEnv
+    Push-Location $backendRoot
+    try { & $php artisan key:generate }
+    finally { Pop-Location }
+}
+
+$sqlite = Join-Path $backendRoot 'database\database.sqlite'
+if (-not (Test-Path -LiteralPath $sqlite)) {
+    New-Item -ItemType File -Path $sqlite | Out-Null
+    Push-Location $backendRoot
+    try { & $php artisan migrate --seed --force }
+    finally { Pop-Location }
+}
 
 $env:AI_PROFILE = 'base'
 $env:SEARCH_MODEL_PATH = Join-Path $projectRoot 'models\smart-bodim-minilm-v1'
