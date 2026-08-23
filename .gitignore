@@ -10,6 +10,7 @@ ai-service/.venv/
 ai-service/.venv312/
 ai-service/.pytest-tmp/
 storage/data.json
+storage/ai-index/
 storage/uploads/*
 !storage/uploads/.gitkeep
 models/*

@@ -4,6 +4,8 @@ A complete academic full-stack application for Sri Lankan boarding accommodation
 
 The primary user journey is the floating **Bodim AI** conversation: a tenant can ask for a room near a campus or workplace, add a distance radius, budget, facility or gender requirement, and receive clickable verified listing cards without exposing private addresses. The dedicated destination finder also ranks results by Haversine distance and shows the nearest bus stop, railway station, supermarket, hospital and food option.
 
+Every public listing includes an **Explore nearby with AI** neighbourhood view. It plots the approximate bodim area and the five nearest essentials on an OpenStreetMap, lists their straight-line distances, and provides filters for bus stops, train stations, Cargills/markets, hospitals and food places. Bodim AI performs semantic property matching; deterministic coordinate calculations produce the displayed nearby distances so the result stays explainable and testable.
+
 ## Architecture
 
 - `frontend/` — React 19, Bootstrap 5.3, Bootstrap Icons, Vite, TypeScript, Router, TanStack Query, React Hook Form/Zod and Leaflet/OpenStreetMap.

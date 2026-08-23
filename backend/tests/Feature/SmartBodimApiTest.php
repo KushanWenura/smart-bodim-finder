@@ -89,6 +89,13 @@ class SmartBodimApiTest extends TestCase
         $rows->each(function (array $listing): void {
             $this->assertLessThanOrEqual(20, $listing['distanceKm']);
             $this->assertNotEmpty($listing['nearbyPlaces']);
+            $places = collect($listing['nearbyPlaces']);
+            $this->assertEqualsCanonicalizing(['bus_station', 'train_station', 'supermarket', 'hospital', 'food'], $places->pluck('type')->all());
+            $places->each(function (array $place): void {
+                $this->assertIsNumeric($place['distanceM']);
+                $this->assertIsNumeric($place['latitude']);
+                $this->assertIsNumeric($place['longitude']);
+            });
             $this->assertArrayNotHasKey('privateAddress', $listing);
         });
     }

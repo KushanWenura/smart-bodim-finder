@@ -32,7 +32,7 @@ class ProximityController extends Controller
         ]);
         $destination = $proximity->resolve($data['destination']);
         if (! $destination) {
-            return response()->json(['message' => 'Destination not found in the academic place directory.', 'suggestions' => $proximity->destinations()->pluck('name')->take(8)], 422);
+            return response()->json(['message' => 'Destination not found in the supported campus and workplace directory.', 'suggestions' => $proximity->destinations()->pluck('name')->take(8)], 422);
         }
 
         $query = Listing::publiclyVisible()->with(['owner.ownerProfile', 'facilities', 'images', 'nearbyPlaces']);
