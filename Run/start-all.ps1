@@ -77,12 +77,13 @@ if (-not (Test-Path -LiteralPath $sqlite)) {
 $env:AI_PROFILE = 'base'
 $env:SEARCH_MODEL_PATH = Join-Path $projectRoot 'models\smart-bodim-minilm-v1'
 $env:SEARCH_MODEL_VERSION = 'smart-bodim-minilm-v1'
+$env:LOAD_SENTIMENT_MODEL = '0'
 $env:AI_INTERNAL_SECRET = 'change-this-in-every-shared-environment'
 
 $processes = @(
     Start-Process -FilePath $php -ArgumentList @('artisan', 'serve', '--host=127.0.0.1', '--port=8000') -WorkingDirectory $backendRoot -WindowStyle Hidden -PassThru
     Start-Process -FilePath $php -ArgumentList @('artisan', 'queue:work', '--tries=3') -WorkingDirectory $backendRoot -WindowStyle Hidden -PassThru
-    Start-Process -FilePath $python -ArgumentList @((Join-Path $aiRoot 'app.py')) -WorkingDirectory $aiRoot -WindowStyle Hidden -PassThru
+    Start-Process -FilePath $python -ArgumentList @('app.py') -WorkingDirectory $aiRoot -WindowStyle Hidden -PassThru
     Start-Process -FilePath $pnpm -ArgumentList @('dev', '--host', '127.0.0.1') -WorkingDirectory $frontendRoot -WindowStyle Hidden -PassThru
 )
 
@@ -91,8 +92,26 @@ $processes = @(
     processIds = @($processes.Id)
 } | ConvertTo-Json | Set-Content -LiteralPath $pidFile -Encoding UTF8
 
-Start-Sleep -Seconds 3
-Write-Host 'Smart Bodim Finder started.' -ForegroundColor Green
+Write-Host 'Starting services and loading the trained search model…' -ForegroundColor Cyan
+$ready = $false
+$deadline = (Get-Date).AddSeconds(90)
+do {
+    Start-Sleep -Seconds 2
+    try {
+        $health = Invoke-RestMethod -Uri 'http://127.0.0.1:5100/health' -TimeoutSec 2
+        $ready = $health.service -eq 'healthy'
+    } catch {
+        $ready = $false
+    }
+} while (-not $ready -and (Get-Date) -lt $deadline -and -not $processes[2].HasExited)
+
+if ($ready) {
+    Write-Host 'Smart Bodim Finder started. Trained AI is ready.' -ForegroundColor Green
+} elseif ($processes[2].HasExited) {
+    Write-Warning 'The website started, but the AI process exited. Search will use its safe fallback until the AI service is restarted.'
+} else {
+    Write-Warning 'The website started, but the trained model is still loading. Refresh the site in a moment.'
+}
 Write-Host 'Website: http://127.0.0.1:5173'
 Write-Host 'API:     http://127.0.0.1:8000/api/v1/health'
 Write-Host 'AI:      http://127.0.0.1:5100/health'

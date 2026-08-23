@@ -42,7 +42,10 @@ class SynchronizeListingIndex implements ShouldQueue
             }
         } catch (\Throwable $exception) {
             DB::table('ai_index_records')->where(['listing_id' => $listing->id, 'model_version_id' => $modelId])->update(['status' => 'error', 'error_message' => mb_substr($exception->getMessage(), 0, 500), 'updated_at' => now()]);
-            throw $exception;
+            // Indexing is an enhancement, not a publication dependency. Keep
+            // the listing workflow available and leave a visible error record
+            // for a later queue retry or administrator rebuild.
+            report($exception);
         }
     }
 }

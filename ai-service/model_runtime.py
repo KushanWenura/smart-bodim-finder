@@ -36,13 +36,17 @@ class ModelRuntime:
             except Exception as exc:
                 self.ids, self.vectors, self.index = [], None, None
                 if self.profile == "production": raise RuntimeError(f"Production AI index could not load: {exc}") from exc
-        try:
-            from transformers import pipeline
-            sentiment_path = os.getenv("SENTIMENT_MODEL_PATH", "distilbert-base-uncased-finetuned-sst-2-english")
-            self.sentiment_model = pipeline("text-classification", model=sentiment_path, device=-1)
-            self.sentiment_version = os.getenv("SENTIMENT_MODEL_VERSION", sentiment_path)
-        except Exception as exc:
-            if self.profile == "production": raise RuntimeError(f"Production sentiment model could not load: {exc}") from exc
+        # Review sentiment has a deterministic lexicon fallback in app.py. Keep
+        # it optional so the trained retrieval model can serve searches without
+        # blocking first startup on a separate network model download.
+        if os.getenv("LOAD_SENTIMENT_MODEL", "0").casefold() in {"1", "true", "yes"}:
+            try:
+                from transformers import pipeline
+                sentiment_path = os.getenv("SENTIMENT_MODEL_PATH", "distilbert-base-uncased-finetuned-sst-2-english")
+                self.sentiment_model = pipeline("text-classification", model=sentiment_path, device=-1)
+                self.sentiment_version = os.getenv("SENTIMENT_MODEL_VERSION", sentiment_path)
+            except Exception as exc:
+                if self.profile == "production": raise RuntimeError(f"Production sentiment model could not load: {exc}") from exc
 
     @property
     def model_ready(self): return self.search_model is not None
