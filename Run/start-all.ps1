@@ -1,0 +1,58 @@
+$ErrorActionPreference = 'Stop'
+
+$projectRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
+$backendRoot = Join-Path $projectRoot 'backend'
+$frontendRoot = Join-Path $projectRoot 'frontend'
+$aiRoot = Join-Path $projectRoot 'ai-service'
+$pidFile = Join-Path $PSScriptRoot '.pids.json'
+
+if (Test-Path -LiteralPath $pidFile) {
+    Write-Host 'Smart Bodim services appear to be running. Run .\Run\stop-all.ps1 first.' -ForegroundColor Yellow
+    exit 1
+}
+
+$php = (Get-Command php -ErrorAction SilentlyContinue).Source
+if (-not $php) {
+    $php = Get-ChildItem -LiteralPath 'C:\wamp64\bin\php' -Filter 'php.exe' -Recurse -ErrorAction SilentlyContinue |
+        Sort-Object FullName -Descending |
+        Select-Object -First 1 -ExpandProperty FullName
+}
+
+$pnpm = (Get-Command pnpm -ErrorAction SilentlyContinue).Source
+if (-not $pnpm) {
+    $bundledPnpm = 'C:\Users\User\.cache\codex-runtimes\codex-primary-runtime\dependencies\bin\fallback\pnpm.cmd'
+    if (Test-Path -LiteralPath $bundledPnpm) { $pnpm = $bundledPnpm }
+}
+
+$python = @(
+    (Join-Path $aiRoot '.venv312\Scripts\python.exe'),
+    (Join-Path $aiRoot '.venv\Scripts\python.exe')
+) | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+
+if (-not $php) { throw 'PHP was not found. Install PHP/WAMP or add php.exe to PATH.' }
+if (-not $pnpm) { throw 'pnpm was not found. Install Node.js and run: corepack enable' }
+if (-not $python) { throw 'Python environment was not found. Follow the AI setup in README.md first.' }
+
+$env:AI_PROFILE = 'base'
+$env:SEARCH_MODEL_PATH = Join-Path $projectRoot 'models\smart-bodim-minilm-v1'
+$env:SEARCH_MODEL_VERSION = 'smart-bodim-minilm-v1'
+$env:AI_INTERNAL_SECRET = 'change-this-in-every-shared-environment'
+
+$processes = @(
+    Start-Process -FilePath $php -ArgumentList @('artisan', 'serve', '--host=127.0.0.1', '--port=8000') -WorkingDirectory $backendRoot -WindowStyle Hidden -PassThru
+    Start-Process -FilePath $php -ArgumentList @('artisan', 'queue:work', '--tries=3') -WorkingDirectory $backendRoot -WindowStyle Hidden -PassThru
+    Start-Process -FilePath $python -ArgumentList @((Join-Path $aiRoot 'app.py')) -WorkingDirectory $aiRoot -WindowStyle Hidden -PassThru
+    Start-Process -FilePath $pnpm -ArgumentList @('dev', '--host', '127.0.0.1') -WorkingDirectory $frontendRoot -WindowStyle Hidden -PassThru
+)
+
+@{
+    startedAt = (Get-Date).ToString('o')
+    processIds = @($processes.Id)
+} | ConvertTo-Json | Set-Content -LiteralPath $pidFile -Encoding UTF8
+
+Start-Sleep -Seconds 3
+Write-Host 'Smart Bodim Finder started.' -ForegroundColor Green
+Write-Host 'Website: http://127.0.0.1:5173'
+Write-Host 'API:     http://127.0.0.1:8000/api/v1/health'
+Write-Host 'AI:      http://127.0.0.1:5100/health'
+Write-Host 'Stop all services with: .\Run\stop-all.ps1'

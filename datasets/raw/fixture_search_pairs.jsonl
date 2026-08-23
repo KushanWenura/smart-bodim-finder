@@ -1,0 +1,3 @@
+{"id":"q1","query":"quiet student room in Moratuwa with wifi","positive":"Quiet private student room near University of Moratuwa with WiFi","negative":"Large house in Galle with parking","source":"synthetic-academic-fixture","license":"CC0-1.0"}
+{"id":"q2","query":"female annex in Kandy with kitchen","positive":"Female-only Kandy annex with kitchen access","negative":"Shared male room in Colombo","source":"synthetic-academic-fixture","license":"CC0-1.0"}
+{"id":"q3","query":"affordable room near Colombo university and bus","positive":"Affordable Colombo boarding room near campus and bus stop","negative":"Beach studio in Matara","source":"synthetic-academic-fixture","license":"CC0-1.0"}

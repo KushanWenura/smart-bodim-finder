@@ -1,0 +1,22 @@
+{
+  "timestampUtc": "2026-08-23T12:33:44.596574+00:00",
+  "dataset": "..\\datasets\\processed\\smart-bodim-v1\\search-test.jsonl",
+  "method": "pooled held-out retrieval; each positive ranked among all held-out positive and negative texts",
+  "fineTuned": {
+    "mrr": 1.0,
+    "recallAt1": 1.0,
+    "queries": 7,
+    "corpusSize": 14
+  },
+  "pretrainedBase": {
+    "mrr": 1.0,
+    "recallAt1": 1.0,
+    "queries": 7,
+    "corpusSize": 14
+  },
+  "keywordBaseline": {
+    "mrr": 0.857143,
+    "recallAt1": 0.714286
+  },
+  "limitations": "Synthetic held-out academic data; not a real-world performance or bias claim."
+}

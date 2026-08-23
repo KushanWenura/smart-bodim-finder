@@ -1,0 +1,17 @@
+{
+  "timestampUtc": "2026-08-23T12:26:28.432615+00:00",
+  "python": "3.12.13",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "preprocessingVersion": "1.0.0",
+  "seed": 42,
+  "source": "datasets\\raw\\smart_bodim_search_pairs.jsonl",
+  "sourceSha256": "bd87060cf8d20fe9b9807b9eedd9dc9466797e428445ad03715a652bd5da2c36",
+  "licenseSummary": [
+    "CC0-1.0"
+  ],
+  "sizes": {
+    "train": 34,
+    "validation": 7,
+    "test": 7
+  }
+}

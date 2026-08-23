@@ -1,0 +1,5 @@
+{"id":"r1","text":"The room was clean, quiet and safe with reliable WiFi.","label":"positive","source":"synthetic-academic-fixture","license":"CC0-1.0"}
+{"id":"r2","text":"Friendly owner and a convenient location near the bus stop.","label":"positive","source":"synthetic-academic-fixture","license":"CC0-1.0"}
+{"id":"r3","text":"The bathroom was dirty and traffic noise was bad at night.","label":"negative","source":"synthetic-academic-fixture","license":"CC0-1.0"}
+{"id":"r4","text":"Poor internet and the utilities were unreliable.","label":"negative","source":"synthetic-academic-fixture","license":"CC0-1.0"}
+{"id":"r5","text":"A room near the main road.","label":"uncertain","source":"synthetic-academic-fixture","license":"CC0-1.0"}
