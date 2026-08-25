@@ -12,9 +12,10 @@ def prepare(source:Path,out:Path,kind:str,seed:int):
         for field in text_fields:row[field]=normalized_text(row[field])
         key="|".join(row[field].casefold() for field in text_fields)
         if key not in seen:clean.append(row);seen.add(key)
-    splits=split_rows(clean,seed)
+    group_key="groupId" if kind=="search" and clean and all(row.get("groupId") for row in clean) else None
+    splits=split_rows(clean,seed,group_key=group_key)
     for name,items in splits.items():write_jsonl(out/f"{kind}-{name}.jsonl",items)
-    manifest=run_manifest(preprocessingVersion="1.0.0",seed=seed,source=str(source),sourceSha256=digest(source),licenseSummary=sorted({x["license"] for x in clean}),sizes={k:len(v) for k,v in splits.items()})
+    manifest=run_manifest(preprocessingVersion="2.0.0",seed=seed,source=str(source),sourceSha256=digest(source),licenseSummary=sorted({x["license"] for x in clean}),splitStrategy="group-aware" if group_key else "row-random",groupField=group_key,sizes={k:len(v) for k,v in splits.items()},groups={k:len({row.get(group_key) for row in v}) for k,v in splits.items()} if group_key else None)
     (out/f"{kind}-manifest.json").write_text(json.dumps(manifest,indent=2),encoding="utf-8")
     return manifest
 

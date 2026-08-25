@@ -17,7 +17,7 @@ Application base path: `/api/v1`. Browser writes require a Sanctum session and C
 
 Search keys: `q`, `city`, `type`, `gender`, `facility`, `minPrice`, `maxPrice`, `minRating`, `occupancy`, `furnished`, `sort`, `page`, `perPage`. Sort is one of `relevance`, `newest`, `price_asc`, `price_desc`, `rating`. Pagination is bounded at 24 public/50 admin rows.
 
-Proximity keys: `destination` (name or supported alias), `radiusKm` (1–100), optional `maxPrice` and `facility`. Results are published/available listings ordered by Haversine `distanceKm`, with a disclosed commute estimate and nearest public `nearbyPlaces`. It is not a live traffic or road-routing API.
+Proximity keys: `destination` (branch name or supported alias), `radiusKm` (1–50), optional `maxPrice` and `facility`. Results are published/available listings ordered by Haversine `distanceKm`, with a disclosed commute estimate and nearest public `nearbyPlaces`. A generic multi-branch organization such as `ICBT Campus` returns HTTP 422 with `error.code=ambiguous_destination` and branch suggestions; `POST assistant/chat` returns the same choices as a conversational clarification. It is not a live traffic or road-routing API.
 
 ## Internal Flask API
 

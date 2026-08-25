@@ -12,6 +12,6 @@ class Institution extends Model
 
     protected function casts(): array
     {
-        return ['latitude' => 'float', 'longitude' => 'float', 'active' => 'boolean'];
+        return ['aliases' => 'array', 'latitude' => 'float', 'longitude' => 'float', 'active' => 'boolean'];
     }
 }

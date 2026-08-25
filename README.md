@@ -124,7 +124,9 @@ cd ai-service
 .venv\Scripts\python prepare_data.py ..\datasets\raw\fixture_reviews.jsonl --kind reviews --out ..\datasets\processed
 
 # Reproduce the submitted semantic-search fine-tune:
-.venv312\Scripts\python train_search.py --train ..\datasets\processed\smart-bodim-v1\search-train.jsonl --output ..\models\smart-bodim-minilm-v1 --base-model sentence-transformers/all-MiniLM-L6-v2 --epochs 2 --batch-size 8 --learning-rate 0.00002 --seed 42
+.venv312\Scripts\python generate_domain_dataset.py --output ..\datasets\raw\smart_bodim_search_pairs.jsonl
+.venv312\Scripts\python prepare_data.py ..\datasets\raw\smart_bodim_search_pairs.jsonl --kind search --out ..\datasets\processed\smart-bodim-v1 --seed 42
+.venv312\Scripts\python train_search.py --train ..\datasets\processed\smart-bodim-v1\search-train.jsonl --output ..\models\smart-bodim-minilm-v1 --base-model sentence-transformers/all-MiniLM-L6-v2 --epochs 2 --batch-size 16 --learning-rate 0.00002 --seed 42
 
 # Optional future sentiment fine-tune after adding a representative licensed review dataset:
 .venv\Scripts\python train_sentiment.py --train ..\datasets\processed\reviews-train.jsonl --validation ..\datasets\processed\reviews-validation.jsonl --output ..\models\sentiment-v1
@@ -132,7 +134,7 @@ cd ai-service
 
 Private data, credentials, uploads, virtual environments and build output are ignored. The delivery archive intentionally includes the trained search artifact and its model card.
 
-The submitted dataset is intentionally honest and reproducible: 24 synthetic seeded public listings are the live chatbot/search corpus; 48 CC0 domain search triples produce a deterministic 34/7/7 train/validation/test split; and 5 synthetic review samples validate the review pipeline. No Kaggle dataset is bundled or claimed. See `datasets/README.md` for exact provenance and intended use.
+The submitted dataset is intentionally honest and reproducible: 24 synthetic seeded public listings are the live chatbot/search corpus; 1,344 CC0 domain triples across 336 intent groups and 28 destinations produce a group-aware 944/200/200 train/validation/test split; and 5 synthetic review samples validate the review pipeline. Ten official ICBT branch names are modelled separately and paired with wrong-branch hard negatives. No Kaggle dataset is bundled or claimed. See `datasets/README.md` for exact provenance and intended use.
 
 ## Documentation
 
@@ -148,4 +150,4 @@ The submitted dataset is intentionally honest and reproducible: 24 synthetic see
 
 ## Model state and limitations
 
-The submission contains `smart-bodim-minilm-v1`, fine-tuned from `sentence-transformers/all-MiniLM-L6-v2` for two CPU epochs using Multiple Negatives Ranking Loss. On the seven-query synthetic held-out set, it records MRR 1.0 and Recall@1 1.0; the unchanged base model also scores 1.0, while the keyword baseline scores MRR 0.8571. This validates the pipeline but does not prove real-world superiority. Distance is straight-line Haversine and commute time is a disclosed estimate, not live routing. Sinhala/Tamil/transliterated quality requires a larger representative dataset.
+The submission contains `smart-bodim-minilm-v1`, fine-tuned from `sentence-transformers/all-MiniLM-L6-v2` for two CPU epochs using cosine triplet margin loss and explicit hard negatives. On the 200-query grouped synthetic held-out set, it records MRR 1.0 and Recall@1 1.0; the unchanged base model scores MRR 0.856167 and Recall@1 0.755, while the keyword baseline scores 0.937917/0.885. This validates the controlled branch-aware task but does not prove real-world superiority. Distance is straight-line Haversine and commute time is a disclosed estimate, not live routing. Sinhala/Tamil-script quality requires representative licensed data.

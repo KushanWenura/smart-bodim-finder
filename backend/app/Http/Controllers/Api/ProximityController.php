@@ -17,6 +17,8 @@ class ProximityController extends Controller
             'id' => $place->id,
             'name' => $place->name,
             'type' => $place->type,
+            'organizationName' => $place->organization_name,
+            'branchName' => $place->branch_name,
             'latitude' => $place->latitude,
             'longitude' => $place->longitude,
         ])->values()]);
@@ -30,7 +32,16 @@ class ProximityController extends Controller
             'maxPrice' => 'nullable|integer|min:5000|max:1000000',
             'facility' => 'nullable|string|max:100',
         ]);
-        $destination = $proximity->resolve($data['destination']);
+        $resolution = $proximity->resolution($data['destination']);
+        if ($resolution['status'] === 'ambiguous') {
+            return response()->json([
+                'message' => 'This institution has several branches. Select the branch you mean.',
+                'code' => 'ambiguous_destination',
+                'organization' => $resolution['organization'],
+                'suggestions' => $resolution['suggestions']->map(fn ($place) => ['id' => $place->id, 'name' => $place->name, 'branchName' => $place->branch_name])->values(),
+            ], 422);
+        }
+        $destination = $resolution['destination'];
         if (! $destination) {
             return response()->json(['message' => 'Destination not found in the supported campus and workplace directory.', 'suggestions' => $proximity->destinations()->pluck('name')->take(8)], 422);
         }
@@ -42,7 +53,7 @@ class ProximityController extends Controller
         $ranked = $proximity->annotate($query->limit(250)->get(), $destination)->filter(fn ($listing) => (float) $listing->distance_km <= $radius)->take(24)->values();
 
         return response()->json([
-            'destination' => ['id' => $destination->id, 'name' => $destination->name, 'type' => $destination->type, 'latitude' => $destination->latitude, 'longitude' => $destination->longitude],
+            'destination' => ['id' => $destination->id, 'name' => $destination->name, 'type' => $destination->type, 'organizationName' => $destination->organization_name, 'branchName' => $destination->branch_name, 'latitude' => $destination->latitude, 'longitude' => $destination->longitude],
             'data' => ListingResource::collection($ranked),
             'meta' => ['total' => $ranked->count(), 'radiusKm' => $radius, 'distanceMethod' => 'Haversine straight-line distance', 'commuteEstimate' => 'Distance-based estimate at 22 km/h; not live route time'],
         ]);

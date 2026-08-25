@@ -116,8 +116,52 @@ class SmartBodimApiTest extends TestCase
         });
     }
 
+    public function test_destination_directory_exposes_verified_icbt_branches(): void
+    {
+        $response = $this->getJson('/api/v1/destinations')->assertOk();
+        $branches = collect($response->json('data'))->where('organizationName', 'ICBT Campus')->values();
+
+        $this->assertCount(10, $branches);
+        $this->assertContains('Colombo', $branches->pluck('branchName'));
+        $this->assertContains('Kandy', $branches->pluck('branchName'));
+        $this->assertContains('Jaffna', $branches->pluck('branchName'));
+        $branches->each(fn (array $branch) => $this->assertNotEmpty($branch['name']));
+    }
+
+    public function test_generic_multi_branch_destination_requires_clarification(): void
+    {
+        $response = $this->getJson('/api/v1/proximity?destination=ICBT%20Campus&radiusKm=15')
+            ->assertUnprocessable()
+            ->assertJsonPath('code', 'ambiguous_destination')
+            ->assertJsonPath('organization', 'ICBT Campus');
+
+        $this->assertCount(10, $response->json('suggestions'));
+    }
+
+    public function test_chatbot_offers_branch_buttons_instead_of_guessing(): void
+    {
+        $response = $this->postJson('/api/v1/assistant/chat', ['message' => 'Find a room near ICBT Campus'])
+            ->assertOk()
+            ->assertJsonPath('search.mode', 'branch-clarification')
+            ->assertJsonPath('interpreted.destination.status', 'ambiguous');
+
+        $this->assertEmpty($response->json('results'));
+        $this->assertCount(10, $response->json('suggestions'));
+    }
+
+    public function test_chatbot_resolves_a_named_institution_branch(): void
+    {
+        Http::fake(['*/v1/search' => Http::response(['mode' => 'fixture-tfidf', 'results' => []])]);
+
+        $this->postJson('/api/v1/assistant/chat', ['message' => 'Find a room within 20 km of ICBT Kandy under Rs. 50000'])
+            ->assertOk()
+            ->assertJsonPath('interpreted.destination.name', 'ICBT Campus - Kandy')
+            ->assertJsonPath('interpreted.destination.branchName', 'Kandy');
+    }
+
     public function test_owner_submission_and_admin_approval_are_audited(): void
     {
+        Queue::fake();
         $owner = User::where('role', 'owner')->first();
         $listing = Listing::create(['owner_id' => $owner->id, 'public_slug' => 'SBF-TEST', 'title' => 'Complete test listing', 'description' => str_repeat('Valid property information. ', 3), 'property_type' => 'private_room', 'monthly_price_lkr' => 25000, 'public_area' => 'Malabe', 'city' => 'Colombo', 'district' => 'Colombo', 'latitude' => 6.9, 'longitude' => 79.95, 'gender_rule' => 'any', 'occupancy_limit' => 1, 'available' => true, 'status' => 'draft']);
         $listing->images()->create(['storage_path' => 'test.jpg', 'mime_type' => 'image/jpeg', 'byte_size' => 100, 'alt_text' => 'Test room', 'sort_order' => 0, 'is_cover' => true]);

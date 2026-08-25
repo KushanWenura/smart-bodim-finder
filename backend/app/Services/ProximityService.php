@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 
 class ProximityService
 {
-    private const ALIASES = [
+    private const LEGACY_ALIASES = [
         'University of Moratuwa' => ['uom', 'moratuwa university', 'katubedda campus'],
         'University of Colombo' => ['uoc', 'colombo university'],
         'University of Sri Jayewardenepura' => ['usj', 'jayewardenepura university', 'japura university'],
@@ -29,22 +29,62 @@ class ProximityService
 
     public function destinations(): Collection
     {
-        return Institution::query()->where('active', true)->orderBy('type')->orderBy('name')->get();
+        return Institution::query()->where('active', true)->orderBy('type')->orderBy('organization_name')->orderBy('branch_name')->orderBy('name')->get();
     }
 
     public function resolve(string $text): ?Institution
     {
-        $normalized = Str::of($text)->lower()->squish()->toString();
-        foreach ($this->destinations() as $destination) {
-            $needles = array_merge([$destination->name], self::ALIASES[$destination->name] ?? []);
-            foreach ($needles as $needle) {
-                if (str_contains($normalized, Str::lower($needle))) {
-                    return $destination;
-                }
+        $resolution = $this->resolution($text);
+
+        return $resolution['status'] === 'matched' ? $resolution['destination'] : null;
+    }
+
+    /**
+     * Resolve a destination without silently choosing the wrong branch.
+     *
+     * @return array{status:string,destination:?Institution,organization:?string,suggestions:Collection}
+     */
+    public function resolution(string $text): array
+    {
+        $normalized = $this->normalize($text);
+        $matches = $this->destinations()->map(function (Institution $destination) use ($normalized): ?array {
+            $needles = collect([$destination->name, $destination->organization_name])
+                ->merge($destination->aliases ?? [])
+                ->merge(self::LEGACY_ALIASES[$destination->name] ?? [])
+                ->filter()
+                ->map(fn ($needle) => $this->normalize((string) $needle))
+                ->filter()
+                ->unique();
+            $score = (int) ($needles->filter(fn ($needle) => str_contains($normalized, $needle))->map(fn ($needle) => mb_strlen($needle))->max() ?? 0);
+            if ($score === 0) {
+                return null;
             }
+            $branch = $this->normalize((string) $destination->branch_name);
+            if ($branch !== '' && str_contains($normalized, $branch)) {
+                $score += 1000;
+            }
+
+            return ['destination' => $destination, 'score' => $score];
+        })->filter()->values();
+
+        if ($matches->isEmpty()) {
+            return ['status' => 'not_found', 'destination' => null, 'organization' => null, 'suggestions' => collect()];
         }
 
-        return null;
+        $highest = $matches->max('score');
+        $leaders = $matches->where('score', $highest)->pluck('destination')->sortBy('name')->values();
+        if ($leaders->count() === 1) {
+            return ['status' => 'matched', 'destination' => $leaders->first(), 'organization' => $leaders->first()->organization_name, 'suggestions' => collect()];
+        }
+
+        $organizations = $leaders->pluck('organization_name')->filter()->unique()->values();
+
+        return [
+            'status' => 'ambiguous',
+            'destination' => null,
+            'organization' => $organizations->count() === 1 ? $organizations->first() : null,
+            'suggestions' => $leaders,
+        ];
     }
 
     public function annotate(Collection $listings, Institution $destination): Collection
@@ -67,5 +107,10 @@ class ProximityService
         $a = sin($latDelta / 2) ** 2 + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($lonDelta / 2) ** 2;
 
         return $earthRadiusKm * 2 * atan2(sqrt($a), sqrt(1 - $a));
+    }
+
+    private function normalize(string $value): string
+    {
+        return trim((string) preg_replace('/[^\pL\pN]+/u', ' ', Str::lower(Str::ascii($value))));
     }
 }

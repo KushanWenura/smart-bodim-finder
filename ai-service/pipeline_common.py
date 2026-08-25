@@ -31,7 +31,19 @@ def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def split_rows(rows: list[dict], seed: int, ratios=(0.7,0.15,0.15)) -> dict[str,list[dict]]:
+def split_rows(rows: list[dict], seed: int, ratios=(0.7,0.15,0.15), group_key: str | None = None) -> dict[str,list[dict]]:
+    if group_key and rows and all(row.get(group_key) for row in rows):
+        grouped: dict[str, list[dict]] = {}
+        for row in rows:
+            grouped.setdefault(str(row[group_key]), []).append(row)
+        keys = list(grouped)
+        random.Random(seed).shuffle(keys)
+        n = len(keys)
+        valid = max(1, int(n * ratios[1])) if n >= 3 else 0
+        test = max(1, int(n * ratios[2])) if n >= 3 else 0
+        train = n - valid - test
+        key_splits = {"train": keys[:train], "validation": keys[train:train + valid], "test": keys[train + valid:]}
+        return {name: [row for key in split_keys for row in grouped[key]] for name, split_keys in key_splits.items()}
     shuffled=list(rows);random.Random(seed).shuffle(shuffled);n=len(shuffled)
     if n>=3:valid=max(1,int(n*ratios[1]));test=max(1,int(n*ratios[2]));train=n-valid-test
     else:train=n;valid=test=0

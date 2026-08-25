@@ -5,18 +5,30 @@ $backendRoot = Join-Path $projectRoot 'backend'
 $frontendRoot = Join-Path $projectRoot 'frontend'
 $aiRoot = Join-Path $projectRoot 'ai-service'
 $pidFile = Join-Path $PSScriptRoot '.pids.json'
+$env:XDEBUG_MODE = 'off'
 
 if (Test-Path -LiteralPath $pidFile) {
-    Write-Host 'Smart Bodim services appear to be running. Run .\Run\stop-all.ps1 first.' -ForegroundColor Yellow
-    exit 1
+    try {
+        $previousState = Get-Content -LiteralPath $pidFile -Raw | ConvertFrom-Json
+        $liveProcesses = @($previousState.processIds | Where-Object { Get-Process -Id $_ -ErrorAction SilentlyContinue })
+    } catch {
+        $liveProcesses = @()
+    }
+    if ($liveProcesses.Count -gt 0) {
+        Write-Host 'Smart Bodim services are already running. Open http://127.0.0.1:5173 or run .\Run\stop-all.ps1 first.' -ForegroundColor Yellow
+        exit 1
+    }
+    Remove-Item -LiteralPath $pidFile -Force
+    Write-Host 'Removed an old launcher state from services that had already stopped.' -ForegroundColor Yellow
 }
 
-$php = (Get-Command php -ErrorAction SilentlyContinue).Source
-if (-not $php) {
-    $php = Get-ChildItem -LiteralPath 'C:\wamp64\bin\php' -Filter 'php.exe' -Recurse -ErrorAction SilentlyContinue |
+$preferredPhp = 'C:\wamp64\bin\php\php8.3.14\php.exe'
+$php = if (Test-Path -LiteralPath $preferredPhp) { $preferredPhp } else {
+    Get-ChildItem -LiteralPath 'C:\wamp64\bin\php' -Filter 'php.exe' -Recurse -ErrorAction SilentlyContinue |
         Sort-Object FullName -Descending |
         Select-Object -First 1 -ExpandProperty FullName
 }
+if (-not $php) { $php = (Get-Command php -ErrorAction SilentlyContinue).Source }
 
 $pnpm = (Get-Command pnpm -ErrorAction SilentlyContinue).Source
 if (-not $pnpm) {
@@ -71,6 +83,10 @@ if (-not (Test-Path -LiteralPath $sqlite)) {
     New-Item -ItemType File -Path $sqlite | Out-Null
     Push-Location $backendRoot
     try { & $php artisan migrate --seed --force }
+    finally { Pop-Location }
+} else {
+    Push-Location $backendRoot
+    try { & $php artisan migrate --force }
     finally { Pop-Location }
 }
 

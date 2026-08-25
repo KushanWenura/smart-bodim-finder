@@ -16,7 +16,7 @@ DistilBERT classifies; it does not generate prose. Every visible review is class
 
 ## Bodim AI chatbot request flow
 
-The floating assistant sends natural-language requests to Laravel's `POST /api/v1/assistant/chat` endpoint. Laravel interprets budget, gender, property type, facilities, Sri Lankan place names, campuses, workplaces and radius phrases. It calculates Haversine distance before sending only eligible public listing text to the Flask ranker. Results can include nearest bus, railway, supermarket, hospital and food records. If Flask is unavailable, structured and keyword fallback still return safe eligible results with a visible warning.
+The floating assistant sends natural-language requests to Laravel's `POST /api/v1/assistant/chat` endpoint. Laravel interprets budget, gender, property type, facilities, Sri Lankan place names, campuses, workplaces and radius phrases. Multi-branch institutions are resolved by organization, branch and aliases. A generic request such as `near ICBT Campus` returns branch-choice buttons; only an explicit branch such as `ICBT Kandy` is assigned coordinates. Laravel then calculates Haversine distance before sending only eligible public listing text to the Flask ranker. Results can include nearest bus, railway, supermarket, hospital and food records. If Flask is unavailable, structured and keyword fallback still return safe eligible results with a visible warning.
 
 This design deliberately keeps authorization and hard filters in Laravel. The AI service ranks candidate IDs only; it cannot reveal private addresses or reintroduce unpublished listings.
 
@@ -24,8 +24,8 @@ This design deliberately keeps authorization and hard filters in Laravel. The AI
 
 1. Place only legitimately licensed JSONL in `datasets/raw/` with `id`, source and license metadata.
 2. Run `validate_dataset.py` for schema/provenance/label/duplicate checks.
-3. Run `prepare_data.py`; it normalizes/deduplicates, produces seeded train/validation/test splits and SHA-256 manifest.
-4. Fine-tune search with `train_search.py` (Multiple Negatives Ranking Loss) and sentiment with `train_sentiment.py` (Transformers Trainer).
+3. Run `prepare_data.py`; it normalizes/deduplicates, keeps every `groupId` in one seeded split and writes a SHA-256 manifest.
+4. Fine-tune search with `train_search.py` (cosine triplet margin loss over explicit hard negatives) and sentiment with `train_sentiment.py` (Transformers Trainer).
 5. Run `evaluate_models.py`; it writes search MRR and keyword baseline, plus sentiment accuracy, per-class precision/recall/F1 and confusion matrix.
 6. Export a model card/run manifest, configure paths/versions, then run `build_index.py` on published/available listing JSON.
 
@@ -33,7 +33,7 @@ Exact commands are in the root README. Each training script records base model, 
 
 ## Current measured state
 
-The current search model was trained on the 34-row training split from 48 CC0 synthetic domain triples for two epochs with seed 42, batch size 8 and learning rate 2e-5. `models/smart-bodim-minilm-v1/evaluation.json` records pooled held-out retrieval on seven queries/14 documents: fine-tuned MRR and Recall@1 are 1.0; the unchanged base model also scores 1.0; keyword baseline MRR is 0.857143 and Recall@1 is 0.714286. These small synthetic values verify reproducibility, not production performance or real-world improvement.
+The current search model was trained on 944 rows from 1,344 CC0 synthetic domain triples for two epochs with seed 42, batch size 16 and learning rate 2e-5. The group-aware split contains 236/50/50 intent groups (944/200/200 rows) with zero overlap. `models/smart-bodim-minilm-v1/evaluation.json` records pooled held-out retrieval on 200 queries: fine-tuned MRR/Recall@1 are 1.0/1.0; unchanged base MiniLM scores 0.856167/0.755; keyword baseline scores 0.937917/0.885. These synthetic values verify the controlled branch-aware task and reproducibility, not production performance or unbiased real-world accuracy.
 
 At runtime, retrieval uses the current database corpus (24 synthetic seeded public listings in the submission) rather than treating the tiny evaluation fixtures as real accommodation data. No Kaggle source is bundled or claimed.
 

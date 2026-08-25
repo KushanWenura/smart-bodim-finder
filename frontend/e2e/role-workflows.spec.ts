@@ -34,6 +34,21 @@ test('guest can search and open a public listing without a private address', asy
   await expect(page.locator('body')).not.toContainText(/exact street address/i);
 });
 
+test('Bodim AI asks for an exact branch before ranking a multi-branch campus', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Open Bodim AI assistant' }).click();
+  await page.getByPlaceholder(/Campus, workplace, budget/i).fill('Find a room near ICBT Campus');
+  await page.getByRole('button', { name: 'Send to Bodim AI' }).click();
+
+  await expect(page.getByText(/has several branches in Sri Lanka/i)).toBeVisible();
+  const branches = page.locator('[aria-label="Choose a destination branch"]');
+  await expect(branches.getByRole('button')).toHaveCount(10);
+  await branches.getByRole('button', { name: 'ICBT Campus - Kandy' }).click();
+
+  await expect(page.getByText(/verified places near ICBT Campus - Kandy/i)).toBeVisible();
+  await expect(page.locator('.sb-ai-results > a').first()).toBeVisible();
+});
+
 test('tenant reaches protected shortlist, messages and saved-search workflows', async ({ page }) => {
   await login(page, 'tenant');
   await expect(page.getByRole('heading', { name: /Welcome back/i })).toBeVisible();

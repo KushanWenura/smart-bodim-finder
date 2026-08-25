@@ -20,9 +20,29 @@ class SearchController extends Controller
         $normalized = mb_strtolower($message);
         $query = Listing::publiclyVisible()->with(['owner', 'facilities', 'images', 'nearbyPlaces']);
         $interpreted = [];
-        $destination = $proximity->resolve($message);
+        $destinationResolution = $proximity->resolution($message);
+        if ($destinationResolution['status'] === 'ambiguous') {
+            $suggestions = $destinationResolution['suggestions']->map(fn ($place) => [
+                'id' => $place->id,
+                'name' => $place->name,
+                'branchName' => $place->branch_name,
+            ])->values();
+            $organization = $destinationResolution['organization'] ?? 'That institution';
+            $interpreted['destination'] = ['status' => 'ambiguous', 'organization' => $organization];
+            SearchLog::create(['user_id' => $request->user()?->id, 'sanitized_query' => $message, 'filters' => $interpreted, 'result_count' => 0, 'mode' => 'assistant:branch-clarification', 'latency_ms' => 0]);
+
+            return response()->json([
+                'answer' => $organization.' has several branches in Sri Lanka. Which branch should I measure from?',
+                'results' => [],
+                'suggestions' => $suggestions,
+                'interpreted' => $interpreted,
+                'search' => ['mode' => 'branch-clarification', 'aiOnline' => true, 'warning' => null],
+                'disclaimer' => 'Choose the correct branch so distance and nearby-place calculations use the right coordinates.',
+            ]);
+        }
+        $destination = $destinationResolution['destination'];
         if ($destination) {
-            $interpreted['destination'] = ['name' => $destination->name, 'type' => $destination->type];
+            $interpreted['destination'] = ['name' => $destination->name, 'type' => $destination->type, 'organizationName' => $destination->organization_name, 'branchName' => $destination->branch_name];
         }
 
         $nearbyAreas = ['maharagama' => ['Nugegoda', 'Homagama'], 'moratuwa' => ['Moratuwa', 'Dehiwala'], 'peradeniya' => ['Peradeniya', 'Kandy City'], 'malabe' => ['Malabe', 'Homagama']];
