@@ -49,35 +49,26 @@ export default function Home() {
         ].map(([icon, label, query]) => <button key={label} onClick={() => openAssistant(query)}><span>{icon}</span>{label}</button>)}</div>
       </div>
 
-      <div className="bb-match-preview" aria-label="Example Buddy AI result">
-        <header className="bb-match-preview-head">
-          <div><BuddyMark /><span><small>Live match preview</small><strong>Buddy checked 24 verified stays</strong></span></div>
-          <span className="bb-match-ready"><i className="bi bi-stars" /> Shortlist ready</span>
-        </header>
+      <div className="bb-buddy-orbit" aria-label="Animated example of Buddy finding a match">
+        <div className="bb-orbit-live"><span><i /> Buddy is matching your request</span><b>LIVE</b></div>
 
-        <div className="bb-match-preview-main">
-          <figure className="bb-match-property">
-            {lead?.image && <img src={lead.image} alt={lead.title} />}
-            <figcaption><span><i className="bi bi-trophy-fill" /> #1 ranked stay</span><strong>{lead?.title || 'Campus-ready private room'}</strong><small><i className="bi bi-geo-alt-fill" /> {lead?.area || 'Near your destination'}</small></figcaption>
-          </figure>
-
-          <div className="bb-match-decision">
-            <div className="bb-match-score"><div><strong>94</strong><small>%</small></div><span><b>Excellent fit</b><small>Based on your complete request</small></span></div>
-            <div className="bb-match-reasons">
-              <span><i className="bi bi-check2" /><b>Within budget</b><small>Rs. 10,500 left</small></span>
-              <span><i className="bi bi-check2" /><b>All must-haves</b><small>WiFi · AC · parking</small></span>
-              <span><i className="bi bi-signpost-split" /><b>Easy commute</b><small>1.8 km · about 8 min</small></span>
-            </div>
-            <button onClick={() => openAssistant()}>Create my shortlist <i className="bi bi-arrow-up-right" /></button>
-          </div>
+        <div className="bb-orbit-stage" aria-hidden="true">
+          <div className="bb-orbit-ring is-outer" />
+          <div className="bb-orbit-ring is-inner" />
+          <div className="bb-orbit-scan" />
+          <div className="bb-orbit-core"><BuddyMark /><strong>94%</strong><span>best fit found</span></div>
+          <span className="bb-orbit-chip is-place"><i className="bi bi-mortarboard" /><b>Near campus</b><small>1.8 km away</small></span>
+          <span className="bb-orbit-chip is-needs"><i className="bi bi-check2-circle" /><b>Must-haves</b><small>WiFi · AC · parking</small></span>
+          <span className="bb-orbit-chip is-budget"><i className="bi bi-wallet2" /><b>Under budget</b><small>Rs. 10,500 left</small></span>
         </div>
 
-        <div className="bb-match-nearby">
-          <span><small>Daily-life check</small><b>Useful places around the stay</b></span>
-          <div><i className="bi bi-bus-front" /><span><b>Bus</b><small>0.3 km</small></span></div>
-          <div><i className="bi bi-cart3" /><span><b>Food City</b><small>0.8 km</small></span></div>
-          <div><i className="bi bi-hospital" /><span><b>Hospital</b><small>1.4 km</small></span></div>
+        <div className="bb-orbit-result">
+          <span className="bb-orbit-result-photo">{lead?.image && <img src={lead.image} alt="" />}</span>
+          <span><small><i className="bi bi-trophy-fill" /> #1 best match</small><strong>{lead?.title || 'Campus-ready private room'}</strong><b><i className="bi bi-geo-alt-fill" /> {lead?.area || 'Near your destination'}</b></span>
+          <i className="bi bi-arrow-up-right" />
         </div>
+
+        <button className="bb-orbit-action" onClick={() => openAssistant()}>Find my best match <i className="bi bi-stars" /></button>
       </div>
     </div></section>
 
