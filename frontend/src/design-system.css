@@ -95,14 +95,19 @@ h1,h2,h3,h4{font-family:'Manrope','Segoe UI',sans-serif;letter-spacing:-.045em}
 .container{max-width:1320px}
 .bb-mark{width:48px;height:48px;display:inline-grid;place-items:center;flex:0 0 auto}
 .bb-mark svg{width:100%;height:100%;overflow:visible}
-.bb-mark-roof,.bb-mark-home{fill:var(--bb-ink)}
-.bb-mark-antenna,.bb-mark-smile{fill:none;stroke:var(--bb-paper);stroke-width:3;stroke-linecap:round}
+.bb-mark-home{fill:var(--bb-ink)}
+.bb-mark-roof{fill:var(--bb-green)}
+.bb-mark-face{fill:var(--bb-paper)}
+.bb-mark-antenna,.bb-mark-smile{fill:none;stroke:var(--bb-ink);stroke-width:2.7;stroke-linecap:round}
+.bb-mark-antenna-dot{fill:var(--bb-ink)}
 .bb-mark-eye{fill:var(--bb-sun)}
-.bb-mark-heart{fill:var(--bb-heart);stroke:var(--bb-paper);stroke-width:1.5}
+.bb-mark-cheek{fill:var(--bb-heart)}
+.bb-mark-heart{fill:var(--bb-heart);stroke:var(--bb-paper);stroke-width:2}
 .bb-mark.is-mini{width:27px;height:27px}
 .bb-brand{display:inline-flex;align-items:center;gap:11px;color:var(--bb-ink);text-decoration:none;white-space:nowrap}
 .bb-brand>span:last-child{display:grid}
 .bb-brand b{font:800 1.22rem/1 'Manrope',sans-serif;letter-spacing:-.055em}
+.bb-brand b>span{color:var(--bb-green)}
 .bb-brand b em{font-style:normal;color:var(--bb-heart)}
 .bb-brand small{font-size:.5rem;line-height:1.2;color:var(--bb-muted);text-transform:uppercase;letter-spacing:.13em;margin-top:5px;font-weight:750}
 .bb-brand.is-inverse{color:#fff}.bb-brand.is-inverse small{color:#9fb7af}.bb-brand.is-inverse .bb-mark-roof,.bb-brand.is-inverse .bb-mark-home{fill:var(--bb-mint)}.bb-brand.is-inverse .bb-mark-antenna,.bb-brand.is-inverse .bb-mark-smile{stroke:var(--bb-ink)}
@@ -271,3 +276,13 @@ h1,h2,h3,h4{font-family:'Manrope','Segoe UI',sans-serif;letter-spacing:-.045em}
   .auth-box h1{font-size:2.55rem}
   .auth-box .form{gap:12px;margin-top:21px}
 }
+
+/* Logo variants retain the two-tone house on dark surfaces */
+.bb-brand.is-inverse .bb-mark-roof,
+.auth-quote>.bb-mark-roof,
+.bb-local-snapshot>header .bb-mark-roof,
+.bb-review-layout .sb-review-summary .bb-mark-roof,
+.bb-footer-cta>.bb-mark-roof,
+.sb-ai-mini-avatar .bb-mark-roof,
+.bb-home-end .container>div>.bb-mark .bb-mark-roof{fill:var(--bb-heart)}
+.bb-ask-nav .bb-mark-roof{fill:var(--bb-heart)}

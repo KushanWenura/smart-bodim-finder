@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" role="img" aria-labelledby="title">
+  <title id="title">BodimBuddy house robot with a heart</title>
+  <path fill="#18213d" d="M12.5 30.5h47v24A11.5 11.5 0 0 1 48 66H24A11.5 11.5 0 0 1 12.5 54.5Z"/>
+  <path fill="#6257d8" d="M7.5 30.8 30 10.3a9 9 0 0 1 12 0l22.5 20.5-5.2 5.7L36 15.4 12.7 36.5Z"/>
+  <rect width="36" height="27" x="18" y="31" fill="#fff" rx="11"/>
+  <path fill="none" stroke="#18213d" stroke-linecap="round" stroke-width="2.7" d="M36 31v-4"/>
+  <circle cx="36" cy="26.5" r="2" fill="#18213d"/>
+  <circle cx="28" cy="42" r="2.7" fill="#ffbf69"/>
+  <circle cx="44" cy="42" r="2.7" fill="#ffbf69"/>
+  <circle cx="24.5" cy="49" r="1.6" fill="#f45f76"/>
+  <circle cx="47.5" cy="49" r="1.6" fill="#f45f76"/>
+  <path fill="none" stroke="#18213d" stroke-linecap="round" stroke-width="2.7" d="M29 49c4.2 3.4 9.8 3.4 14 0"/>
+  <path fill="#f45f76" stroke="#fff" stroke-width="2" d="M55.5 12.5c-4.5-5.3-13.2.7-4.6 8.4l4.6 3.9 4.6-3.9c8.6-7.7-.1-13.7-4.6-8.4Z"/>
+</svg>

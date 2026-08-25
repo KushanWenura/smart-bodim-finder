@@ -8,18 +8,21 @@ const money = (value: number) => `Rs. ${Number(value).toLocaleString('en-LK')}`;
 const initials = (name = '') => name.split(/\s+/).map(part => part[0]).slice(0, 2).join('').toUpperCase();
 
 export function BuddyMark({ className = '' }: { className?: string }) {
-  return <span className={`bb-mark ${className}`} aria-hidden="true"><svg viewBox="0 0 64 64" role="img">
-    <path className="bb-mark-roof" d="M7 29 29 9a4.5 4.5 0 0 1 6 0l22 20-4.8 5.2L32 16 11.8 34.2Z" />
-    <path className="bb-mark-home" d="M12 28.5h40V48a10 10 0 0 1-10 10H22a10 10 0 0 1-10-10Z" />
-    <path className="bb-mark-antenna" d="M32 22v-5" />
-    <circle className="bb-mark-eye" cx="24" cy="37" r="3" /><circle className="bb-mark-eye" cx="40" cy="37" r="3" />
-    <path className="bb-mark-smile" d="M25 46c4.2 3.2 9.8 3.2 14 0" />
-    <path className="bb-mark-heart" d="M47.5 18.7c-3.9-4.6-11.4.6-4 7.2l4 3.4 4-3.4c7.4-6.6-.1-11.8-4-7.2Z" />
+  return <span className={`bb-mark ${className}`} aria-hidden="true"><svg viewBox="0 0 72 72" role="img">
+    <path className="bb-mark-home" d="M12.5 30.5h47v24A11.5 11.5 0 0 1 48 66H24A11.5 11.5 0 0 1 12.5 54.5Z" />
+    <path className="bb-mark-roof" d="M7.5 30.8 30 10.3a9 9 0 0 1 12 0l22.5 20.5-5.2 5.7L36 15.4 12.7 36.5Z" />
+    <rect className="bb-mark-face" x="18" y="31" width="36" height="27" rx="11" />
+    <path className="bb-mark-antenna" d="M36 31v-4" />
+    <circle className="bb-mark-antenna-dot" cx="36" cy="26.5" r="2" />
+    <circle className="bb-mark-eye" cx="28" cy="42" r="2.7" /><circle className="bb-mark-eye" cx="44" cy="42" r="2.7" />
+    <circle className="bb-mark-cheek" cx="24.5" cy="49" r="1.6" /><circle className="bb-mark-cheek" cx="47.5" cy="49" r="1.6" />
+    <path className="bb-mark-smile" d="M29 49c4.2 3.4 9.8 3.4 14 0" />
+    <path className="bb-mark-heart" d="M55.5 12.5c-4.5-5.3-13.2.7-4.6 8.4l4.6 3.9 4.6-3.9c8.6-7.7-.1-13.7-4.6-8.4Z" />
   </svg></span>;
 }
 
 function Brand({ inverse = false }: { inverse?: boolean }) {
-  return <Link className={`bb-brand ${inverse ? 'is-inverse' : ''}`} to="/" aria-label="BodimBuddy.lk home"><BuddyMark /><span><b>BodimBuddy<em>.lk</em></b><small>Your friendly stay finder</small></span></Link>;
+  return <Link className={`bb-brand ${inverse ? 'is-inverse' : ''}`} to="/" aria-label="BodimBuddy.lk home"><BuddyMark /><span><b>Bodim<span>Buddy</span><em>.lk</em></b><small>Your friendly stay finder</small></span></Link>;
 }
 
 export function Header({ workspaceRole }: { workspaceRole?: Role } = {}) {
