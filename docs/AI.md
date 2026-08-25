@@ -14,7 +14,7 @@ The submitted search path is `models/smart-bodim-minilm-v1`, fine-tuned from `se
 
 DistilBERT classifies; it does not generate prose. Every visible review is classified sentence/document-wise, low confidence maps to `uncertain`, and a configurable phrase lexicon finds cleanliness, owner responsiveness, noise, safety, WiFi, food, bathroom, transport, location, price/value and utilities. A deterministic template mentions only aspects present in stored evidence. Fewer than two reviews produce an insufficient-data statement.
 
-## Bodim AI chatbot request flow
+## Buddy AI chatbot request flow
 
 The floating assistant sends natural-language requests to Laravel's `POST /api/v1/assistant/chat` endpoint. Laravel interprets budget ranges and `35k` shorthand, occupancy, furnished state, gender, property type, facilities and common aliases (`AC`, `A/C`, `car park`, `Wi-Fi`), Sri Lankan place names, campuses, workplaces, radius phrases and nearby-place priorities. Multi-branch institutions are resolved by organization, branch and aliases. A generic request such as `near ICBT Campus` returns branch-choice buttons; selecting a branch preserves the original constraints, and only an explicit branch such as `ICBT Kandy` is assigned coordinates. The assistant retains at most three previous user messages for explicit refinements such as `make it cheaper` or `only within 5 km`; it does not maintain an unrestricted transcript. Laravel then calculates Haversine distance before sending only eligible public listing text to the Flask ranker. Results can prioritize the nearest bus, railway, supermarket, hospital or food records. If Flask is unavailable, structured and keyword fallback still return safe eligible results with a visible warning.
 

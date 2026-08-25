@@ -14,7 +14,7 @@ describe('NeighbourhoodExplorer',()=>{
   it('opens the highlighted essentials map and filters distance cards',()=>{
     render(<NeighbourhoodExplorer latitude={6.91} longitude={79.95} label="Malabe" places={places}/>);
     expect(screen.getByText('Cargills Food City Malabe')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button',{name:/explore nearby with ai/i}));
+    fireEvent.click(screen.getByRole('button',{name:/explore nearby with buddy/i}));
     expect(screen.getByRole('region',{name:/test map with 3 places/i})).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button',{name:/hospitals/i}));
     expect(screen.getByText('Neville Fernando Teaching Hospital')).toBeInTheDocument();

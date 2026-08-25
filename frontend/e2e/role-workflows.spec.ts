@@ -23,8 +23,8 @@ test('guest can search and open a public listing without a private address', asy
   await expect(firstListing).toBeVisible();
   await firstListing.click();
   await expect(page).toHaveURL(/\/listing\/\d+$/);
-  await expect(page.getByRole('heading', { name: 'See what your daily life looks like here.' })).toBeVisible();
-  await page.getByRole('button', { name: /Explore nearby with AI/i }).first().click();
+  await expect(page.getByRole('heading', { name: 'See the neighbourhood, not just the room.' })).toBeVisible();
+  await page.getByRole('button', { name: /Open interactive map/i }).click();
   await expect(page.getByRole('region', { name: /Map of .* and 5 nearby essential places/i })).toBeVisible();
   const nearbyFilters = page.getByRole('group', { name: 'Filter nearby places' });
   await expect(nearbyFilters.getByRole('button', { name: /Cargills & markets/i })).toBeVisible();
@@ -34,11 +34,11 @@ test('guest can search and open a public listing without a private address', asy
   await expect(page.locator('body')).not.toContainText(/exact street address/i);
 });
 
-test('Bodim AI asks for an exact branch before ranking a multi-branch campus', async ({ page }) => {
+test('Buddy AI asks for an exact branch before ranking a multi-branch campus', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Open Bodim AI assistant' }).click();
+  await page.getByRole('button', { name: 'Open Buddy AI assistant' }).click();
   await page.getByPlaceholder(/Campus, budget, WiFi, AC, parking/i).fill('Find a room near ICBT Campus');
-  await page.getByRole('button', { name: 'Send to Bodim AI' }).click();
+  await page.getByRole('button', { name: 'Send to Buddy AI' }).click();
 
   await expect(page.getByText(/has several branches in Sri Lanka/i)).toBeVisible();
   const branches = page.locator('[aria-label="Choose a destination branch"]');
@@ -49,17 +49,17 @@ test('Bodim AI asks for an exact branch before ranking a multi-branch campus', a
   await expect(page.locator('.sb-ai-results > a').first()).toBeVisible();
 });
 
-test('Bodim AI applies strict requirements and explains the ranked best matches', async ({ page }) => {
+test('Buddy AI applies strict requirements and explains the ranked best matches', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Open Bodim AI assistant' }).click();
+  await page.getByRole('button', { name: 'Open Buddy AI assistant' }).click();
   await page.getByPlaceholder(/Campus, budget, WiFi, AC, parking/i).fill('Near University of Moratuwa Katubedda with WiFi, AC and car park under Rs. 35,000');
-  await page.getByRole('button', { name: 'Send to Bodim AI' }).click();
+  await page.getByRole('button', { name: 'Send to Buddy AI' }).click();
 
   await expect(page.getByText(/exact eligible matches near University of Moratuwa - Katubedda/i)).toBeVisible();
   const requirements = page.getByLabel('Applied requirements');
   await expect(requirements.getByText('Air conditioning', { exact: true })).toBeVisible();
   await expect(requirements.getByText('Parking', { exact: true })).toBeVisible();
-  await expect(page.getByText(/#1 Best match/i)).toBeVisible();
+  await expect(page.getByText(/#1 Best match/i).first()).toBeVisible();
   await expect(page.getByText(/% fit/i).first()).toBeVisible();
   await expect(page.getByText(/Includes all 3 requested facilities/i).first()).toBeVisible();
 });

@@ -19,7 +19,7 @@ export function TenantDashboard(){
   ];
   return <RoleLayout role="tenant">
     <section className="client-welcome">
-      <div className="client-welcome-copy"><span className="client-kicker"><i className="bi bi-stars"/> Personal stay assistant</span><h1>Welcome back, {user?.name.split(' ')[0]}.</h1><p>Tell Bodim AI where you study or work, what you can spend and what you need nearby. It will turn that into a practical shortlist.</p><div className="client-welcome-actions"><button className="btn client-primary" onClick={()=>openAi()}><i className="bi bi-stars"/> Ask Bodim AI</button><Link className="btn client-secondary" to="/nearby"><i className="bi bi-signpost-split"/> Find by destination</Link></div>
+      <div className="client-welcome-copy"><span className="client-kicker"><i className="bi bi-stars"/> Your personal stay Buddy</span><h1>Welcome back, {user?.name.split(' ')[0]}.</h1><p>Tell Buddy AI where you study or work, what you can spend and what you need nearby. It will turn that into a practical shortlist.</p><div className="client-welcome-actions"><button className="btn client-primary" onClick={()=>openAi()}><i className="bi bi-stars"/> Ask Buddy</button><Link className="btn client-secondary" to="/nearby"><i className="bi bi-signpost-split"/> Find by destination</Link></div>
       </div>
       <aside className="client-prompt"><div className="client-prompt-icon"><i className="bi bi-chat-quote"/></div><span>Try a natural request</span><strong>Find a WiFi room within 10 km of University of Moratuwa under Rs. 35,000.</strong><button onClick={()=>openAi('Find a WiFi room within 10 km of University of Moratuwa under Rs. 35,000')}>Use this request <i className="bi bi-arrow-right"/></button></aside>
     </section>

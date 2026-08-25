@@ -39,7 +39,7 @@ services:
     build: ./backend
     restart: unless-stopped
     environment: &backend-environment
-      APP_NAME: Smart Bodim Finder
+      APP_NAME: BodimBuddy.lk
       APP_ENV: local
       APP_KEY: ${APP_KEY:-base64:MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA=}
       APP_DEBUG: ${APP_DEBUG:-false}

@@ -7,6 +7,21 @@ import type { Listing, Role } from '../types';
 const money = (value: number) => `Rs. ${Number(value).toLocaleString('en-LK')}`;
 const initials = (name = '') => name.split(/\s+/).map(part => part[0]).slice(0, 2).join('').toUpperCase();
 
+export function BuddyMark({ className = '' }: { className?: string }) {
+  return <span className={`bb-mark ${className}`} aria-hidden="true"><svg viewBox="0 0 64 64" role="img">
+    <path className="bb-mark-roof" d="M7 29 29 9a4.5 4.5 0 0 1 6 0l22 20-4.8 5.2L32 16 11.8 34.2Z" />
+    <path className="bb-mark-home" d="M12 28.5h40V48a10 10 0 0 1-10 10H22a10 10 0 0 1-10-10Z" />
+    <path className="bb-mark-antenna" d="M32 22v-5" />
+    <circle className="bb-mark-eye" cx="24" cy="37" r="3" /><circle className="bb-mark-eye" cx="40" cy="37" r="3" />
+    <path className="bb-mark-smile" d="M25 46c4.2 3.2 9.8 3.2 14 0" />
+    <path className="bb-mark-heart" d="M47.5 18.7c-3.9-4.6-11.4.6-4 7.2l4 3.4 4-3.4c7.4-6.6-.1-11.8-4-7.2Z" />
+  </svg></span>;
+}
+
+function Brand({ inverse = false }: { inverse?: boolean }) {
+  return <Link className={`bb-brand ${inverse ? 'is-inverse' : ''}`} to="/" aria-label="BodimBuddy.lk home"><BuddyMark /><span><b>BodimBuddy<em>.lk</em></b><small>Your friendly stay finder</small></span></Link>;
+}
+
 export function Header({ workspaceRole }: { workspaceRole?: Role } = {}) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -16,20 +31,17 @@ export function Header({ workspaceRole }: { workspaceRole?: Role } = {}) {
   useEffect(() => setExpanded(false), [location.pathname]);
 
   return <>
-    {!workspaceRole && <div className="bw-trustbar"><div className="container"><span><i className="bi bi-patch-check-fill" /> Owner-verified stays</span><span><i className="bi bi-geo-alt-fill" /> Campus distance intelligence</span><span><i className="bi bi-shield-check" /> No platform payments</span></div></div>}
-    <header className={`sb-header ${workspaceRole ? 'sb-header-workspace' : ''}`}>
-      <nav className="navbar navbar-expand-lg container py-3" aria-label="Main navigation">
-        <Link className="navbar-brand sb-brand" to="/" aria-label="Bodimwise home">
-          <span className="sb-brand-icon"><i className="bi bi-house-heart-fill" /></span>
-          <span className="sb-brand-copy"><b>bodim<span>wise</span></b><small>Find your better base</small></span>
-        </Link>
+    {!workspaceRole && <div className="bb-trustbar"><div className="container"><span><i className="bi bi-heart-fill" /> Made for Sri Lankan renters</span><span><i className="bi bi-patch-check-fill" /> Human-verified owners</span><span><i className="bi bi-shield-check" /> View first · pay safely</span></div></div>}
+    <header className={`bb-header ${workspaceRole ? 'is-workspace' : ''}`}>
+      <nav className="navbar navbar-expand-lg container bb-navbar" aria-label="Main navigation">
+        <Brand />
         <button className="navbar-toggler border-0" type="button" aria-label="Toggle navigation" aria-expanded={expanded} onClick={() => setExpanded(!expanded)}><i className={`bi ${expanded ? 'bi-x-lg' : 'bi-list'}`} /></button>
         <div className={`collapse navbar-collapse ${expanded ? 'show' : ''}`}>
-          <div className="navbar-nav mx-auto">{workspaceRole
+          <div className="navbar-nav bb-navlinks">{workspaceRole
             ? <span className="sb-workspace-label"><i className="bi bi-grid-1x2-fill" /> {workspaceRole === 'admin' ? 'Operations' : workspaceRole === 'owner' ? 'Property workspace' : 'My workspace'}</span>
-            : <><NavLink className="nav-link" to="/search">Explore stays</NavLink><NavLink className="nav-link" to="/nearby">Near campus or work</NavLink><NavLink className="nav-link" to="/about">How it works</NavLink><NavLink className="nav-link" to="/safety">Stay safe</NavLink></>}
+            : <><NavLink className="nav-link" to="/search"><i className="bi bi-compass" /> Discover</NavLink><NavLink className="nav-link" to="/nearby"><i className="bi bi-signpost-split" /> Commute match</NavLink><NavLink className="nav-link" to="/about"><i className="bi bi-heart" /> Our story</NavLink><NavLink className="nav-link" to="/safety"><i className="bi bi-shield-check" /> Safety</NavLink></>}
           </div>
-          <div className="sb-nav-actions">{user ? <>
+          <div className="bb-nav-actions">{!workspaceRole && <button className="bb-ask-nav" onClick={() => window.dispatchEvent(new CustomEvent('smartbodim:open-assistant'))}><BuddyMark className="is-mini" /><span>Ask Buddy</span></button>}{user ? <>
             <Link className="sb-icon-btn" aria-label="Notifications" to={`/${user.role}/notifications`}><i className="bi bi-bell" /></Link>
             <Link className="sb-user-chip" to={roleHome(user.role)}><span>{initials(user.name)}</span><b>{user.name.split(' ')[0]}</b></Link>
             <button className="sb-text-button" onClick={async () => { await logout(); navigate('/'); }}>Log out</button>
@@ -45,16 +57,16 @@ export function Header({ workspaceRole }: { workspaceRole?: Role } = {}) {
 
 export function Footer() {
   const openAi = () => window.dispatchEvent(new CustomEvent('smartbodim:open-assistant'));
-  return <footer className="sb-footer">
+  return <footer className="bb-footer">
     <div className="container">
-      <section className="bw-footer-cta"><div><span><i className="bi bi-stars" /> Bodim AI</span><h2>Find a place around your real daily life.</h2><p>Describe your campus, workplace, budget and essentials in one sentence.</p></div><button onClick={openAi}>Start a smart search <i className="bi bi-arrow-right" /></button></section>
-      <div className="bw-footer-grid">
-        <div><Link className="sb-brand text-white" to="/"><span className="sb-brand-icon"><i className="bi bi-house-heart-fill" /></span><span className="sb-brand-copy"><b>bodim<span>wise</span></b><small>Find your better base</small></span></Link><p>A privacy-aware Sri Lankan accommodation platform combining verified listings, explainable AI matching and useful neighbourhood data.</p></div>
-        <div><h3>Find a place</h3><Link to="/search">Explore all stays</Link><Link to="/nearby">Search by destination</Link><button onClick={openAi}>Ask Bodim AI</button></div>
+      <section className="bb-footer-cta"><BuddyMark /><div><span>Meet your new rental sidekick</span><h2>Tell Buddy where life happens. We’ll find the room around it.</h2></div><button onClick={openAi}>Chat with Buddy <i className="bi bi-arrow-up-right" /></button></section>
+      <div className="bb-footer-grid">
+        <div><Brand inverse /><p>A friendly, privacy-aware Sri Lankan accommodation companion combining verified listings, transparent AI matching and practical neighbourhood data.</p></div>
+        <div><h3>Find your place</h3><Link to="/search">Browse every stay</Link><Link to="/nearby">Match my commute</Link><button onClick={openAi}>Ask Buddy AI</button></div>
         <div><h3>Learn</h3><Link to="/about">How matching works</Link><Link to="/safety">Safety guide</Link><Link to="/privacy">Privacy</Link></div>
         <div><h3>For property owners</h3><Link to="/register">Create an account</Link><Link to="/owner/create">List a property</Link><Link to="/terms">Listing standards</Link></div>
       </div>
-      <div className="sb-footer-bottom"><span>© 2026 Bodimwise · Smart Bodim Finder</span><span>Built for safer, shorter moves across Sri Lanka</span></div>
+      <div className="bb-footer-bottom"><span>© 2026 BodimBuddy.lk</span><span>Built with heart for safer, shorter moves across Sri Lanka 🇱🇰</span></div>
     </div>
   </footer>;
 }
@@ -90,7 +102,7 @@ const starterPrompts = [
 ];
 
 export function AiChatbot() {
-  const welcome: AssistantMessage = { id: 1, role: 'assistant', text: 'Ayubowan! I’m your Sri Lankan stay-finding assistant. Tell me where you study or work, your maximum monthly budget, and anything you cannot compromise on.' };
+  const welcome: AssistantMessage = { id: 1, role: 'assistant', text: 'Ayubowan! I’m Buddy, your Sri Lankan stay-finding sidekick. Tell me where you study or work, your maximum monthly budget, and anything you cannot compromise on.' };
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState('');
   const [busy, setBusy] = useState(false);
@@ -154,16 +166,16 @@ export function AiChatbot() {
   const submit = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); void ask(draft); };
 
   return <div className={`sb-ai ${open ? 'is-open' : ''}`}>
-    {open && <button className="sb-ai-backdrop" aria-label="Close Bodim AI assistant" onClick={() => setOpen(false)} />}
-    {open && <section className="sb-ai-window" role="dialog" aria-modal="true" aria-label="Bodim AI assistant">
+    {open && <button className="sb-ai-backdrop" aria-label="Close Buddy AI assistant" onClick={() => setOpen(false)} />}
+    {open && <section className="sb-ai-window" role="dialog" aria-modal="true" aria-label="Buddy AI assistant">
       <header className="sb-ai-head">
-        <div className="sb-ai-identity"><span className="sb-ai-avatar"><i className="bi bi-stars" /></span><div><strong>Bodim AI</strong><small><i /> Strict matching + transparent ranking</small></div></div>
-        <div className="sb-ai-head-actions"><button aria-label="Start a new Bodim AI conversation" onClick={reset}><i className="bi bi-arrow-counterclockwise" /></button><button aria-label="Close Bodim AI assistant" onClick={() => setOpen(false)}><i className="bi bi-x-lg" /></button></div>
+        <div className="sb-ai-identity"><span className="sb-ai-avatar"><BuddyMark /></span><div><strong>Buddy AI</strong><small><i /> Friendly guidance · honest ranking</small></div></div>
+        <div className="sb-ai-head-actions"><button aria-label="Start a new Buddy AI conversation" onClick={reset}><i className="bi bi-arrow-counterclockwise" /></button><button aria-label="Close Buddy AI assistant" onClick={() => setOpen(false)}><i className="bi bi-x-lg" /></button></div>
       </header>
       <div className="sb-ai-context"><span><i className="bi bi-shield-check" /> Exact addresses stay private</span><span><i className="bi bi-geo" /> Distances are estimates</span></div>
       <div className="sb-ai-messages" ref={listRef} aria-live="polite">
         {messages.map(message => <div className={`sb-ai-turn ${message.role}`} key={message.id}>
-          {message.role === 'assistant' && <span className="sb-ai-mini-avatar"><i className="bi bi-stars" /></span>}
+          {message.role === 'assistant' && <span className="sb-ai-mini-avatar"><BuddyMark /></span>}
           <div className="sb-ai-turn-content">
             <div className="sb-ai-bubble">{message.text}</div>
             {message.prompts?.length ? <div className="sb-ai-clarifications" aria-label="Choose a destination branch">{message.prompts.map(prompt => <button key={prompt.name} onClick={() => void ask(prompt.query || `Find a room near ${prompt.name}`)}><i className="bi bi-geo-alt" /><span>{prompt.name}</span><i className="bi bi-chevron-right" /></button>)}</div> : null}
@@ -182,13 +194,13 @@ export function AiChatbot() {
       </div>
       {messages.length === 1 && <div className="sb-ai-starters"><span>Try a guided search</span><div>{starterPrompts.map(prompt => <button key={prompt.label} onClick={() => void ask(prompt.query)}><i className={`bi ${prompt.icon}`} /><span><b>{prompt.label}</b><small>{prompt.query}</small></span><i className="bi bi-arrow-right" /></button>)}</div></div>}
       <form className="sb-ai-compose" onSubmit={submit}>
-        <label className="visually-hidden" htmlFor="bodim-ai-question">Ask Bodim AI</label>
+        <label className="visually-hidden" htmlFor="bodim-ai-question">Ask Buddy AI</label>
         <textarea ref={inputRef} id="bodim-ai-question" rows={1} value={draft} onChange={event => setDraft(event.target.value)} onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); void ask(draft); } }} maxLength={500} placeholder="Campus, budget, WiFi, AC, parking…" />
-        <div><small>{draft.length}/500</small><button aria-label="Send to Bodim AI" disabled={busy || draft.trim().length < 2}><i className="bi bi-arrow-up" /></button></div>
+        <div><small>{draft.length}/500</small><button aria-label="Send to Buddy AI" disabled={busy || draft.trim().length < 2}><i className="bi bi-arrow-up" /></button></div>
       </form>
       <footer><span><i className="bi bi-funnel" /> Hard filters first</span><span><i className="bi bi-bar-chart" /> Suitability ranked second</span></footer>
     </section>}
-    <button className="sb-ai-launcher" aria-label={open ? 'Close Bodim AI assistant' : 'Open Bodim AI assistant'} aria-expanded={open} onClick={() => setOpen(!open)}><span><i className="bi bi-stars" /></span><b>Ask Bodim AI</b><small>Find my best match</small></button>
+    <button className="sb-ai-launcher" aria-label={open ? 'Close Buddy AI assistant' : 'Open Buddy AI assistant'} aria-expanded={open} onClick={() => setOpen(!open)}><span><BuddyMark /></span><b>Ask Buddy</b><small>Your stay sidekick</small></button>
   </div>;
 }
 
@@ -206,7 +218,7 @@ export function RoleLayout({ role, children }: { role: Role; children: ReactNode
     <aside className="sb-sidebar">
       <div className="sb-side-profile"><span>{initials(user?.name)}</span><div><strong>{user?.name}</strong><small>{role === 'admin' ? 'Platform operations' : role === 'owner' ? 'Verified property partner' : 'Tenant account'}</small></div></div>
       <nav aria-label={`${role} workspace navigation`}>{links[role].map(([path, icon, label]) => <NavLink key={path} className={({ isActive }) => isActive ? 'active' : ''} to={`/${role}/${path}`}><i className={`bi ${icon}`} /><span>{label}</span></NavLink>)}</nav>
-      <div className="sb-side-help"><span><i className="bi bi-stars" /></span><strong>{role === 'tenant' ? 'Need a sharper match?' : role === 'owner' ? 'Improve your ranking' : 'System overview'}</strong><small>{role === 'tenant' ? 'Describe the whole need to Bodim AI.' : role === 'owner' ? 'Complete details help the right tenants find you.' : 'Review trust, content and AI health.'}</small><Link to={role === 'tenant' ? '/nearby' : `/${role}/${role === 'owner' ? 'listings' : 'dashboard'}`}>{role === 'tenant' ? 'Open smart finder' : 'View workspace'} <i className="bi bi-arrow-right" /></Link></div>
+      <div className="sb-side-help"><BuddyMark /><strong>{role === 'tenant' ? 'Buddy can help' : role === 'owner' ? 'Improve your ranking' : 'System overview'}</strong><small>{role === 'tenant' ? 'Describe your whole stay need in one message.' : role === 'owner' ? 'Complete details help the right tenants find you.' : 'Review trust, content and AI health.'}</small><Link to={role === 'tenant' ? '/nearby' : `/${role}/${role === 'owner' ? 'listings' : 'dashboard'}`}>{role === 'tenant' ? 'Open smart finder' : 'View workspace'} <i className="bi bi-arrow-right" /></Link></div>
     </aside>
     <section className="sb-dashboard"><div className="sb-dashboard-inner">{children}</div></section>
   </main>{role === 'tenant' && <AiChatbot />}</>;
