@@ -4,7 +4,7 @@
 
 | Layer | Command | Verified result on 2026-08-25 |
 |---|---|---|
-| Laravel feature/security/contract | `php artisan test` | 30 passed, 343 assertions |
+| Laravel feature/security/contract | `php artisan test` | 33 passed, 417 assertions |
 | Laravel formatting | `php vendor/bin/pint --test` | passed |
 | React type/build | `pnpm run lint && pnpm run build` | type-check/build passed; 234 modules with route code-splitting |
 | React component/security | `pnpm test` | 4 files, 7 tests passed |
@@ -23,13 +23,14 @@
 - PHP↔Flask ranking and index lifecycle contract, including campus/workplace interpretation, ordered Haversine results and five categories of nearby essentials.
 - Nationwide multi-branch institution ambiguity, constraint-preserving branch choices and exact-branch matching without silently guessing a campus.
 - Strict WiFi/AC/car-parking/budget filtering, descending composite suitability scores, numbered ranking labels and user-facing match explanations.
+- Conversational refinements preserve short-term context for requests such as “make it cheaper” or “only within 5 km”; occupancy, furnished state and nearby-place priorities remain enforceable requirements.
 - Frontend listing price/accessibility, chatbot launcher, role redirect and stored-XSS escaping.
 - Browser-level guest search/detail privacy, tenant protected tools, owner portfolio/wizard and admin AI/global-search workflows.
 - Flask canonical text, ranking, constraints, sentiment/aspects/summary, shared-secret and error schema.
 
 ## Browser acceptance scenarios
 
-The five read-safe core workflows in `frontend/e2e/role-workflows.spec.ts` are automated and verified at a desktop viewport. The following extended acceptance checklist should also be rerun against fresh seed data before a public release:
+The six read-safe core workflows in `frontend/e2e/role-workflows.spec.ts` are automated and verified at a desktop viewport. The following extended acceptance checklist should also be rerun against fresh seed data before a public release:
 
 1. Tenant login → search/filter/map → listing detail → favorite/compare → enquiry/reply → review → notification read.
 2. Owner login → profile/verification → four-step listing wizard/images → submit → view pending/history/rejection feedback → resubmit.

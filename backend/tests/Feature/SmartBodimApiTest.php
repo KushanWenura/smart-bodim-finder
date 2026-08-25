@@ -160,6 +160,49 @@ class SmartBodimApiTest extends TestCase
         });
     }
 
+    public function test_assistant_understands_k_budget_occupancy_furnished_and_nearby_priorities(): void
+    {
+        Http::fake(['*/v1/search' => Http::response(['mode' => 'fixture-tfidf', 'results' => []])]);
+
+        $response = $this->postJson('/api/v1/assistant/chat', [
+            'message' => 'Find a furnished room near University of Moratuwa Katubedda for two people with WiFi under 35k near Cargills',
+        ])->assertOk()
+            ->assertJsonPath('interpreted.destination.name', 'University of Moratuwa - Katubedda')
+            ->assertJsonPath('interpreted.maxPrice', 35000)
+            ->assertJsonPath('interpreted.occupancy', 2)
+            ->assertJsonPath('interpreted.furnished', true)
+            ->assertJsonPath('interpreted.nearbyPriorities.0', 'supermarket')
+            ->assertJsonCount(1, 'interpreted.nearbyPriorities');
+
+        $this->assertNotEmpty($response->json('results'));
+        $this->assertNotEmpty($response->json('followUps'));
+        collect($response->json('results'))->each(function (array $listing): void {
+            $this->assertLessThanOrEqual(35000, $listing['price']);
+            $this->assertGreaterThanOrEqual(2, $listing['occupancy']);
+            $this->assertTrue($listing['furnished']);
+            $this->assertContains('WiFi', $listing['facilities']);
+        });
+    }
+
+    public function test_assistant_uses_short_conversation_context_for_refinements(): void
+    {
+        Http::fake(['*/v1/search' => Http::response(['mode' => 'fixture-tfidf', 'results' => []])]);
+
+        $response = $this->postJson('/api/v1/assistant/chat', [
+            'message' => 'Make it cheaper and only within 5 km',
+            'context' => ['Find a WiFi room near University of Moratuwa Katubedda under 35k'],
+        ])->assertOk()
+            ->assertJsonPath('interpreted.destination.name', 'University of Moratuwa - Katubedda')
+            ->assertJsonPath('interpreted.maxPrice', 30000)
+            ->assertJsonPath('interpreted.radiusKm', 5);
+
+        $this->assertContains('WiFi', $response->json('interpreted.facilities'));
+        collect($response->json('results'))->each(function (array $listing): void {
+            $this->assertLessThanOrEqual(30000, $listing['price']);
+            $this->assertLessThanOrEqual(5, $listing['distanceKm']);
+        });
+    }
+
     public function test_destination_directory_exposes_verified_icbt_branches(): void
     {
         $response = $this->getJson('/api/v1/destinations')->assertOk();
