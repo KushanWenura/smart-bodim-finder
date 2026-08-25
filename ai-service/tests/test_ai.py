@@ -52,6 +52,15 @@ class ReviewTests(unittest.TestCase):
         self.assertEqual(result["sampleSize"], 3)
         self.assertIn("Based on 3 reviews", result["summary"])
 
+    def test_summary_does_not_praise_a_mixed_noise_aspect(self):
+        result = ai.summarize_reviews([
+            "The room was quiet and the owner was helpful",
+            "Reliable wifi and the owner responds quickly",
+            "The room was clean, although traffic noise is noticeable",
+        ])
+        self.assertNotIn("praised noise", result["summary"])
+        self.assertNotIn("noise", result["aspects"]["praised"])
+
     def test_negation_changes_sentiment_instead_of_counting_positive_word(self):
         result = ai.analyze_review("The room was not clean and not safe")
         self.assertEqual(result["label"], "negative")

@@ -9,7 +9,7 @@ import { BuddyMark, PublicLayout } from '../components/Shell';
 import type { Listing } from '../types';
 
 const money = (value: number) => new Intl.NumberFormat('en-LK', { style: 'currency', currency: 'LKR', maximumFractionDigits: 0 }).format(value).replace('LKR', 'Rs.');
-type Detail = { data: Listing; favorite: boolean; reviews: Array<{ id: number; rating: number; body: string; tenant: { name: string } }>; reviewSummary: { summary: string; sampleSize: number; online?: boolean }; related: Listing[] };
+type Detail = { data: Listing; favorite: boolean; reviews: Array<{ id: number; rating: number; body: string; created_at?: string; tenant: { name: string } }>; reviewSummary: { summary: string; sampleSize: number; online?: boolean }; related: Listing[] };
 
 export default function ListingDetail() {
   const { id } = useParams();
@@ -21,8 +21,10 @@ export default function ListingDetail() {
   const [error, setError] = useState('');
   const [saved, setSaved] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
+  const [reviewsOpen, setReviewsOpen] = useState(false);
   const { data, isLoading } = useQuery({ queryKey: ['listing', id], queryFn: async () => (await api.get(`/listings/${id}`)).data as Detail });
   useEffect(() => { if (data) setSaved(Boolean(data.favorite)); }, [data]);
+  useEffect(() => { setReviewsOpen(false); }, [id]);
   const review = useMutation({ mutationFn: (body: unknown) => api.post('/reviews', body), onSuccess: () => queryClient.invalidateQueries({ queryKey: ['listing', id] }) });
   const favorite = useMutation({ mutationFn: () => saved ? api.delete(`/favorites/${id}`) : api.put(`/favorites/${id}`), onSuccess: response => { const next = Boolean(response.data.favorite); setSaved(next); setSaveMessage(next ? 'Saved to your shortlist.' : 'Removed from your shortlist.'); void queryClient.invalidateQueries({ queryKey: ['favorites'] }); }, onError: exception => setError((exception as { message?: string }).message || 'Could not update your shortlist.') });
   const enquiry = useMutation({ mutationFn: (text: string) => api.post('/conversations', { listingId: Number(id), text }), onSuccess: () => navigate('/tenant/messages') });
@@ -33,6 +35,8 @@ export default function ListingDetail() {
   const startEnquiry = () => { if (!user) return navigate('/login'); if (user.role !== 'tenant') return setError('Only tenant accounts can start property enquiries.'); setEnquiring(true); };
   const openNeighbourhood = () => window.dispatchEvent(new CustomEvent('smartbodim:open-neighbourhood'));
   const nearby = item.nearbyPlaces?.slice().sort((a, b) => a.distanceM - b.distanceM) || [];
+  const reviewCount = data.reviews.length;
+  const reviewRegionId = `listing-${item.id}-original-reviews`;
 
   return <PublicLayout><section className="bb-detail"><div className="container">
     <nav className="bb-breadcrumb"><Link to="/search"><i className="bi bi-arrow-left" /> Back to stays</Link><span>{item.slug}</span></nav>
@@ -62,7 +66,36 @@ export default function ListingDetail() {
 
     {item.nearbyPlaces?.length ? <section className="bb-neighbourhood-block"><div className="bb-block-heading"><div><span>Explore the everyday</span><h2>See the neighbourhood, not just the room.</h2><p>Compare transport, groceries, healthcare and food around the privacy-safe property marker.</p></div><button onClick={openNeighbourhood}>Open interactive map <i className="bi bi-arrow-down" /></button></div><NeighbourhoodExplorer latitude={item.latitude} longitude={item.longitude} label={`${item.area}, ${item.city}`} places={item.nearbyPlaces} autoOpen={location.hash === '#neighbourhood-explorer'} /></section> : null}
 
-    <section className="bb-resident-section"><div className="bb-block-heading"><div><span>Resident experiences</span><h2>What people noticed after moving in.</h2></div></div><div className="bb-review-layout"><div className="sb-review-summary"><BuddyMark /><div><strong>Buddy evidence summary</strong><p>{data.reviewSummary.summary}</p><small>Based on {data.reviewSummary.sampleSize} visible reviews. This summarizes opinions, not verified facts.</small></div></div><div>{data.reviews.map(entry => <article className="sb-review" key={entry.id}><div><strong>{entry.tenant?.name}</strong><span>{'★'.repeat(entry.rating)}</span></div><p>{entry.body}</p></article>)}</div></div>{user?.role === 'tenant' && <form className="sb-review-form" onSubmit={submitReview}><h3>Share your experience</h3><div className="row g-3"><div className="col-md-3"><select className="form-select" name="rating"><option value="5">5 — Excellent</option><option value="4">4 — Good</option><option value="3">3 — Fair</option><option value="2">2 — Poor</option><option value="1">1 — Very poor</option></select></div><div className="col-md-9"><textarea className="form-control" aria-label="Review text" name="text" required minLength={15} maxLength={2000} placeholder="Describe cleanliness, safety, noise, owner response…" /></div></div><button className="btn sb-btn-primary mt-3">Publish or update review</button></form>}</section>
+    <section className="bb-resident-section">
+      <div className="bb-block-heading"><div><span>Resident experiences</span><h2>What people noticed after moving in.</h2><p>Start with Buddy’s quick summary, then open the original reviews whenever you want the full story.</p></div></div>
+      <div className="bb-review-experience">
+        <div className="sb-review-summary">
+          <BuddyMark />
+          <div><span className="bb-ai-summary-label"><i className="bi bi-stars" /> AI review summary</span><strong>Buddy found the recurring themes</strong><p>{data.reviewSummary.summary}</p><small>Based on {data.reviewSummary.sampleSize} public {data.reviewSummary.sampleSize === 1 ? 'review' : 'reviews'}. This summarizes opinions, not verified facts.</small></div>
+        </div>
+        {reviewCount > 0 ? <button
+          type="button"
+          className={`bb-review-reveal ${reviewsOpen ? 'is-open' : ''}`}
+          aria-expanded={reviewsOpen}
+          aria-controls={reviewRegionId}
+          onClick={() => setReviewsOpen(open => !open)}
+        >
+          <span className="bb-review-reveal-icon" aria-hidden="true"><BuddyMark /><i className="bi bi-stars" /></span>
+          <span><strong>{reviewsOpen ? 'Hide original reviews' : `Read all ${reviewCount} original ${reviewCount === 1 ? 'review' : 'reviews'}`}</strong><small>{reviewsOpen ? 'Keep the page focused on Buddy’s summary' : 'See the exact, unedited words residents submitted'}</small></span>
+          <i className={`bi ${reviewsOpen ? 'bi-chevron-up' : 'bi-arrow-down'}`} aria-hidden="true" />
+        </button> : <div className="bb-review-empty"><i className="bi bi-chat-heart" /><span><strong>No public reviews yet</strong><small>When residents share an experience, Buddy will summarize the common themes here.</small></span></div>}
+      </div>
+
+      {reviewsOpen && <div className="bb-original-reviews" id={reviewRegionId} role="region" aria-label="Original resident reviews">
+        <header><div><span>Original resident reviews</span><h3>Read it in their own words.</h3></div><b><i className="bi bi-shield-check" /> Never rewritten by AI</b></header>
+        <div className="bb-original-review-grid">{data.reviews.map(entry => <article className="sb-review" key={entry.id}>
+          <div className="bb-review-author"><span aria-hidden="true">{entry.tenant?.name?.split(' ').map(part => part[0]).join('').slice(0, 2) || 'R'}</span><div><strong>{entry.tenant?.name || 'Verified resident'}</strong><small>Resident review</small></div><b aria-label={`${entry.rating} out of 5 stars`}>{'★'.repeat(entry.rating)}<i>{'★'.repeat(5 - entry.rating)}</i></b></div>
+          <p>“{entry.body}”</p>
+        </article>)}</div>
+      </div>}
+
+      {user?.role === 'tenant' && <form className="sb-review-form" onSubmit={submitReview}><h3>Share your experience</h3><div className="row g-3"><div className="col-md-3"><select className="form-select" name="rating"><option value="5">5 — Excellent</option><option value="4">4 — Good</option><option value="3">3 — Fair</option><option value="2">2 — Poor</option><option value="1">1 — Very poor</option></select></div><div className="col-md-9"><textarea className="form-control" aria-label="Review text" name="text" required minLength={15} maxLength={2000} placeholder="Describe cleanliness, safety, noise, owner response…" /></div></div><button className="btn sb-btn-primary mt-3">Publish or update review</button></form>}
+    </section>
 
     <section className="bb-host-promise"><div className="bb-host"><span>{item.ownerName?.slice(0, 2)}</span><div><small>Your host</small><strong>{item.ownerName}</strong><b><i className="bi bi-patch-check-fill" /> Verified owner</b></div></div><div><i className="bi bi-shield-heart" /><span><strong>Buddy’s safe-renting reminder</strong><small>Visit the property, meet the owner and verify everything independently before paying.</small></span></div></section>
 

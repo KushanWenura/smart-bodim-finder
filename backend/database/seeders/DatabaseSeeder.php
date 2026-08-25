@@ -62,6 +62,7 @@ class DatabaseSeeder extends Seeder
 
         $this->seedModelVersions();
         $this->call(SriLankanListingSeeder::class);
+        $this->call(ReviewExperienceSeeder::class);
         $this->seedNotifications($owner, $tenant);
     }
 

@@ -30,7 +30,7 @@ app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = MAX_BODY
 
 POSITIVE = {"clean", "quiet", "safe", "friendly", "reliable", "good", "great", "excellent", "helpful", "peaceful", "convenient", "quickly", "comfortable", "පිරිසිදු", "නිස්කලංක", "ආරක්ෂිත", "හොඳ", "සුවපහසු", "சுத்தம்", "அமைதி", "பாதுகாப்பான", "நல்ல", "வசதியான"}
-NEGATIVE = {"dirty", "noisy", "noise", "unsafe", "rude", "poor", "bad", "broken", "slow", "expensive", "crowded", "smell", "unreliable", "අපිරිසිදු", "ශබ්ද", "අනාරක්ෂිත", "නරක", "කැඩුණු", "அழுக்கு", "சத்தம்", "பாதுகாப்பற்ற", "மோசம்", "உடைந்த"}
+NEGATIVE = {"dirty", "noisy", "noise", "traffic", "unsafe", "rude", "poor", "bad", "broken", "slow", "expensive", "crowded", "smell", "unreliable", "අපිරිසිදු", "ශබ්ද", "අනාරක්ෂිත", "නරක", "කැඩුණු", "அழுக்கு", "சத்தம்", "பாதுகாப்பற்ற", "மோசம்", "உடைந்த"}
 NEGATIONS = {"not", "no", "never", "without", "isn't", "wasn't", "නැහැ", "නොවේ", "නෑ", "இல்லை", "அல்ல"}
 ASPECTS = {
     "cleanliness": {"clean", "cleaner", "dirty", "tidy", "smell", "පිරිසිදු", "අපිරිසිදු", "சுத்தம்", "அழுக்கு"},
@@ -141,18 +141,15 @@ def summarize_reviews(reviews: list[str]) -> dict[str, Any]:
         return {"summary": "Not enough reviews for a reliable summary.", "sampleSize": len(clean_reviews), "aspects": [], "modelVersion": SENTIMENT_VERSION}
     analyses = [analyze_review(review) for review in clean_reviews]
     positive_aspects, negative_aspects = Counter(), Counter()
-    for text, analysis in zip(clean_reviews, analyses):
-        lowered = text.lower()
+    for analysis in analyses:
         for aspect in analysis["aspects"]:
-            phrases = ASPECTS[aspect]
-            positive_hits = sum(word in lowered for word in phrases & POSITIVE)
-            negative_hits = sum(word in lowered for word in phrases & NEGATIVE)
-            if analysis["label"] == "positive" or positive_hits > negative_hits:
+            aspect_label = analysis["aspectSentiment"].get(aspect, "mixed")
+            if aspect_label == "positive":
                 positive_aspects[aspect] += 1
-            elif analysis["label"] == "negative" or negative_hits > positive_hits:
+            elif aspect_label == "negative":
                 negative_aspects[aspect] += 1
-    praised = [name for name, count in positive_aspects.most_common(2) if count >= 1]
-    concerns = [name for name, count in negative_aspects.most_common(1) if count >= 1 and name not in praised]
+    praised = [name for name, count in positive_aspects.most_common() if count > negative_aspects[name]][:2]
+    concerns = [name for name, count in negative_aspects.most_common() if count > positive_aspects[name]][:1]
     if praised:
         summary = "Most reviewers praised " + " and ".join(praised)
         if concerns:

@@ -9,9 +9,9 @@
 | React type/build | `pnpm run lint && pnpm run build` | type-check/build passed; 234 modules with route code-splitting |
 | React component/security | `pnpm test` | 4 files, 7 tests passed |
 | Playwright browser workflows | `pnpm run test:e2e` | 6 role/guest/branch-clarification/strict-ranking workflows passed against the live stack in system Edge |
-| Flask unit/API/FAISS lifecycle | `python -m pytest ai-service/tests -q` | 19 passed |
+| Flask unit/API/FAISS lifecycle | `python -m pytest ai-service/tests -q` | 20 passed |
 | Fine-tuned search evaluation | `python ai-service/evaluate_search_model.py ...` | 1,152-query group-held-out MRR 0.9795/Recall@1 0.9644; base MiniLM MRR 0.6977/Recall@1 0.5625; keyword MRR 0.8234/Recall@1 0.7526 |
-| MySQL migration/seed | environment override + `artisan migrate --seed` | 35 tables, 4 users, 24 listings, 5 reviews; final migration verified |
+| MySQL migration/seed | environment override + `artisan migrate --seed` | 35 tables, 6 users, 24 listings, 7 reviews; final migration verified |
 
 ## Covered behavior
 
