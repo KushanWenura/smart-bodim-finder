@@ -49,26 +49,12 @@ export default function Home() {
         ].map(([icon, label, query]) => <button key={label} onClick={() => openAssistant(query)}><span>{icon}</span>{label}</button>)}</div>
       </div>
 
-      <div className="bb-buddy-orbit" aria-label="Animated example of Buddy finding a match">
-        <div className="bb-orbit-live"><span><i /> Buddy is matching your request</span><b>LIVE</b></div>
-
-        <div className="bb-orbit-stage" aria-hidden="true">
-          <div className="bb-orbit-ring is-outer" />
-          <div className="bb-orbit-ring is-inner" />
-          <div className="bb-orbit-scan" />
-          <div className="bb-orbit-core"><BuddyMark /><strong>94%</strong><span>best fit found</span></div>
-          <span className="bb-orbit-chip is-place"><i className="bi bi-mortarboard" /><b>Near campus</b><small>1.8 km away</small></span>
-          <span className="bb-orbit-chip is-needs"><i className="bi bi-check2-circle" /><b>Must-haves</b><small>WiFi · AC · parking</small></span>
-          <span className="bb-orbit-chip is-budget"><i className="bi bi-wallet2" /><b>Under budget</b><small>Rs. 10,500 left</small></span>
-        </div>
-
-        <div className="bb-orbit-result">
-          <span className="bb-orbit-result-photo">{lead?.image && <img src={lead.image} alt="" />}</span>
-          <span><small><i className="bi bi-trophy-fill" /> #1 best match</small><strong>{lead?.title || 'Campus-ready private room'}</strong><b><i className="bi bi-geo-alt-fill" /> {lead?.area || 'Near your destination'}</b></span>
-          <i className="bi bi-arrow-up-right" />
-        </div>
-
-        <button className="bb-orbit-action" onClick={() => openAssistant()}>Find my best match <i className="bi bi-stars" /></button>
+      <div className="bb-home-board" aria-label="Example Buddy AI result">
+        <div className="bb-board-top"><div><span>Buddy’s pick for you</span><strong>One clear shortlist, not endless scrolling.</strong></div><b>94<small>% fit</small></b></div>
+        <div className="bb-board-photo">{lead?.image && <img src={lead.image} alt={lead.title} />}<div><span>#1 best match</span><strong>{lead?.title || 'Campus-ready private room'}</strong><small><i className="bi bi-geo-alt-fill" /> {lead?.area || 'Near your destination'}</small></div></div>
+        <div className="bb-board-checks"><div><i className="bi bi-check2" /><span><b>Every must-have</b><small>WiFi · budget · room rule</small></span></div><div><i className="bi bi-signpost-split" /><span><b>1.8 km away</b><small>Distance from your branch</small></span></div></div>
+        <div className="bb-board-route"><span><i className="bi bi-bus-front" /><b>Bus</b><small>0.3 km</small></span><span><i className="bi bi-cart3" /><b>Food City</b><small>0.8 km</small></span><span><i className="bi bi-hospital" /><b>Hospital</b><small>1.4 km</small></span></div>
+        <button onClick={() => openAssistant()}>Build my own shortlist <i className="bi bi-arrow-right" /></button>
       </div>
     </div></section>
 
