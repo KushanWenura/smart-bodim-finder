@@ -135,7 +135,7 @@ cd ai-service
 
 Private data, credentials, uploads, virtual environments and build output are ignored. The delivery archive intentionally includes the trained search artifact and its model card.
 
-The submitted dataset is intentionally honest and reproducible: 24 synthetic seeded public listings are the live chatbot/search corpus; 7,680 CC0 domain triples across 1,920 intent groups and 160 destinations produce a group-aware 5,376/1,152/1,152 train/validation/test split; and 5 synthetic review samples validate the review pipeline. The catalog contains 152 higher-education destinations across 41 organizations plus 8 workplaces. Official physical branches are modelled separately and paired with same-organization wrong-branch hard negatives. No Kaggle dataset is bundled or claimed. See `datasets/README.md` for exact scope, provenance and limitations.
+The submitted dataset is intentionally honest and reproducible: 24 individually written synthetic Sri Lankan listings across 24 areas are the live chatbot/search corpus; each has a distinct locally stored image generated specifically for this project. The training data contains 7,680 CC0 domain triples across 1,920 intent groups and 160 destinations, producing a group-aware 5,376/1,152/1,152 train/validation/test split; 5 synthetic review samples validate the review pipeline. The destination catalog contains 152 higher-education locations across 41 organizations plus 8 workplaces. Official physical branches are modelled separately and paired with same-organization wrong-branch hard negatives. No Kaggle dataset or third-party property photograph is bundled or claimed. See `datasets/README.md` for exact scope, provenance and limitations.
 
 ## Documentation
 

@@ -9,7 +9,17 @@ class ListingResource extends JsonResource
 {
     private function imageUrl(?string $path): ?string
     {
-        return ! $path ? null : (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') ? $path : asset('storage/'.$path));
+        if (! $path) {
+            return null;
+        }
+
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+
+        return str_starts_with($path, '/')
+            ? asset(ltrim($path, '/'))
+            : asset('storage/'.$path);
     }
 
     public function toArray(Request $request): array

@@ -25,6 +25,21 @@ class SmartBodimApiTest extends TestCase
         $this->seed();
     }
 
+    public function test_seeded_catalogue_contains_24_unique_sri_lankan_listings_and_local_photos(): void
+    {
+        $this->assertSame(24, Listing::count());
+        $this->assertSame(24, Listing::query()->distinct()->count('title'));
+        $this->assertSame(24, Listing::query()->distinct()->count('description'));
+        $this->assertSame(24, DB::table('listing_images')->count());
+        $this->assertSame(24, DB::table('listing_images')->distinct()->count('storage_path'));
+        $this->assertSame(120, DB::table('listing_nearby_places')->count());
+
+        DB::table('listing_images')->pluck('storage_path')->each(function (string $path): void {
+            $this->assertStringStartsWith('/images/listings/', $path);
+            $this->assertFileExists(public_path(ltrim($path, '/')));
+        });
+    }
+
     public function test_public_listing_filters_only_return_eligible_results(): void
     {
         $response = $this->getJson('/api/v1/listings?city=Colombo&maxPrice=30000&perPage=5')->assertOk();

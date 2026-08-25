@@ -37,7 +37,7 @@ Exact commands are in the root README. Each training script records base model, 
 
 The current search model is trained on 5,376 rows from 7,680 CC0 synthetic domain triples for two epochs with seed 42, batch size 16 and learning rate 2e-5. The group-aware split contains 1,344/288/288 intent groups (5,376/1,152/1,152 rows) with zero overlap. The source catalog contains 152 higher-education destinations across 41 organizations plus 8 workplaces. `models/smart-bodim-minilm-v1/evaluation.json` records the pooled held-out retrieval metrics. These synthetic values verify the controlled nationwide branch-aware task and reproducibility, not production performance or unbiased real-world accuracy.
 
-At runtime, retrieval uses the current database corpus (24 synthetic seeded public listings in the submission) rather than treating the tiny evaluation fixtures as real accommodation data. No Kaggle source is bundled or claimed.
+At runtime, retrieval uses the current database corpus (24 individually written synthetic Sri Lankan listings across 24 areas, with distinct local project images) rather than treating the tiny evaluation fixtures as real accommodation data. No Kaggle source or scraped property photography is bundled or claimed.
 
 ## Limitations and responsible use
 
