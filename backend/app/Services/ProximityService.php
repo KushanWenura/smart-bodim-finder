@@ -74,7 +74,13 @@ class ProximityService
         }
 
         $highest = $matches->max('score');
-        $leaders = $matches->where('score', $highest)->pluck('destination')->sortBy('name')->values();
+        $leaders = $matches->where('score', $highest)->pluck('destination')->sortBy(
+            fn (Institution $destination) => sprintf(
+                '%02d:%s',
+                $this->branchDisplayPriority($destination),
+                $destination->name,
+            )
+        )->values();
         if ($leaders->count() === 1) {
             return ['status' => 'matched', 'destination' => $leaders->first(), 'organization' => $leaders->first()->organization_name, 'suggestions' => collect()];
         }
@@ -119,5 +125,20 @@ class ProximityService
     private function normalize(string $value): string
     {
         return trim((string) preg_replace('/[^\pL\pN]+/u', ' ', Str::lower(Str::ascii($value))));
+    }
+
+    /**
+     * Put the commonly understood main location first in a clarification list.
+     * This only changes display order; Buddy still requires an explicit click.
+     */
+    private function branchDisplayPriority(Institution $destination): int
+    {
+        $branch = $this->normalize((string) $destination->branch_name);
+
+        if (str_contains($branch, 'main campus')) {
+            return 0;
+        }
+
+        return in_array($branch, ['katubedda', 'colombo', 'malabe campus'], true) ? 1 : 10;
     }
 }

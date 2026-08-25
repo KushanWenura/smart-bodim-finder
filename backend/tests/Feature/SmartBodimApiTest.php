@@ -6,6 +6,7 @@ use App\Jobs\SynchronizeListingIndex;
 use App\Models\Listing;
 use App\Models\User;
 use App\Services\AiServiceClient;
+use App\Services\ListingRiskService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -261,6 +262,22 @@ class SmartBodimApiTest extends TestCase
         $this->assertStringContainsString('WiFi', $response->json('suggestions.0.query'));
         $this->assertStringContainsString('35000', $response->json('suggestions.0.query'));
         $this->assertStringContainsString($response->json('suggestions.0.name'), $response->json('suggestions.0.query'));
+        $this->assertSame('ICBT Campus - Colombo', $response->json('suggestions.0.name'));
+        $this->assertStringContainsString('will not choose one automatically', $response->json('answer'));
+    }
+
+    public function test_generic_moratuwa_query_requires_branch_choice_with_katubedda_first(): void
+    {
+        $response = $this->postJson('/api/v1/assistant/chat', [
+            'message' => 'University of Moratuwa ලඟ WiFi සහ AC තියෙන room එකක් 35000ට අඩුවෙන් ඕන',
+        ])->assertOk()
+            ->assertJsonPath('search.mode', 'branch-clarification')
+            ->assertJsonPath('interpreted.destination.status', 'ambiguous');
+
+        $this->assertCount(2, $response->json('suggestions'));
+        $this->assertSame('University of Moratuwa - Katubedda', $response->json('suggestions.0.name'));
+        $this->assertSame('University of Moratuwa - Institute of Technology Diyagama', $response->json('suggestions.1.name'));
+        $this->assertEmpty($response->json('results'));
     }
 
     public function test_chatbot_resolves_a_named_institution_branch(): void
@@ -473,7 +490,7 @@ class SmartBodimApiTest extends TestCase
     public function test_listing_risk_assessment_is_advisory_and_evidence_backed(): void
     {
         $listing = Listing::firstOrFail();
-        $assessment = app(\App\Services\ListingRiskService::class)->assess($listing);
+        $assessment = app(ListingRiskService::class)->assess($listing);
 
         $this->assertSame($listing->id, $assessment->listing_id);
         $this->assertIsArray($assessment->flags);

@@ -47,7 +47,7 @@ class SearchController extends Controller
             $log = SearchLog::create(['user_id' => $request->user()?->id, 'sanitized_query' => $message, 'filters' => $interpreted, 'intent_confidence' => $intent['confidence'], 'result_count' => 0, 'mode' => 'assistant:branch-clarification', 'model_version' => 'query-understanding-v2', 'experiment_bucket' => 'ranking-v2', 'latency_ms' => 0]);
 
             return response()->json([
-                'answer' => $organization.' has several branches in Sri Lanka. Which branch should I measure from?',
+                'answer' => $organization.' has several branches in Sri Lanka. I will not choose one automatically—select the exact branch you travel to.',
                 'results' => [],
                 'suggestions' => $suggestions,
                 'interpreted' => $interpreted,
