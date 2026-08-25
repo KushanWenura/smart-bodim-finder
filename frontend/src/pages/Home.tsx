@@ -49,12 +49,35 @@ export default function Home() {
         ].map(([icon, label, query]) => <button key={label} onClick={() => openAssistant(query)}><span>{icon}</span>{label}</button>)}</div>
       </div>
 
-      <div className="bb-home-board" aria-label="Example Buddy AI result">
-        <div className="bb-board-top"><div><span>Buddy’s pick for you</span><strong>One clear shortlist, not endless scrolling.</strong></div><b>94<small>% fit</small></b></div>
-        <div className="bb-board-photo">{lead?.image && <img src={lead.image} alt={lead.title} />}<div><span>#1 best match</span><strong>{lead?.title || 'Campus-ready private room'}</strong><small><i className="bi bi-geo-alt-fill" /> {lead?.area || 'Near your destination'}</small></div></div>
-        <div className="bb-board-checks"><div><i className="bi bi-check2" /><span><b>Every must-have</b><small>WiFi · budget · room rule</small></span></div><div><i className="bi bi-signpost-split" /><span><b>1.8 km away</b><small>Distance from your branch</small></span></div></div>
-        <div className="bb-board-route"><span><i className="bi bi-bus-front" /><b>Bus</b><small>0.3 km</small></span><span><i className="bi bi-cart3" /><b>Food City</b><small>0.8 km</small></span><span><i className="bi bi-hospital" /><b>Hospital</b><small>1.4 km</small></span></div>
-        <button onClick={() => openAssistant()}>Build my own shortlist <i className="bi bi-arrow-right" /></button>
+      <div className="bb-match-preview" aria-label="Example Buddy AI result">
+        <header className="bb-match-preview-head">
+          <div><BuddyMark /><span><small>Live match preview</small><strong>Buddy checked 24 verified stays</strong></span></div>
+          <span className="bb-match-ready"><i className="bi bi-stars" /> Shortlist ready</span>
+        </header>
+
+        <div className="bb-match-preview-main">
+          <figure className="bb-match-property">
+            {lead?.image && <img src={lead.image} alt={lead.title} />}
+            <figcaption><span><i className="bi bi-trophy-fill" /> #1 ranked stay</span><strong>{lead?.title || 'Campus-ready private room'}</strong><small><i className="bi bi-geo-alt-fill" /> {lead?.area || 'Near your destination'}</small></figcaption>
+          </figure>
+
+          <div className="bb-match-decision">
+            <div className="bb-match-score"><div><strong>94</strong><small>%</small></div><span><b>Excellent fit</b><small>Based on your complete request</small></span></div>
+            <div className="bb-match-reasons">
+              <span><i className="bi bi-check2" /><b>Within budget</b><small>Rs. 10,500 left</small></span>
+              <span><i className="bi bi-check2" /><b>All must-haves</b><small>WiFi · AC · parking</small></span>
+              <span><i className="bi bi-signpost-split" /><b>Easy commute</b><small>1.8 km · about 8 min</small></span>
+            </div>
+            <button onClick={() => openAssistant()}>Create my shortlist <i className="bi bi-arrow-up-right" /></button>
+          </div>
+        </div>
+
+        <div className="bb-match-nearby">
+          <span><small>Daily-life check</small><b>Useful places around the stay</b></span>
+          <div><i className="bi bi-bus-front" /><span><b>Bus</b><small>0.3 km</small></span></div>
+          <div><i className="bi bi-cart3" /><span><b>Food City</b><small>0.8 km</small></span></div>
+          <div><i className="bi bi-hospital" /><span><b>Hospital</b><small>1.4 km</small></span></div>
+        </div>
       </div>
     </div></section>
 
