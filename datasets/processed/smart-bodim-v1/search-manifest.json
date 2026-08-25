@@ -1,24 +1,24 @@
 {
-  "timestampUtc": "2026-08-25T02:31:47.016132+00:00",
+  "timestampUtc": "2026-08-25T03:15:41.906970+00:00",
   "python": "3.14.6",
   "platform": "Windows-11-10.0.26200-SP0",
   "preprocessingVersion": "2.0.0",
   "seed": 42,
   "source": "datasets\\raw\\smart_bodim_search_pairs.jsonl",
-  "sourceSha256": "220c7d04056b8e0a71c427f3c1e40b9c4b5566389320591e710b2b505f808941",
+  "sourceSha256": "61f90becd04844cc0ac1bbac416e8798e78b5acc7403a921560cf1d930b975a2",
   "licenseSummary": [
     "CC0-1.0"
   ],
   "splitStrategy": "group-aware",
   "groupField": "groupId",
   "sizes": {
-    "train": 944,
-    "validation": 200,
-    "test": 200
+    "train": 5376,
+    "validation": 1152,
+    "test": 1152
   },
   "groups": {
-    "train": 236,
-    "validation": 50,
-    "test": 50
+    "train": 1344,
+    "validation": 288,
+    "test": 288
   }
 }

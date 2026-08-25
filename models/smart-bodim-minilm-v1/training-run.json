@@ -1,5 +1,5 @@
 {
-  "timestampUtc": "2026-08-25T02:38:52.341645+00:00",
+  "timestampUtc": "2026-08-25T03:28:08.626789+00:00",
   "python": "3.14.6",
   "platform": "Windows-11-10.0.26200-SP0",
   "task": "semantic-search",
@@ -12,9 +12,9 @@
     "batchSize": 16,
     "learningRate": 2e-05
   },
-  "trainSize": 944,
+  "trainSize": 5376,
   "epochMeanLoss": [
-    0.006763,
+    0.00146,
     0.0
   ],
   "artifact": "models\\smart-bodim-minilm-v1"

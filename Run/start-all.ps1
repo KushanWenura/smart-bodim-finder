@@ -90,6 +90,10 @@ if (-not (Test-Path -LiteralPath $sqlite)) {
     finally { Pop-Location }
 }
 
+Push-Location $backendRoot
+try { & $php artisan db:seed --class=Database\Seeders\InstitutionSeeder --force }
+finally { Pop-Location }
+
 $env:AI_PROFILE = 'base'
 $env:SEARCH_MODEL_PATH = Join-Path $projectRoot 'models\smart-bodim-minilm-v1'
 $env:SEARCH_MODEL_VERSION = 'smart-bodim-minilm-v1'

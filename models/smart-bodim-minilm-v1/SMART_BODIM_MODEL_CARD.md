@@ -8,15 +8,15 @@ Fine-tuned semantic retrieval model for Sri Lankan boarding-accommodation querie
 
 - Base: `sentence-transformers/all-MiniLM-L6-v2` (22.7M parameters, 384-dimensional embeddings).
 - Loss: cosine triplet margin loss (`margin=0.20`) with explicit hard negatives.
-- Domain data: 1,344 CC0 synthetic Smart Bodim query/relevant/irrelevant triples across 336 grouped intents and 28 destinations.
-- Deterministic group-aware split: 944 train, 200 validation, 200 test; seed 42, with zero intent-group overlap.
+- Domain data: 7,680 CC0 synthetic Smart Bodim query/relevant/irrelevant triples across 1,920 grouped intents and 160 destinations.
+- Deterministic group-aware split: 5,376 train, 1,152 validation, 1,152 test; seed 42, with zero intent-group overlap.
 - Training: 2 epochs, batch size 16, learning rate 2e-5, CPU.
-- Branch handling: ten ICBT branches are separate destinations; negatives include a same-brand wrong branch.
+- Branch handling: 152 higher-education locations across 41 organizations are separate destinations; multi-site negatives use a same-organization wrong branch.
 - The saved `model.safetensors` contains the fine-tuned weights; this is not an untouched downloaded model.
 
 ## Recorded evaluation
 
-`evaluation.json` uses 200 held-out queries and a pooled 100-unique-document corpus. The fine-tuned model achieved MRR 1.0 and Recall@1 1.0; unchanged pretrained MiniLM achieved MRR 0.856167 and Recall@1 0.755; the keyword baseline achieved MRR 0.937917 and Recall@1 0.885. These synthetic results demonstrate the controlled branch-aware task, not real-world production accuracy.
+`evaluation.json` uses 1,152 held-out queries and a pooled 576-unique-document corpus. The fine-tuned model achieved MRR 0.979508 and Recall@1 0.964410; unchanged pretrained MiniLM achieved MRR 0.697696 and Recall@1 0.562500; the keyword baseline achieved MRR 0.823419 and Recall@1 0.752604. These synthetic results demonstrate the controlled branch-aware task, not real-world production accuracy.
 
 ## Responsible-use limitations
 

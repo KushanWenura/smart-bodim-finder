@@ -26,26 +26,26 @@ It ranks candidate listing descriptions by semantic fit. Laravel remains respons
 ## Training
 
 - Dataset: `datasets/raw/smart_bodim_search_pairs.jsonl`
-- Examples: 1,344
-- Intent groups: 336
-- Destinations: 28, including ten independently labelled ICBT branches
+- Examples: 7,680
+- Intent groups: 1,920
+- Destinations: 160, including 152 higher-education locations across 41 organizations
 - Split: group-aware 70/15/15 so paraphrases of one intent stay in one split
 - Objective: cosine triplet margin loss (`margin=0.20`)
 - Optimizer: AdamW
 - Epochs: 2
 - Positive examples: matching destination, budget and facility needs
-- Hard negatives: wrong branch, over-budget and missing-facility listings
+- Hard negatives: same-organization wrong branch, over-budget and missing-facility listings
 - Language styles: formal, conversational, casual Sri Lankan English and typo/noise variants
 
 ## Recorded held-out evaluation
 
 | Model | MRR | Recall@1 |
 |---|---:|---:|
-| Smart Bodim MiniLM v1 | 1.0000 | 1.0000 |
-| Base MiniLM | 0.8562 | 0.7550 |
-| Keyword baseline | 0.9379 | 0.8850 |
+| Smart Bodim MiniLM v1 | 0.9795 | 0.9644 |
+| Base MiniLM | 0.6977 | 0.5625 |
+| Keyword baseline | 0.8234 | 0.7526 |
 
-The evaluation contains 200 group-held-out queries over 100 pooled candidate documents. These are controlled synthetic academic results and must not be interpreted as production accuracy on every real user request.
+The evaluation contains 1,152 group-held-out queries over 576 pooled candidate documents. These are controlled synthetic academic results and must not be interpreted as production accuracy on every real user request.
 
 ## Usage
 

@@ -30,7 +30,9 @@ def train(args):
             epoch_losses.append(float(loss.detach().cpu()))
         mean_loss=sum(epoch_losses)/max(len(epoch_losses),1);loss_history.append(round(mean_loss,6))
         print(json.dumps({"epoch":epoch+1,"epochs":args.epochs,"steps":math.ceil(len(shuffled)/args.batch_size),"meanLoss":mean_loss}))
+    readme_path=args.output/"README.md";preserved_readme=readme_path.read_text(encoding="utf-8") if readme_path.exists() else None
     model.save_pretrained(str(args.output))
+    if preserved_readme is not None:readme_path.write_text(preserved_readme,encoding="utf-8")
     manifest=run_manifest(task="semantic-search",baseModel=args.base_model,loss="CosineTripletMarginLoss",margin=margin,seed=args.seed,hyperparameters={"epochs":args.epochs,"batchSize":args.batch_size,"learningRate":args.learning_rate},trainSize=len(rows),epochMeanLoss=loss_history,artifact=str(args.output));(args.output/"training-run.json").write_text(json.dumps(manifest,indent=2),encoding="utf-8")
 
 if __name__=="__main__":

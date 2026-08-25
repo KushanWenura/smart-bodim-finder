@@ -9,7 +9,7 @@ import type { Destination, Listing } from '../types';
 export default function Home() {
   const { data: featured = [] } = useQuery({ queryKey: ['featured'], queryFn: async () => (await api.get('/listings/featured')).data.data as Listing[] });
   const { data: destinations = [] } = useQuery({ queryKey: ['destinations'], queryFn: async () => (await api.get('/destinations')).data.data as Destination[] });
-  const popularNames = ['University of Moratuwa', 'University of Colombo', 'SLIIT Malabe Campus', 'NSBM Green University', 'ICBT Campus - Colombo', 'ICBT Campus - Kandy', 'World Trade Center Colombo', 'Kandy City Centre'];
+  const popularNames = ['University of Moratuwa - Katubedda', 'University of Colombo - Main Campus', 'Sri Lanka Institute of Information Technology - Malabe Campus', 'NSBM Green University', 'ICBT Campus - Colombo', 'ICBT Campus - Kandy', 'World Trade Center Colombo', 'Kandy City Centre'];
   const popularDestinations = popularNames.map(name => destinations.find(place => place.name === name)).filter((place): place is Destination => Boolean(place));
   const openAssistant = (message?: string) => window.dispatchEvent(new CustomEvent('smartbodim:open-assistant', { detail: { message } }));
   const submit = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); openAssistant(String(new FormData(event.currentTarget).get('q') || '')); };

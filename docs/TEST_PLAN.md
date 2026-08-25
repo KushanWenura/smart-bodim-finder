@@ -4,13 +4,13 @@
 
 | Layer | Command | Verified result on 2026-08-25 |
 |---|---|---|
-| Laravel feature/security/contract | `php artisan test` | 27 passed, 302 assertions |
+| Laravel feature/security/contract | `php artisan test` | 29 passed, 315 assertions |
 | Laravel formatting | `php vendor/bin/pint --test` | passed |
-| React type/build | `pnpm run lint && pnpm run build` | type-check/build passed; 233 modules with route code-splitting |
+| React type/build | `pnpm run lint && pnpm run build` | type-check/build passed; 234 modules with route code-splitting |
 | React component/security | `pnpm test` | 4 files, 7 tests passed |
 | Playwright browser workflows | `pnpm run test:e2e` | 5 role/guest/branch-clarification workflows passed against the live stack in system Edge |
-| Flask unit/API/FAISS lifecycle | `python -m pytest ai-service/tests -q` | 14 passed |
-| Fine-tuned search evaluation | `python ai-service/evaluate_search_model.py ...` | 200-query group-held-out MRR 1.0/Recall@1 1.0; base MiniLM MRR 0.8562/Recall@1 0.755; keyword MRR 0.9379/Recall@1 0.885 |
+| Flask unit/API/FAISS lifecycle | `python -m pytest ai-service/tests -q` | 16 passed |
+| Fine-tuned search evaluation | `python ai-service/evaluate_search_model.py ...` | 1,152-query group-held-out MRR 0.9795/Recall@1 0.9644; base MiniLM MRR 0.6977/Recall@1 0.5625; keyword MRR 0.8234/Recall@1 0.7526 |
 | MySQL migration/seed | environment override + `artisan migrate --seed` | 35 tables, 4 users, 24 listings, 5 reviews; final migration verified |
 
 ## Covered behavior
@@ -21,7 +21,7 @@
 - Favorite add/remove/idempotency and detail-page state; one tenant review/listing and aggregate refresh.
 - Invalid executable upload, SQL-like search text and AI failure fallback.
 - PHP↔Flask ranking and index lifecycle contract, including campus/workplace interpretation, ordered Haversine results and five categories of nearby essentials.
-- Multi-branch institution ambiguity, ten ICBT branch choices and exact-branch distance ranking without silently guessing a campus.
+- Nationwide multi-branch institution ambiguity, organization-specific branch choices and exact-branch distance ranking without silently guessing a campus.
 - Frontend listing price/accessibility, chatbot launcher, role redirect and stored-XSS escaping.
 - Browser-level guest search/detail privacy, tenant protected tools, owner portfolio/wizard and admin AI/global-search workflows.
 - Flask canonical text, ranking, constraints, sentiment/aspects/summary, shared-secret and error schema.

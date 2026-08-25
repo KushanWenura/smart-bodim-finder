@@ -1,0 +1,3114 @@
+{
+  "catalogVersion": "2026.08.25-v1",
+  "retrievedOn": "2026-08-25",
+  "scope": "UGC universities/campuses, public university centre networks, Ministry-approved non-state institutes, and official physical branches",
+  "coordinatePolicy": "Reference coordinates are campus-local where curated and town-centre otherwise; verify road routes before deciding.",
+  "destinations": [
+    {
+      "name": "Aquinas College of Higher Studies",
+      "organization": "Aquinas College of Higher Studies",
+      "branch": null,
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Borella",
+      "latitude": 6.9147,
+      "longitude": 79.8777,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "aquinas campus",
+        "aquinas college of higher studies"
+      ],
+      "sourceUrl": "https://www.aquinas.lk/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "Benedict XVI Catholic Institute",
+      "organization": "Benedict XVI Catholic Institute",
+      "branch": null,
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Negombo",
+      "latitude": 7.2083,
+      "longitude": 79.8358,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "bci campus",
+        "benedict xvi catholic institute"
+      ],
+      "sourceUrl": "https://www.bci.lk/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "Bhiksu University of Sri Lanka",
+      "organization": "Bhiksu University of Sri Lanka",
+      "branch": null,
+      "type": "campus",
+      "sector": "public",
+      "town": "Anuradhapura",
+      "latitude": 8.3114,
+      "longitude": 80.4037,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "bhiksu university of sri lanka",
+        "busl"
+      ],
+      "sourceUrl": "https://busl.ac.lk/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Buddhist and Pali University of Sri Lanka",
+      "organization": "Buddhist and Pali University of Sri Lanka",
+      "branch": null,
+      "type": "campus",
+      "sector": "public",
+      "town": "Homagama",
+      "latitude": 6.8412,
+      "longitude": 80.003,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "bpu",
+        "buddhist and pali university of sri lanka"
+      ],
+      "sourceUrl": "https://www.bpu.ac.lk/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Business Management School",
+      "organization": "Business Management School",
+      "branch": null,
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Colombo",
+      "latitude": 6.9271,
+      "longitude": 79.8612,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "bms campus",
+        "business management school"
+      ],
+      "sourceUrl": "https://www.bms.lk/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "CINEC Campus - Jaffna Branch",
+      "organization": "CINEC Campus",
+      "branch": "Jaffna Branch",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Jaffna",
+      "latitude": 9.6615,
+      "longitude": 80.0255,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "cinec",
+        "cinec campus",
+        "cinec campus jaffna branch",
+        "cinec jaffna",
+        "jaffna branch"
+      ],
+      "sourceUrl": "https://www.cinec.edu/about-cinec.html",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "CINEC Campus - Malabe Campus",
+      "organization": "CINEC Campus",
+      "branch": "Malabe Campus",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Malabe",
+      "latitude": 6.9041,
+      "longitude": 79.9546,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "cinec",
+        "cinec campus",
+        "cinec campus malabe campus",
+        "cinec malabe",
+        "malabe campus"
+      ],
+      "sourceUrl": "https://www.cinec.edu/about-cinec.html",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "CINEC Campus - Nugegoda Branch",
+      "organization": "CINEC Campus",
+      "branch": "Nugegoda Branch",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Nugegoda",
+      "latitude": 6.8649,
+      "longitude": 79.8997,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "cinec",
+        "cinec campus",
+        "cinec campus nugegoda branch",
+        "cinec nugegoda",
+        "nugegoda branch"
+      ],
+      "sourceUrl": "https://www.cinec.edu/about-cinec.html",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "CINEC Campus - Trincomalee Branch",
+      "organization": "CINEC Campus",
+      "branch": "Trincomalee Branch",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Trincomalee",
+      "latitude": 8.5874,
+      "longitude": 81.2152,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "cinec",
+        "cinec campus",
+        "cinec campus trincomalee branch",
+        "cinec trincomalee",
+        "trincomalee branch"
+      ],
+      "sourceUrl": "https://www.cinec.edu/about-cinec.html",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Ampara",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Ampara",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Ampara",
+      "latitude": 7.2917,
+      "longitude": 81.672,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "ampara",
+        "esoft",
+        "esoft ampara",
+        "esoft metro campus",
+        "esoft metro campus ampara"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Anuradhapura",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Anuradhapura",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Anuradhapura",
+      "latitude": 8.3114,
+      "longitude": 80.4037,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "anuradhapura",
+        "esoft",
+        "esoft anuradhapura",
+        "esoft metro campus",
+        "esoft metro campus anuradhapura"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Avissawella",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Avissawella",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Avissawella",
+      "latitude": 6.9553,
+      "longitude": 80.2114,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "avissawella",
+        "esoft",
+        "esoft avissawella",
+        "esoft metro campus",
+        "esoft metro campus avissawella"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Badulla",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Badulla",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Badulla",
+      "latitude": 6.9934,
+      "longitude": 81.055,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "badulla",
+        "esoft",
+        "esoft badulla",
+        "esoft metro campus",
+        "esoft metro campus badulla"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Bambalapitiya",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Bambalapitiya",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Bambalapitiya",
+      "latitude": 6.8915,
+      "longitude": 79.8568,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "bambalapitiya",
+        "esoft",
+        "esoft bambalapitiya",
+        "esoft metro campus",
+        "esoft metro campus bambalapitiya"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Bandarawela",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Bandarawela",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Bandarawela",
+      "latitude": 6.8294,
+      "longitude": 80.99,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "bandarawela",
+        "esoft",
+        "esoft bandarawela",
+        "esoft metro campus",
+        "esoft metro campus bandarawela"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Batticaloa",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Batticaloa",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Batticaloa",
+      "latitude": 7.717,
+      "longitude": 81.7,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "batticaloa",
+        "esoft",
+        "esoft batticaloa",
+        "esoft metro campus",
+        "esoft metro campus batticaloa"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Campus One - One Galle Face",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Campus One - One Galle Face",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Colombo Fort",
+      "latitude": 6.9344,
+      "longitude": 79.8428,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "campus one one galle face",
+        "esoft",
+        "esoft colombo fort",
+        "esoft metro campus",
+        "esoft metro campus campus one one galle face"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Chilaw",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Chilaw",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Chilaw",
+      "latitude": 7.5758,
+      "longitude": 79.7953,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "chilaw",
+        "esoft",
+        "esoft chilaw",
+        "esoft metro campus",
+        "esoft metro campus chilaw"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Dambulla",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Dambulla",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Dambulla",
+      "latitude": 7.8742,
+      "longitude": 80.6511,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "dambulla",
+        "esoft",
+        "esoft dambulla",
+        "esoft metro campus",
+        "esoft metro campus dambulla"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Embilipitiya",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Embilipitiya",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Embilipitiya",
+      "latitude": 6.3439,
+      "longitude": 80.8489,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "embilipitiya",
+        "esoft",
+        "esoft embilipitiya",
+        "esoft metro campus",
+        "esoft metro campus embilipitiya"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Galle",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Galle",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Galle",
+      "latitude": 6.0329,
+      "longitude": 80.2168,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft galle",
+        "esoft metro campus",
+        "esoft metro campus galle",
+        "galle"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Gampaha",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Gampaha",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Gampaha",
+      "latitude": 7.0912,
+      "longitude": 79.9983,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft gampaha",
+        "esoft metro campus",
+        "esoft metro campus gampaha",
+        "gampaha"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Hatton",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Hatton",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Hatton",
+      "latitude": 6.8916,
+      "longitude": 80.5955,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft hatton",
+        "esoft metro campus",
+        "esoft metro campus hatton",
+        "hatton"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Ja-Ela",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Ja-Ela",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Ja-Ela",
+      "latitude": 7.0744,
+      "longitude": 79.8919,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft ja ela",
+        "esoft metro campus",
+        "esoft metro campus ja ela",
+        "ja ela"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Jaffna",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Jaffna",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Jaffna",
+      "latitude": 9.6615,
+      "longitude": 80.0255,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft jaffna",
+        "esoft metro campus",
+        "esoft metro campus jaffna",
+        "jaffna"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Kalutara",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Kalutara",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Kalutara",
+      "latitude": 6.5854,
+      "longitude": 79.9607,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft kalutara",
+        "esoft metro campus",
+        "esoft metro campus kalutara",
+        "kalutara"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Kandy",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Kandy",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Kandy",
+      "latitude": 7.2906,
+      "longitude": 80.6337,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft kandy",
+        "esoft metro campus",
+        "esoft metro campus kandy",
+        "kandy"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Katubedda",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Katubedda",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Katubedda",
+      "latitude": 6.7969,
+      "longitude": 79.9018,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft katubedda",
+        "esoft metro campus",
+        "esoft metro campus katubedda",
+        "katubedda"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Kegalle",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Kegalle",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Kegalle",
+      "latitude": 7.2513,
+      "longitude": 80.3464,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft kegalle",
+        "esoft metro campus",
+        "esoft metro campus kegalle",
+        "kegalle"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Kiribathgoda",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Kiribathgoda",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Kiribathgoda",
+      "latitude": 6.9785,
+      "longitude": 79.927,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft kiribathgoda",
+        "esoft metro campus",
+        "esoft metro campus kiribathgoda",
+        "kiribathgoda"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Kuliyapitiya",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Kuliyapitiya",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Kuliyapitiya",
+      "latitude": 7.468,
+      "longitude": 80.0401,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft kuliyapitiya",
+        "esoft metro campus",
+        "esoft metro campus kuliyapitiya",
+        "kuliyapitiya"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Kurunegala",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Kurunegala",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Kurunegala",
+      "latitude": 7.4863,
+      "longitude": 80.3652,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft kurunegala",
+        "esoft metro campus",
+        "esoft metro campus kurunegala",
+        "kurunegala"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Matale",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Matale",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Matale",
+      "latitude": 7.4675,
+      "longitude": 80.6234,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft matale",
+        "esoft metro campus",
+        "esoft metro campus matale",
+        "matale"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Matara",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Matara",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Matara",
+      "latitude": 5.9549,
+      "longitude": 80.555,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft matara",
+        "esoft metro campus",
+        "esoft metro campus matara",
+        "matara"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Monaragala",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Monaragala",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Monaragala",
+      "latitude": 6.8728,
+      "longitude": 81.3507,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft metro campus",
+        "esoft metro campus monaragala",
+        "esoft monaragala",
+        "monaragala"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Narammala",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Narammala",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Narammala",
+      "latitude": 7.4317,
+      "longitude": 80.215,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft metro campus",
+        "esoft metro campus narammala",
+        "esoft narammala",
+        "narammala"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Negombo",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Negombo",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Negombo",
+      "latitude": 7.2083,
+      "longitude": 79.8358,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft metro campus",
+        "esoft metro campus negombo",
+        "esoft negombo",
+        "negombo"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Nittambuwa",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Nittambuwa",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Nittambuwa",
+      "latitude": 7.1442,
+      "longitude": 80.0967,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft metro campus",
+        "esoft metro campus nittambuwa",
+        "esoft nittambuwa",
+        "nittambuwa"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Nugegoda",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Nugegoda",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Nugegoda",
+      "latitude": 6.8649,
+      "longitude": 79.8997,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft metro campus",
+        "esoft metro campus nugegoda",
+        "esoft nugegoda",
+        "nugegoda"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Panadura",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Panadura",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Panadura",
+      "latitude": 6.7132,
+      "longitude": 79.9026,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft metro campus",
+        "esoft metro campus panadura",
+        "esoft panadura",
+        "panadura"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Piliyandala",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Piliyandala",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Piliyandala",
+      "latitude": 6.8018,
+      "longitude": 79.9227,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft metro campus",
+        "esoft metro campus piliyandala",
+        "esoft piliyandala",
+        "piliyandala"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Polonnaruwa",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Polonnaruwa",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Polonnaruwa",
+      "latitude": 7.9403,
+      "longitude": 81.0188,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft metro campus",
+        "esoft metro campus polonnaruwa",
+        "esoft polonnaruwa",
+        "polonnaruwa"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Ratnapura",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Ratnapura",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Ratnapura",
+      "latitude": 6.7056,
+      "longitude": 80.3847,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft metro campus",
+        "esoft metro campus ratnapura",
+        "esoft ratnapura",
+        "ratnapura"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Tangalle",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Tangalle",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Tangalle",
+      "latitude": 6.0243,
+      "longitude": 80.7941,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft metro campus",
+        "esoft metro campus tangalle",
+        "esoft tangalle",
+        "tangalle"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Trincomalee",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Trincomalee",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Trincomalee",
+      "latitude": 8.5874,
+      "longitude": 81.2152,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft metro campus",
+        "esoft metro campus trincomalee",
+        "esoft trincomalee",
+        "trincomalee"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Wattala",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Wattala",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Wattala",
+      "latitude": 6.989,
+      "longitude": 79.8916,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft metro campus",
+        "esoft metro campus wattala",
+        "esoft wattala",
+        "wattala"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ESOFT Metro Campus - Wennappuwa",
+      "organization": "ESOFT Metro Campus",
+      "branch": "Wennappuwa",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Wennappuwa",
+      "latitude": 7.3437,
+      "longitude": 79.8417,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "esoft",
+        "esoft metro campus",
+        "esoft metro campus wennappuwa",
+        "esoft wennappuwa",
+        "wennappuwa"
+      ],
+      "sourceUrl": "https://esoft.lk/about-us/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "Eastern University Sri Lanka - Swamy Vipulananda Institute",
+      "organization": "Eastern University Sri Lanka",
+      "branch": "Swamy Vipulananda Institute",
+      "type": "campus",
+      "sector": "public",
+      "town": "Batticaloa",
+      "latitude": 7.717,
+      "longitude": 81.7,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "eastern university sri lanka",
+        "eastern university sri lanka swamy vipulananda institute",
+        "svias",
+        "swamy vipulananda institute"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Eastern University Sri Lanka - Trincomalee Campus",
+      "organization": "Eastern University Sri Lanka",
+      "branch": "Trincomalee Campus",
+      "type": "campus",
+      "sector": "public",
+      "town": "Trincomalee",
+      "latitude": 8.5874,
+      "longitude": 81.2152,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "eastern university sri lanka",
+        "eastern university sri lanka trincomalee campus",
+        "eastern university trinco",
+        "trincomalee campus"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=25&lang=en&option=com_university&view=campuses",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Eastern University Sri Lanka - Vantharumoolai Campus",
+      "organization": "Eastern University Sri Lanka",
+      "branch": "Vantharumoolai Campus",
+      "type": "campus",
+      "sector": "public",
+      "town": "Vantharumoolai",
+      "latitude": 7.797,
+      "longitude": 81.579,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "eastern university",
+        "eastern university sri lanka",
+        "eastern university sri lanka vantharumoolai campus",
+        "eusl",
+        "vantharumoolai campus"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=25&lang=en&option=com_university&view=campuses",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Gampaha Wickramarachchi University of Indigenous Medicine",
+      "organization": "Gampaha Wickramarachchi University of Indigenous Medicine",
+      "branch": null,
+      "type": "campus",
+      "sector": "public",
+      "town": "Yakkala",
+      "latitude": 7.0899,
+      "longitude": 80.0365,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "gampaha wickramarachchi university of indigenous medicine",
+        "gwuim"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "General Sir John Kotelawala Defence University - Ratmalana Campus",
+      "organization": "General Sir John Kotelawala Defence University",
+      "branch": "Ratmalana Campus",
+      "type": "campus",
+      "sector": "public",
+      "town": "Ratmalana",
+      "latitude": 6.8211,
+      "longitude": 79.8862,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "general sir john kotelawala defence university",
+        "general sir john kotelawala defence university ratmalana campus",
+        "kdu",
+        "kotelawala university",
+        "ratmalana campus"
+      ],
+      "sourceUrl": "https://kdu.ac.lk/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "General Sir John Kotelawala Defence University - Southern Campus Sooriyawewa",
+      "organization": "General Sir John Kotelawala Defence University",
+      "branch": "Southern Campus Sooriyawewa",
+      "type": "campus",
+      "sector": "public",
+      "town": "Sooriyawewa",
+      "latitude": 6.302,
+      "longitude": 81.001,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "general sir john kotelawala defence university",
+        "general sir john kotelawala defence university southern campus sooriyawewa",
+        "kdu southern campus",
+        "southern campus sooriyawewa"
+      ],
+      "sourceUrl": "https://kdu.ac.lk/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Horizon Campus",
+      "organization": "Horizon Campus",
+      "branch": null,
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Malabe",
+      "latitude": 6.9041,
+      "longitude": 79.9546,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "horizon campus",
+        "horizon university"
+      ],
+      "sourceUrl": "https://horizoncampus.edu.lk/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ICBT Campus - Anuradhapura",
+      "organization": "ICBT Campus",
+      "branch": "Anuradhapura",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Anuradhapura",
+      "latitude": 8.3114,
+      "longitude": 80.4037,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "anuradhapura",
+        "icbt",
+        "icbt anuradhapura",
+        "icbt campus",
+        "icbt campus anuradhapura"
+      ],
+      "sourceUrl": "https://icbt.lk/branches/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ICBT Campus - Batticaloa",
+      "organization": "ICBT Campus",
+      "branch": "Batticaloa",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Batticaloa",
+      "latitude": 7.717,
+      "longitude": 81.7,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "batticaloa",
+        "icbt",
+        "icbt batticaloa",
+        "icbt campus",
+        "icbt campus batticaloa"
+      ],
+      "sourceUrl": "https://icbt.lk/branches/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ICBT Campus - Colombo",
+      "organization": "ICBT Campus",
+      "branch": "Colombo",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Colombo",
+      "latitude": 6.9271,
+      "longitude": 79.8612,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "colombo",
+        "icbt",
+        "icbt campus",
+        "icbt campus colombo",
+        "icbt colombo"
+      ],
+      "sourceUrl": "https://icbt.lk/branches/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ICBT Campus - Galle",
+      "organization": "ICBT Campus",
+      "branch": "Galle",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Galle",
+      "latitude": 6.0329,
+      "longitude": 80.2168,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "galle",
+        "icbt",
+        "icbt campus",
+        "icbt campus galle",
+        "icbt galle"
+      ],
+      "sourceUrl": "https://icbt.lk/branches/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ICBT Campus - Gampaha",
+      "organization": "ICBT Campus",
+      "branch": "Gampaha",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Gampaha",
+      "latitude": 7.0912,
+      "longitude": 79.9983,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "gampaha",
+        "icbt",
+        "icbt campus",
+        "icbt campus gampaha",
+        "icbt gampaha"
+      ],
+      "sourceUrl": "https://icbt.lk/branches/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ICBT Campus - Jaffna",
+      "organization": "ICBT Campus",
+      "branch": "Jaffna",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Jaffna",
+      "latitude": 9.6615,
+      "longitude": 80.0255,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "icbt",
+        "icbt campus",
+        "icbt campus jaffna",
+        "icbt jaffna",
+        "jaffna"
+      ],
+      "sourceUrl": "https://icbt.lk/branches/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ICBT Campus - Kandy",
+      "organization": "ICBT Campus",
+      "branch": "Kandy",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Kandy",
+      "latitude": 7.2906,
+      "longitude": 80.6337,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "icbt",
+        "icbt campus",
+        "icbt campus kandy",
+        "icbt kandy",
+        "kandy"
+      ],
+      "sourceUrl": "https://icbt.lk/branches/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ICBT Campus - Kurunegala",
+      "organization": "ICBT Campus",
+      "branch": "Kurunegala",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Kurunegala",
+      "latitude": 7.4863,
+      "longitude": 80.3652,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "icbt",
+        "icbt campus",
+        "icbt campus kurunegala",
+        "icbt kurunegala",
+        "kurunegala"
+      ],
+      "sourceUrl": "https://icbt.lk/branches/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ICBT Campus - Matara",
+      "organization": "ICBT Campus",
+      "branch": "Matara",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Matara",
+      "latitude": 5.9549,
+      "longitude": 80.555,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "icbt",
+        "icbt campus",
+        "icbt campus matara",
+        "icbt matara",
+        "icbt southern campus",
+        "matara"
+      ],
+      "sourceUrl": "https://icbt.lk/branches/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "ICBT Campus - Nugegoda",
+      "organization": "ICBT Campus",
+      "branch": "Nugegoda",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Nugegoda",
+      "latitude": 6.8649,
+      "longitude": 79.8997,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "icbt",
+        "icbt campus",
+        "icbt campus nugegoda",
+        "icbt nugegoda",
+        "nugegoda"
+      ],
+      "sourceUrl": "https://icbt.lk/branches/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "Institute of Chartered Accountants of Sri Lanka",
+      "organization": "Institute of Chartered Accountants of Sri Lanka",
+      "branch": null,
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Colombo",
+      "latitude": 6.9271,
+      "longitude": 79.8612,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "ca sri lanka",
+        "icasl",
+        "institute of chartered accountants of sri lanka"
+      ],
+      "sourceUrl": "https://www.casrilanka.com/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "Institute of Chemistry Ceylon",
+      "organization": "Institute of Chemistry Ceylon",
+      "branch": null,
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Rajagiriya",
+      "latitude": 6.9094,
+      "longitude": 79.8943,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "college of chemical sciences",
+        "ichem",
+        "institute of chemistry ceylon"
+      ],
+      "sourceUrl": "https://ichemc.edu.lk/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "International Institute of Health Sciences",
+      "organization": "International Institute of Health Sciences",
+      "branch": null,
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Welisara",
+      "latitude": 7.0281,
+      "longitude": 79.9074,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "iihs",
+        "international institute of health sciences"
+      ],
+      "sourceUrl": "https://iihsciences.edu.lk/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "KIU Campus",
+      "organization": "KIU Campus",
+      "branch": null,
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Battaramulla",
+      "latitude": 6.9022,
+      "longitude": 79.9198,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "kiu campus",
+        "kiu university"
+      ],
+      "sourceUrl": "https://www.kiu.ac.lk/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "NSBM Green University",
+      "organization": "NSBM Green University",
+      "branch": null,
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Homagama",
+      "latitude": 6.8412,
+      "longitude": 80.003,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "nsbm",
+        "nsbm green university"
+      ],
+      "sourceUrl": "https://www.nsbm.ac.lk/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "National Institute of Business Management - Colombo Campus",
+      "organization": "National Institute of Business Management",
+      "branch": "Colombo Campus",
+      "type": "campus",
+      "sector": "statutory",
+      "town": "Colombo 07",
+      "latitude": 6.9105,
+      "longitude": 79.8611,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "colombo campus",
+        "national institute of business management",
+        "national institute of business management colombo campus",
+        "nibm",
+        "nibm colombo 07"
+      ],
+      "sourceUrl": "https://nibm.ac.lk/contact",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "National Institute of Business Management - Galle Campus",
+      "organization": "National Institute of Business Management",
+      "branch": "Galle Campus",
+      "type": "campus",
+      "sector": "statutory",
+      "town": "Galle",
+      "latitude": 6.0329,
+      "longitude": 80.2168,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "galle campus",
+        "national institute of business management",
+        "national institute of business management galle campus",
+        "nibm",
+        "nibm galle"
+      ],
+      "sourceUrl": "https://nibm.ac.lk/contact",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "National Institute of Business Management - Kandy Campus",
+      "organization": "National Institute of Business Management",
+      "branch": "Kandy Campus",
+      "type": "campus",
+      "sector": "statutory",
+      "town": "Kandy",
+      "latitude": 7.2906,
+      "longitude": 80.6337,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "kandy campus",
+        "national institute of business management",
+        "national institute of business management kandy campus",
+        "nibm",
+        "nibm kandy"
+      ],
+      "sourceUrl": "https://nibm.ac.lk/contact",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "National Institute of Business Management - Kandy Innovation Centre Peradeniya",
+      "organization": "National Institute of Business Management",
+      "branch": "Kandy Innovation Centre Peradeniya",
+      "type": "campus",
+      "sector": "statutory",
+      "town": "Peradeniya",
+      "latitude": 7.2541,
+      "longitude": 80.5974,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "kandy innovation centre peradeniya",
+        "national institute of business management",
+        "national institute of business management kandy innovation centre peradeniya",
+        "nibm",
+        "nibm peradeniya"
+      ],
+      "sourceUrl": "https://nibm.ac.lk/contact",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "National Institute of Business Management - Kurunegala Campus",
+      "organization": "National Institute of Business Management",
+      "branch": "Kurunegala Campus",
+      "type": "campus",
+      "sector": "statutory",
+      "town": "Kurunegala",
+      "latitude": 7.4863,
+      "longitude": 80.3652,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "kurunegala campus",
+        "national institute of business management",
+        "national institute of business management kurunegala campus",
+        "nibm",
+        "nibm kurunegala"
+      ],
+      "sourceUrl": "https://nibm.ac.lk/contact",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "National Institute of Business Management - Matara Campus",
+      "organization": "National Institute of Business Management",
+      "branch": "Matara Campus",
+      "type": "campus",
+      "sector": "statutory",
+      "town": "Matara",
+      "latitude": 5.9549,
+      "longitude": 80.555,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "matara campus",
+        "national institute of business management",
+        "national institute of business management matara campus",
+        "nibm",
+        "nibm matara"
+      ],
+      "sourceUrl": "https://nibm.ac.lk/contact",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "National Institute of Business Management - National Innovation Centre Kirulapone",
+      "organization": "National Institute of Business Management",
+      "branch": "National Innovation Centre Kirulapone",
+      "type": "campus",
+      "sector": "statutory",
+      "town": "Kirulapone",
+      "latitude": 6.8777,
+      "longitude": 79.8748,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "national innovation centre kirulapone",
+        "national institute of business management",
+        "national institute of business management national innovation centre kirulapone",
+        "nibm",
+        "nibm kirulapone"
+      ],
+      "sourceUrl": "https://nibm.ac.lk/contact",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "National Institute of Business Management - Rajagiriya Campus",
+      "organization": "National Institute of Business Management",
+      "branch": "Rajagiriya Campus",
+      "type": "campus",
+      "sector": "statutory",
+      "town": "Rajagiriya",
+      "latitude": 6.9094,
+      "longitude": 79.8943,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "national institute of business management",
+        "national institute of business management rajagiriya campus",
+        "nibm",
+        "nibm rajagiriya",
+        "rajagiriya campus"
+      ],
+      "sourceUrl": "https://nibm.ac.lk/contact",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Ocean University of Sri Lanka - Batticaloa Regional Centre",
+      "organization": "Ocean University of Sri Lanka",
+      "branch": "Batticaloa Regional Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Batticaloa",
+      "latitude": 7.717,
+      "longitude": 81.7,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "batticaloa regional centre",
+        "ocean university batticaloa",
+        "ocean university of sri lanka",
+        "ocean university of sri lanka batticaloa regional centre",
+        "ocu"
+      ],
+      "sourceUrl": "https://ocu.ac.lk/history/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Ocean University of Sri Lanka - Boossa Regional Centre",
+      "organization": "Ocean University of Sri Lanka",
+      "branch": "Boossa Regional Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Boossa",
+      "latitude": 6.066,
+      "longitude": 80.164,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "boossa regional centre",
+        "ocean university boossa",
+        "ocean university of sri lanka",
+        "ocean university of sri lanka boossa regional centre",
+        "ocu"
+      ],
+      "sourceUrl": "https://ocu.ac.lk/history/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Ocean University of Sri Lanka - Jaffna Regional Centre",
+      "organization": "Ocean University of Sri Lanka",
+      "branch": "Jaffna Regional Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Jaffna",
+      "latitude": 9.6615,
+      "longitude": 80.0255,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "jaffna regional centre",
+        "ocean university jaffna",
+        "ocean university of sri lanka",
+        "ocean university of sri lanka jaffna regional centre",
+        "ocu"
+      ],
+      "sourceUrl": "https://ocu.ac.lk/history/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Ocean University of Sri Lanka - Main Campus Mattakkuliya",
+      "organization": "Ocean University of Sri Lanka",
+      "branch": "Main Campus Mattakkuliya",
+      "type": "campus",
+      "sector": "public",
+      "town": "Colombo",
+      "latitude": 6.9271,
+      "longitude": 79.8612,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "main campus mattakkuliya",
+        "ocean university colombo",
+        "ocean university of sri lanka",
+        "ocean university of sri lanka main campus mattakkuliya",
+        "ocu"
+      ],
+      "sourceUrl": "https://ocu.ac.lk/history/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Ocean University of Sri Lanka - Negombo Regional Centre",
+      "organization": "Ocean University of Sri Lanka",
+      "branch": "Negombo Regional Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Negombo",
+      "latitude": 7.2083,
+      "longitude": 79.8358,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "negombo regional centre",
+        "ocean university negombo",
+        "ocean university of sri lanka",
+        "ocean university of sri lanka negombo regional centre",
+        "ocu"
+      ],
+      "sourceUrl": "https://ocu.ac.lk/history/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Ocean University of Sri Lanka - Panadura Regional Centre",
+      "organization": "Ocean University of Sri Lanka",
+      "branch": "Panadura Regional Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Panadura",
+      "latitude": 6.7132,
+      "longitude": 79.9026,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "ocean university of sri lanka",
+        "ocean university of sri lanka panadura regional centre",
+        "ocean university panadura",
+        "ocu",
+        "panadura regional centre"
+      ],
+      "sourceUrl": "https://ocu.ac.lk/history/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Ocean University of Sri Lanka - Tangalle Regional Centre",
+      "organization": "Ocean University of Sri Lanka",
+      "branch": "Tangalle Regional Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Tangalle",
+      "latitude": 6.0243,
+      "longitude": 80.7941,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "ocean university of sri lanka",
+        "ocean university of sri lanka tangalle regional centre",
+        "ocean university tangalle",
+        "ocu",
+        "tangalle regional centre"
+      ],
+      "sourceUrl": "https://ocu.ac.lk/history/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Ocean University of Sri Lanka - Trincomalee Regional Centre",
+      "organization": "Ocean University of Sri Lanka",
+      "branch": "Trincomalee Regional Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Trincomalee",
+      "latitude": 8.5874,
+      "longitude": 81.2152,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "ocean university of sri lanka",
+        "ocean university of sri lanka trincomalee regional centre",
+        "ocean university trincomalee",
+        "ocu",
+        "trincomalee regional centre"
+      ],
+      "sourceUrl": "https://ocu.ac.lk/history/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Ambalangoda Study Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Ambalangoda Study Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Ambalangoda",
+      "latitude": 6.2442,
+      "longitude": 80.059,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "ambalangoda study centre",
+        "open university ambalangoda",
+        "open university of sri lanka",
+        "open university of sri lanka ambalangoda study centre",
+        "ousl"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Ambalantota Study Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Ambalantota Study Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Ambalantota",
+      "latitude": 6.1241,
+      "longitude": 81.1185,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "ambalantota study centre",
+        "open university ambalantota",
+        "open university of sri lanka",
+        "open university of sri lanka ambalantota study centre",
+        "ousl"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Ampara Study Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Ampara Study Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Ampara",
+      "latitude": 7.2917,
+      "longitude": 81.672,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "ampara study centre",
+        "open university ampara",
+        "open university of sri lanka",
+        "open university of sri lanka ampara study centre",
+        "ousl"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Anuradhapura Regional Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Anuradhapura Regional Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Anuradhapura",
+      "latitude": 8.3114,
+      "longitude": 80.4037,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "anuradhapura regional centre",
+        "open university anuradhapura",
+        "open university of sri lanka",
+        "open university of sri lanka anuradhapura regional centre",
+        "ousl"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Badulla Regional Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Badulla Regional Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Badulla",
+      "latitude": 6.9934,
+      "longitude": 81.055,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "badulla regional centre",
+        "open university badulla",
+        "open university of sri lanka",
+        "open university of sri lanka badulla regional centre",
+        "ousl"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Bandarawela Study Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Bandarawela Study Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Bandarawela",
+      "latitude": 6.8294,
+      "longitude": 80.99,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "bandarawela study centre",
+        "open university bandarawela",
+        "open university of sri lanka",
+        "open university of sri lanka bandarawela study centre",
+        "ousl"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Batticaloa Regional Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Batticaloa Regional Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Batticaloa",
+      "latitude": 7.717,
+      "longitude": 81.7,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "batticaloa regional centre",
+        "open university batticaloa",
+        "open university of sri lanka",
+        "open university of sri lanka batticaloa regional centre",
+        "ousl"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Colombo Regional Centre (Nawala)",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Colombo Regional Centre (Nawala)",
+      "type": "campus",
+      "sector": "public",
+      "town": "Nawala-Nugegoda",
+      "latitude": 6.8935,
+      "longitude": 79.8868,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "colombo regional centre nawala",
+        "open university nawala nugegoda",
+        "open university of sri lanka",
+        "open university of sri lanka colombo regional centre nawala",
+        "ousl"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Galle Study Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Galle Study Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Galle",
+      "latitude": 6.0329,
+      "longitude": 80.2168,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "galle study centre",
+        "open university galle",
+        "open university of sri lanka",
+        "open university of sri lanka galle study centre",
+        "ousl"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Gampaha Study Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Gampaha Study Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Gampaha",
+      "latitude": 7.0912,
+      "longitude": 79.9983,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "gampaha study centre",
+        "open university gampaha",
+        "open university of sri lanka",
+        "open university of sri lanka gampaha study centre",
+        "ousl"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Hatton Study Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Hatton Study Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Hatton",
+      "latitude": 6.8916,
+      "longitude": 80.5955,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "hatton study centre",
+        "open university hatton",
+        "open university of sri lanka",
+        "open university of sri lanka hatton study centre",
+        "ousl"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Jaffna Regional Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Jaffna Regional Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Jaffna",
+      "latitude": 9.6615,
+      "longitude": 80.0255,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "jaffna regional centre",
+        "open university jaffna",
+        "open university of sri lanka",
+        "open university of sri lanka jaffna regional centre",
+        "ousl"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Kalutara Study Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Kalutara Study Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Kalutara",
+      "latitude": 6.5854,
+      "longitude": 79.9607,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "kalutara study centre",
+        "open university kalutara",
+        "open university of sri lanka",
+        "open university of sri lanka kalutara study centre",
+        "ousl"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Kandy Regional Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Kandy Regional Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Kandy",
+      "latitude": 7.2906,
+      "longitude": 80.6337,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "kandy regional centre",
+        "open university kandy",
+        "open university of sri lanka",
+        "open university of sri lanka kandy regional centre",
+        "ousl"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Kegalle Study Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Kegalle Study Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Kegalle",
+      "latitude": 7.2513,
+      "longitude": 80.3464,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "kegalle study centre",
+        "open university kegalle",
+        "open university of sri lanka",
+        "open university of sri lanka kegalle study centre",
+        "ousl"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Kilinochchi Study Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Kilinochchi Study Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Kilinochchi",
+      "latitude": 9.3803,
+      "longitude": 80.377,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "kilinochchi study centre",
+        "open university kilinochchi",
+        "open university of sri lanka",
+        "open university of sri lanka kilinochchi study centre",
+        "ousl"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Kurunegala Regional Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Kurunegala Regional Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Kurunegala",
+      "latitude": 7.4863,
+      "longitude": 80.3652,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "kurunegala regional centre",
+        "open university kurunegala",
+        "open university of sri lanka",
+        "open university of sri lanka kurunegala regional centre",
+        "ousl"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Mannar Study Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Mannar Study Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Mannar",
+      "latitude": 8.981,
+      "longitude": 79.9044,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "mannar study centre",
+        "open university mannar",
+        "open university of sri lanka",
+        "open university of sri lanka mannar study centre",
+        "ousl"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Matale Study Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Matale Study Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Matale",
+      "latitude": 7.4675,
+      "longitude": 80.6234,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "matale study centre",
+        "open university matale",
+        "open university of sri lanka",
+        "open university of sri lanka matale study centre",
+        "ousl"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Matara Regional Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Matara Regional Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Matara",
+      "latitude": 5.9549,
+      "longitude": 80.555,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "matara regional centre",
+        "open university matara",
+        "open university of sri lanka",
+        "open university of sri lanka matara regional centre",
+        "ousl"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Monaragala Study Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Monaragala Study Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Monaragala",
+      "latitude": 6.8728,
+      "longitude": 81.3507,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "monaragala study centre",
+        "open university monaragala",
+        "open university of sri lanka",
+        "open university of sri lanka monaragala study centre",
+        "ousl"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Mullaitivu Study Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Mullaitivu Study Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Mullaitivu",
+      "latitude": 9.2671,
+      "longitude": 80.8142,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "mullaitivu study centre",
+        "open university mullaitivu",
+        "open university of sri lanka",
+        "open university of sri lanka mullaitivu study centre",
+        "ousl"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Polonnaruwa Study Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Polonnaruwa Study Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Polonnaruwa",
+      "latitude": 7.9403,
+      "longitude": 81.0188,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "open university of sri lanka",
+        "open university of sri lanka polonnaruwa study centre",
+        "open university polonnaruwa",
+        "ousl",
+        "polonnaruwa study centre"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Puttalam Study Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Puttalam Study Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Puttalam",
+      "latitude": 8.0362,
+      "longitude": 79.8283,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "open university of sri lanka",
+        "open university of sri lanka puttalam study centre",
+        "open university puttalam",
+        "ousl",
+        "puttalam study centre"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Ratnapura Regional Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Ratnapura Regional Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Ratnapura",
+      "latitude": 6.7056,
+      "longitude": 80.3847,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "open university of sri lanka",
+        "open university of sri lanka ratnapura regional centre",
+        "open university ratnapura",
+        "ousl",
+        "ratnapura regional centre"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Trincomalee Study Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Trincomalee Study Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Trincomalee",
+      "latitude": 8.5874,
+      "longitude": 81.2152,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "open university of sri lanka",
+        "open university of sri lanka trincomalee study centre",
+        "open university trincomalee",
+        "ousl",
+        "trincomalee study centre"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Open University of Sri Lanka - Vavuniya Study Centre",
+      "organization": "Open University of Sri Lanka",
+      "branch": "Vavuniya Study Centre",
+      "type": "campus",
+      "sector": "public",
+      "town": "Vavuniya",
+      "latitude": 8.7514,
+      "longitude": 80.4971,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "open university of sri lanka",
+        "open university of sri lanka vavuniya study centre",
+        "open university vavuniya",
+        "ousl",
+        "vavuniya study centre"
+      ],
+      "sourceUrl": "https://ou.ac.lk/res/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Rajarata University of Sri Lanka - Medicine Saliyapura",
+      "organization": "Rajarata University of Sri Lanka",
+      "branch": "Medicine Saliyapura",
+      "type": "campus",
+      "sector": "public",
+      "town": "Saliyapura",
+      "latitude": 8.414,
+      "longitude": 80.403,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "medicine saliyapura",
+        "rajarata medical faculty",
+        "rajarata university of sri lanka",
+        "rajarata university of sri lanka medicine saliyapura"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Rajarata University of Sri Lanka - Mihintale Campus",
+      "organization": "Rajarata University of Sri Lanka",
+      "branch": "Mihintale Campus",
+      "type": "campus",
+      "sector": "public",
+      "town": "Mihintale",
+      "latitude": 8.35,
+      "longitude": 80.503,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "mihintale campus",
+        "rajarata university",
+        "rajarata university of sri lanka",
+        "rajarata university of sri lanka mihintale campus",
+        "rusl"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=25&lang=en&option=com_university&view=campuses",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Royal Institute Colombo",
+      "organization": "Royal Institute Colombo",
+      "branch": null,
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Colombo",
+      "latitude": 6.9271,
+      "longitude": 79.8612,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "ric",
+        "royal institute colombo"
+      ],
+      "sourceUrl": "https://ric.lk/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "SAEGIS Campus",
+      "organization": "SAEGIS Campus",
+      "branch": null,
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Nugegoda",
+      "latitude": 6.8649,
+      "longitude": 79.8997,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "saegis",
+        "saegis campus"
+      ],
+      "sourceUrl": "https://saegis.ac.lk/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "SANASA Campus",
+      "organization": "SANASA Campus",
+      "branch": null,
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Kegalle",
+      "latitude": 7.2513,
+      "longitude": 80.3464,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "sanasa campus",
+        "sanasa university"
+      ],
+      "sourceUrl": "https://www.sanasacampus.lk/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "Sabaragamuwa University of Sri Lanka",
+      "organization": "Sabaragamuwa University of Sri Lanka",
+      "branch": null,
+      "type": "campus",
+      "sector": "public",
+      "town": "Belihuloya",
+      "latitude": 6.715,
+      "longitude": 80.787,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "sabaragamuwa university",
+        "sabaragamuwa university of sri lanka",
+        "susl"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "South Eastern University of Sri Lanka - Applied Sciences Sammanthurai",
+      "organization": "South Eastern University of Sri Lanka",
+      "branch": "Applied Sciences Sammanthurai",
+      "type": "campus",
+      "sector": "public",
+      "town": "Sammanthurai",
+      "latitude": 7.362,
+      "longitude": 81.802,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "applied sciences sammanthurai",
+        "seusl science",
+        "south eastern university of sri lanka",
+        "south eastern university of sri lanka applied sciences sammanthurai"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "South Eastern University of Sri Lanka - Oluvil Campus",
+      "organization": "South Eastern University of Sri Lanka",
+      "branch": "Oluvil Campus",
+      "type": "campus",
+      "sector": "public",
+      "town": "Oluvil",
+      "latitude": 7.2833,
+      "longitude": 81.8588,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "oluvil campus",
+        "seusl",
+        "south eastern university",
+        "south eastern university of sri lanka",
+        "south eastern university of sri lanka oluvil campus"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=25&lang=en&option=com_university&view=campuses",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Sri Lanka Institute of Information Technology - City Uni Colombo",
+      "organization": "Sri Lanka Institute of Information Technology",
+      "branch": "City Uni Colombo",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Colombo",
+      "latitude": 6.9271,
+      "longitude": 79.8612,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "city uni colombo",
+        "sliit",
+        "sliit colombo",
+        "sri lanka institute of information technology",
+        "sri lanka institute of information technology city uni colombo"
+      ],
+      "sourceUrl": "https://www.sliit.lk/about/campuses-centers/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "Sri Lanka Institute of Information Technology - Kandy Uni",
+      "organization": "Sri Lanka Institute of Information Technology",
+      "branch": "Kandy Uni",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Kandy",
+      "latitude": 7.2906,
+      "longitude": 80.6337,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "kandy uni",
+        "sliit",
+        "sliit kandy",
+        "sri lanka institute of information technology",
+        "sri lanka institute of information technology kandy uni"
+      ],
+      "sourceUrl": "https://www.sliit.lk/about/campuses-centers/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "Sri Lanka Institute of Information Technology - Kurunegala Centre",
+      "organization": "Sri Lanka Institute of Information Technology",
+      "branch": "Kurunegala Centre",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Kurunegala",
+      "latitude": 7.4863,
+      "longitude": 80.3652,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "kurunegala centre",
+        "sliit",
+        "sliit kurunegala",
+        "sri lanka institute of information technology",
+        "sri lanka institute of information technology kurunegala centre"
+      ],
+      "sourceUrl": "https://www.sliit.lk/about/campuses-centers/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "Sri Lanka Institute of Information Technology - Malabe Campus",
+      "organization": "Sri Lanka Institute of Information Technology",
+      "branch": "Malabe Campus",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Malabe",
+      "latitude": 6.9041,
+      "longitude": 79.9546,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "malabe campus",
+        "sliit",
+        "sliit malabe",
+        "sri lanka institute of information technology",
+        "sri lanka institute of information technology malabe campus"
+      ],
+      "sourceUrl": "https://www.sliit.lk/about/campuses-centers/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "Sri Lanka Institute of Information Technology - Matara Centre",
+      "organization": "Sri Lanka Institute of Information Technology",
+      "branch": "Matara Centre",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Matara",
+      "latitude": 5.9549,
+      "longitude": 80.555,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "matara centre",
+        "sliit",
+        "sliit matara",
+        "sri lanka institute of information technology",
+        "sri lanka institute of information technology matara centre"
+      ],
+      "sourceUrl": "https://www.sliit.lk/about/campuses-centers/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "Sri Lanka Institute of Information Technology - Metro Campus Colombo",
+      "organization": "Sri Lanka Institute of Information Technology",
+      "branch": "Metro Campus Colombo",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Colombo",
+      "latitude": 6.9271,
+      "longitude": 79.8612,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "metro campus colombo",
+        "sliit",
+        "sliit colombo",
+        "sri lanka institute of information technology",
+        "sri lanka institute of information technology metro campus colombo"
+      ],
+      "sourceUrl": "https://www.sliit.lk/about/campuses-centers/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "Sri Lanka Institute of Information Technology - Northern Uni Jaffna",
+      "organization": "Sri Lanka Institute of Information Technology",
+      "branch": "Northern Uni Jaffna",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Jaffna",
+      "latitude": 9.6615,
+      "longitude": 80.0255,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "northern uni jaffna",
+        "sliit",
+        "sliit jaffna",
+        "sri lanka institute of information technology",
+        "sri lanka institute of information technology northern uni jaffna"
+      ],
+      "sourceUrl": "https://www.sliit.lk/about/campuses-centers/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "Sri Lanka Institute of Information Technology - SLIIT International Colombo",
+      "organization": "Sri Lanka Institute of Information Technology",
+      "branch": "SLIIT International Colombo",
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Colombo",
+      "latitude": 6.9271,
+      "longitude": 79.8612,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "sliit",
+        "sliit colombo",
+        "sliit international colombo",
+        "sri lanka institute of information technology",
+        "sri lanka institute of information technology sliit international colombo"
+      ],
+      "sourceUrl": "https://www.sliit.lk/about/campuses-centers/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "Sri Lanka International Buddhist Academy",
+      "organization": "Sri Lanka International Buddhist Academy",
+      "branch": null,
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Kandy",
+      "latitude": 7.2906,
+      "longitude": 80.6337,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "siba",
+        "sri lanka international buddhist academy"
+      ],
+      "sourceUrl": "https://siba.edu.lk/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "Sri Lanka Technological Campus",
+      "organization": "Sri Lanka Technological Campus",
+      "branch": null,
+      "type": "campus",
+      "sector": "non-state",
+      "town": "Padukka",
+      "latitude": 6.8408,
+      "longitude": 80.0903,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "slt campus",
+        "sltc",
+        "sri lanka technological campus"
+      ],
+      "sourceUrl": "https://sltc.ac.lk/",
+      "recognitionSourceUrl": "https://www.mohe.gov.lk/index.php?Itemid=225&id=345&lang=en&option=com_content&view=article"
+    },
+    {
+      "name": "University of Colombo - Main Campus",
+      "organization": "University of Colombo",
+      "branch": "Main Campus",
+      "type": "campus",
+      "sector": "public",
+      "town": "Colombo",
+      "latitude": 6.9271,
+      "longitude": 79.8612,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "colombo university",
+        "main campus",
+        "university of colombo",
+        "university of colombo main campus",
+        "uoc"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=25&lang=en&option=com_university&view=campuses",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "University of Colombo - School of Computing",
+      "organization": "University of Colombo",
+      "branch": "School of Computing",
+      "type": "campus",
+      "sector": "public",
+      "town": "Colombo",
+      "latitude": 6.9271,
+      "longitude": 79.8612,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "school of computing",
+        "ucsc",
+        "university of colombo",
+        "university of colombo school of computing"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "University of Colombo - Sri Palee Campus",
+      "organization": "University of Colombo",
+      "branch": "Sri Palee Campus",
+      "type": "campus",
+      "sector": "public",
+      "town": "Horana",
+      "latitude": 6.7159,
+      "longitude": 80.0626,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "sri palee campus",
+        "sri pali campus",
+        "university of colombo",
+        "university of colombo sri palee campus"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=25&lang=en&option=com_university&view=campuses",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "University of Jaffna - Ariviyal Nagar Campus",
+      "organization": "University of Jaffna",
+      "branch": "Ariviyal Nagar Campus",
+      "type": "campus",
+      "sector": "public",
+      "town": "Kilinochchi",
+      "latitude": 9.3803,
+      "longitude": 80.377,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "ariviyal nagar campus",
+        "jaffna kilinochchi campus",
+        "university of jaffna",
+        "university of jaffna ariviyal nagar campus"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=25&lang=en&option=com_university&view=campuses",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "University of Jaffna - Main Campus",
+      "organization": "University of Jaffna",
+      "branch": "Main Campus",
+      "type": "campus",
+      "sector": "public",
+      "town": "Jaffna",
+      "latitude": 9.6615,
+      "longitude": 80.0255,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "jaffna university",
+        "main campus",
+        "university of jaffna",
+        "university of jaffna main campus",
+        "uoj"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=25&lang=en&option=com_university&view=campuses",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "University of Kelaniya - Faculty of Medicine Ragama",
+      "organization": "University of Kelaniya",
+      "branch": "Faculty of Medicine Ragama",
+      "type": "campus",
+      "sector": "public",
+      "town": "Ragama",
+      "latitude": 7.0302,
+      "longitude": 79.917,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "faculty of medicine ragama",
+        "kelaniya medical faculty",
+        "university of kelaniya",
+        "university of kelaniya faculty of medicine ragama"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "University of Kelaniya - Main Campus",
+      "organization": "University of Kelaniya",
+      "branch": "Main Campus",
+      "type": "campus",
+      "sector": "public",
+      "town": "Kelaniya",
+      "latitude": 6.9749,
+      "longitude": 79.9159,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "kelaniya university",
+        "main campus",
+        "university of kelaniya",
+        "university of kelaniya main campus",
+        "uok"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=25&lang=en&option=com_university&view=campuses",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "University of Moratuwa - Institute of Technology Diyagama",
+      "organization": "University of Moratuwa",
+      "branch": "Institute of Technology Diyagama",
+      "type": "campus",
+      "sector": "public",
+      "town": "Homagama",
+      "latitude": 6.8412,
+      "longitude": 80.003,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "diyagama campus",
+        "institute of technology diyagama",
+        "itum",
+        "university of moratuwa",
+        "university of moratuwa institute of technology diyagama"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "University of Moratuwa - Katubedda",
+      "organization": "University of Moratuwa",
+      "branch": "Katubedda",
+      "type": "campus",
+      "sector": "public",
+      "town": "Katubedda",
+      "latitude": 6.7969,
+      "longitude": 79.9018,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "katubedda",
+        "moratuwa university",
+        "university of moratuwa",
+        "university of moratuwa katubedda",
+        "uom"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "University of Peradeniya",
+      "organization": "University of Peradeniya",
+      "branch": null,
+      "type": "campus",
+      "sector": "public",
+      "town": "Peradeniya",
+      "latitude": 7.2541,
+      "longitude": 80.5974,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "peradeniya university",
+        "university of peradeniya",
+        "uop"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "University of Ruhuna - Agriculture and Technology Mapalana",
+      "organization": "University of Ruhuna",
+      "branch": "Agriculture and Technology Mapalana",
+      "type": "campus",
+      "sector": "public",
+      "town": "Mapalana",
+      "latitude": 6.056,
+      "longitude": 80.561,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "agriculture and technology mapalana",
+        "ruhuna agriculture",
+        "university of ruhuna",
+        "university of ruhuna agriculture and technology mapalana"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "University of Ruhuna - Engineering Faculty Hapugala",
+      "organization": "University of Ruhuna",
+      "branch": "Engineering Faculty Hapugala",
+      "type": "campus",
+      "sector": "public",
+      "town": "Hapugala",
+      "latitude": 6.078,
+      "longitude": 80.191,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "engineering faculty hapugala",
+        "ruhuna engineering",
+        "university of ruhuna",
+        "university of ruhuna engineering faculty hapugala"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "University of Ruhuna - Medicine and Allied Health Karapitiya",
+      "organization": "University of Ruhuna",
+      "branch": "Medicine and Allied Health Karapitiya",
+      "type": "campus",
+      "sector": "public",
+      "town": "Karapitiya",
+      "latitude": 6.0662,
+      "longitude": 80.2272,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "medicine and allied health karapitiya",
+        "ruhuna medical faculty",
+        "university of ruhuna",
+        "university of ruhuna medicine and allied health karapitiya"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "University of Ruhuna - Wellamadama Campus",
+      "organization": "University of Ruhuna",
+      "branch": "Wellamadama Campus",
+      "type": "campus",
+      "sector": "public",
+      "town": "Wellamadama",
+      "latitude": 5.9383,
+      "longitude": 80.5763,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "ruhuna university",
+        "university of ruhuna",
+        "university of ruhuna wellamadama campus",
+        "uor",
+        "wellamadama campus"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=25&lang=en&option=com_university&view=campuses",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "University of Sri Jayewardenepura - Gangodawila",
+      "organization": "University of Sri Jayewardenepura",
+      "branch": "Gangodawila",
+      "type": "campus",
+      "sector": "public",
+      "town": "Nugegoda",
+      "latitude": 6.8649,
+      "longitude": 79.8997,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "gangodawila",
+        "japura university",
+        "university of sri jayewardenepura",
+        "university of sri jayewardenepura gangodawila",
+        "usj"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "University of Sri Jayewardenepura - Technology Faculty Pitipana",
+      "organization": "University of Sri Jayewardenepura",
+      "branch": "Technology Faculty Pitipana",
+      "type": "campus",
+      "sector": "public",
+      "town": "Homagama",
+      "latitude": 6.8412,
+      "longitude": 80.003,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "technology faculty pitipana",
+        "university of sri jayewardenepura",
+        "university of sri jayewardenepura technology faculty pitipana",
+        "usj technology"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "University of Vavuniya Sri Lanka - Pambaimadu Campus",
+      "organization": "University of Vavuniya Sri Lanka",
+      "branch": "Pambaimadu Campus",
+      "type": "campus",
+      "sector": "public",
+      "town": "Pambaimadu",
+      "latitude": 8.759,
+      "longitude": 80.497,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "pambaimadu campus",
+        "university of vavuniya sri lanka",
+        "university of vavuniya sri lanka pambaimadu campus",
+        "uov",
+        "vavuniya university"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=25&lang=en&option=com_university&view=campuses",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "University of Vocational Technology",
+      "organization": "University of Vocational Technology",
+      "branch": null,
+      "type": "campus",
+      "sector": "public",
+      "town": "Ratmalana",
+      "latitude": 6.8211,
+      "longitude": 79.8862,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "university of vocational technology",
+        "univotec",
+        "uovt"
+      ],
+      "sourceUrl": "https://uovt.ac.lk/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "University of the Visual and Performing Arts",
+      "organization": "University of the Visual and Performing Arts",
+      "branch": null,
+      "type": "campus",
+      "sector": "public",
+      "town": "Colombo",
+      "latitude": 6.9271,
+      "longitude": 79.8612,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "university of the visual and performing arts",
+        "uvpa"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Uva Wellassa University of Sri Lanka",
+      "organization": "Uva Wellassa University of Sri Lanka",
+      "branch": null,
+      "type": "campus",
+      "sector": "public",
+      "town": "Badulla",
+      "latitude": 6.9934,
+      "longitude": 81.055,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "uva wellassa",
+        "uva wellassa university of sri lanka",
+        "uwu"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Wayamba University of Sri Lanka - Kuliyapitiya Premises",
+      "organization": "Wayamba University of Sri Lanka",
+      "branch": "Kuliyapitiya Premises",
+      "type": "campus",
+      "sector": "public",
+      "town": "Kuliyapitiya",
+      "latitude": 7.468,
+      "longitude": 80.0401,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "kuliyapitiya premises",
+        "wayamba university",
+        "wayamba university of sri lanka",
+        "wayamba university of sri lanka kuliyapitiya premises",
+        "wusl"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Wayamba University of Sri Lanka - Makandura Premises",
+      "organization": "Wayamba University of Sri Lanka",
+      "branch": "Makandura Premises",
+      "type": "campus",
+      "sector": "public",
+      "town": "Makandura",
+      "latitude": 7.322,
+      "longitude": 79.989,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "makandura premises",
+        "wayamba makandura",
+        "wayamba university of sri lanka",
+        "wayamba university of sri lanka makandura premises"
+      ],
+      "sourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Colombo South Teaching Hospital",
+      "organization": "Colombo South Teaching Hospital",
+      "branch": null,
+      "type": "workplace",
+      "sector": "employment",
+      "town": "Dehiwala",
+      "latitude": 6.8516,
+      "longitude": 79.8653,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "colombo south teaching hospital",
+        "csth",
+        "kalubowila hospital"
+      ],
+      "sourceUrl": "https://www.gov.lk/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Galle City Centre",
+      "organization": "Galle City Centre",
+      "branch": null,
+      "type": "workplace",
+      "sector": "employment",
+      "town": "Galle",
+      "latitude": 6.0329,
+      "longitude": 80.2168,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "galle city centre",
+        "galle office"
+      ],
+      "sourceUrl": "https://www.gov.lk/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Kandy City Centre",
+      "organization": "Kandy City Centre",
+      "branch": null,
+      "type": "workplace",
+      "sector": "employment",
+      "town": "Kandy",
+      "latitude": 7.2906,
+      "longitude": 80.6337,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "kandy city centre",
+        "kcc"
+      ],
+      "sourceUrl": "https://www.gov.lk/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "National Hospital of Sri Lanka",
+      "organization": "National Hospital of Sri Lanka",
+      "branch": null,
+      "type": "workplace",
+      "sector": "employment",
+      "town": "Colombo",
+      "latitude": 6.9271,
+      "longitude": 79.8612,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "national hospital of sri lanka",
+        "nhsl"
+      ],
+      "sourceUrl": "https://www.gov.lk/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Orion City IT Park",
+      "organization": "Orion City IT Park",
+      "branch": null,
+      "type": "workplace",
+      "sector": "employment",
+      "town": "Colombo",
+      "latitude": 6.9271,
+      "longitude": 79.8612,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "orion city",
+        "orion city it park"
+      ],
+      "sourceUrl": "https://www.gov.lk/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "TRACE Expert City",
+      "organization": "TRACE Expert City",
+      "branch": null,
+      "type": "workplace",
+      "sector": "employment",
+      "town": "Maradana",
+      "latitude": 6.927,
+      "longitude": 79.864,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "trace city",
+        "trace expert city"
+      ],
+      "sourceUrl": "https://www.gov.lk/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "Teaching Hospital Karapitiya",
+      "organization": "Teaching Hospital Karapitiya",
+      "branch": null,
+      "type": "workplace",
+      "sector": "employment",
+      "town": "Karapitiya",
+      "latitude": 6.0662,
+      "longitude": 80.2272,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "teaching hospital karapitiya",
+        "th karapitiya"
+      ],
+      "sourceUrl": "https://www.gov.lk/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    },
+    {
+      "name": "World Trade Center Colombo",
+      "organization": "World Trade Center Colombo",
+      "branch": null,
+      "type": "workplace",
+      "sector": "employment",
+      "town": "Colombo Fort",
+      "latitude": 6.9344,
+      "longitude": 79.8428,
+      "locationPrecision": "town-reference",
+      "aliases": [
+        "world trade center colombo",
+        "world trade centre",
+        "wtc"
+      ],
+      "sourceUrl": "https://www.gov.lk/",
+      "recognitionSourceUrl": "https://www.ugc.ac.lk/index.php?Itemid=10&id=14&lang=en&option=com_university&view=single"
+    }
+  ]
+}

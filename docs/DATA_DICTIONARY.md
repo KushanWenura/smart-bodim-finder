@@ -4,7 +4,7 @@
 |---|---|
 | `users` | Shared tenant/owner/admin identity; indexed role/status, hashed password, soft deletion. |
 | `tenant_profiles`, `owner_profiles` | Role-specific preferences and verification. One-to-one with users. Required facilities are an explicitly documented JSON preference cache. |
-| `locations`, `institutions`, `facilities` | Reference data; unique area tuple/facility code; coordinates are decimals. Institutions store organization/branch names, JSON aliases and a provenance URL so one organization can have multiple independently searchable branches. |
+| `locations`, `institutions`, `facilities` | Reference data; unique area tuple/facility code; coordinates are decimals. Institutions are synchronized from the checked-in nationwide catalog and store organization/branch names, JSON aliases and a provenance URL so one organization can have multiple independently searchable branches. |
 | `listings` | Owner, private/public location, integer LKR money, availability, moderated status, aggregate counters and timestamps; soft deleted. |
 | `listing_facility` | Unique many-to-many facility assignment. |
 | `listing_images` | Safe storage/thumbnail paths, MIME/size/dimensions, caption/alt/order/cover; unique listing order. |

@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Conversation;
 use App\Models\Facility;
-use App\Models\Institution;
 use App\Models\Listing;
 use App\Models\ListingNearbyPlace;
 use App\Models\Location;
@@ -24,6 +23,7 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
+        $this->call(InstitutionSeeder::class);
         $this->seedProximityData();
 
         if (User::where('email', 'admin@smartbodim.lk')->exists()) {
@@ -70,50 +70,6 @@ class DatabaseSeeder extends Seeder
 
     private function seedProximityData(): void
     {
-        $icbtSource = 'https://icbt.lk/branches/';
-        $destinations = [
-            ['name' => 'University of Moratuwa', 'type' => 'campus', 'latitude' => 6.7969, 'longitude' => 79.9018, 'aliases' => ['uom', 'moratuwa university', 'katubedda campus']],
-            ['name' => 'University of Colombo', 'type' => 'campus', 'latitude' => 6.9003, 'longitude' => 79.8587, 'aliases' => ['uoc', 'colombo university']],
-            ['name' => 'University of Sri Jayewardenepura', 'type' => 'campus', 'latitude' => 6.8528, 'longitude' => 79.9036, 'aliases' => ['usj', 'jayewardenepura university', 'japura university']],
-            ['name' => 'SLIIT Malabe Campus', 'type' => 'campus', 'latitude' => 6.9147, 'longitude' => 79.9739, 'organization' => 'SLIIT', 'branch' => 'Malabe', 'aliases' => ['sliit', 'sliit malabe']],
-            ['name' => 'NSBM Green University', 'type' => 'campus', 'latitude' => 6.8213, 'longitude' => 80.0407, 'aliases' => ['nsbm', 'nsbm homagama']],
-            ['name' => 'University of Kelaniya', 'type' => 'campus', 'latitude' => 6.9749, 'longitude' => 79.9159, 'aliases' => ['uok', 'kelaniya university']],
-            ['name' => 'University of Peradeniya', 'type' => 'campus', 'latitude' => 7.2541, 'longitude' => 80.5974, 'aliases' => ['uop', 'peradeniya university']],
-            ['name' => 'University of Ruhuna', 'type' => 'campus', 'latitude' => 5.9383, 'longitude' => 80.5763, 'aliases' => ['uor', 'ruhuna university']],
-            ['name' => 'University of Jaffna', 'type' => 'campus', 'latitude' => 9.6849, 'longitude' => 80.0220, 'aliases' => ['uofj', 'jaffna university']],
-            ['name' => 'Kotelawala Defence University', 'type' => 'campus', 'latitude' => 6.8207, 'longitude' => 79.8868, 'aliases' => ['kdu', 'kotelawala university']],
-            ['name' => 'ICBT Campus - Colombo', 'type' => 'campus', 'latitude' => 6.8859, 'longitude' => 79.8573, 'organization' => 'ICBT Campus', 'branch' => 'Colombo', 'aliases' => ['icbt', 'icbt campus', 'icbt colombo', 'icbt bambalapitiya'], 'source' => $icbtSource],
-            ['name' => 'ICBT Campus - Kandy', 'type' => 'campus', 'latitude' => 7.2963, 'longitude' => 80.6350, 'organization' => 'ICBT Campus', 'branch' => 'Kandy', 'aliases' => ['icbt', 'icbt campus', 'icbt kandy'], 'source' => $icbtSource],
-            ['name' => 'ICBT Campus - Galle', 'type' => 'campus', 'latitude' => 6.0375, 'longitude' => 80.2160, 'organization' => 'ICBT Campus', 'branch' => 'Galle', 'aliases' => ['icbt', 'icbt campus', 'icbt galle'], 'source' => $icbtSource],
-            ['name' => 'ICBT Campus - Nugegoda', 'type' => 'campus', 'latitude' => 6.8721, 'longitude' => 79.8899, 'organization' => 'ICBT Campus', 'branch' => 'Nugegoda', 'aliases' => ['icbt', 'icbt campus', 'icbt nugegoda'], 'source' => $icbtSource],
-            ['name' => 'ICBT Campus - Batticaloa', 'type' => 'campus', 'latitude' => 7.7102, 'longitude' => 81.7026, 'organization' => 'ICBT Campus', 'branch' => 'Batticaloa', 'aliases' => ['icbt', 'icbt campus', 'icbt batticaloa'], 'source' => $icbtSource],
-            ['name' => 'ICBT Campus - Matara', 'type' => 'campus', 'latitude' => 5.9485, 'longitude' => 80.5350, 'organization' => 'ICBT Campus', 'branch' => 'Matara', 'aliases' => ['icbt', 'icbt campus', 'icbt matara', 'icbt southern campus'], 'source' => $icbtSource],
-            ['name' => 'ICBT Campus - Jaffna', 'type' => 'campus', 'latitude' => 9.6667, 'longitude' => 80.0250, 'organization' => 'ICBT Campus', 'branch' => 'Jaffna', 'aliases' => ['icbt', 'icbt campus', 'icbt jaffna'], 'source' => $icbtSource],
-            ['name' => 'ICBT Campus - Kurunegala', 'type' => 'campus', 'latitude' => 7.4863, 'longitude' => 80.3652, 'organization' => 'ICBT Campus', 'branch' => 'Kurunegala', 'aliases' => ['icbt', 'icbt campus', 'icbt kurunegala'], 'source' => $icbtSource],
-            ['name' => 'ICBT Campus - Gampaha', 'type' => 'campus', 'latitude' => 7.0912, 'longitude' => 79.9983, 'organization' => 'ICBT Campus', 'branch' => 'Gampaha', 'aliases' => ['icbt', 'icbt campus', 'icbt gampaha'], 'source' => $icbtSource],
-            ['name' => 'ICBT Campus - Anuradhapura', 'type' => 'campus', 'latitude' => 8.3350, 'longitude' => 80.4108, 'organization' => 'ICBT Campus', 'branch' => 'Anuradhapura', 'aliases' => ['icbt', 'icbt campus', 'icbt anuradhapura'], 'source' => $icbtSource],
-            ['name' => 'World Trade Center Colombo', 'type' => 'workplace', 'latitude' => 6.9320, 'longitude' => 79.8440, 'aliases' => ['wtc', 'world trade centre', 'fort office']],
-            ['name' => 'Orion City IT Park', 'type' => 'workplace', 'latitude' => 6.9466, 'longitude' => 79.8795, 'aliases' => ['orion city', 'dematagoda it park']],
-            ['name' => 'TRACE Expert City', 'type' => 'workplace', 'latitude' => 6.9270, 'longitude' => 79.8624, 'aliases' => ['trace city', 'maradana tech hub']],
-            ['name' => 'Kandy City Centre', 'type' => 'workplace', 'latitude' => 7.2938, 'longitude' => 80.6407, 'aliases' => ['kcc', 'kandy office']],
-            ['name' => 'Galle City Centre', 'type' => 'workplace', 'latitude' => 6.0329, 'longitude' => 80.2168, 'aliases' => ['galle office', 'galle town workplace']],
-            ['name' => 'Colombo South Teaching Hospital', 'type' => 'workplace', 'latitude' => 6.8667, 'longitude' => 79.8771, 'aliases' => ['kalubowila hospital', 'csth']],
-            ['name' => 'National Hospital of Sri Lanka', 'type' => 'workplace', 'latitude' => 6.9187, 'longitude' => 79.8685, 'aliases' => ['national hospital colombo', 'nhsl']],
-            ['name' => 'Teaching Hospital Karapitiya', 'type' => 'workplace', 'latitude' => 6.0669, 'longitude' => 80.2261, 'aliases' => ['karapitiya hospital', 'th karapitiya']],
-        ];
-        foreach ($destinations as $destination) {
-            Institution::query()->updateOrCreate(['name' => $destination['name']], [
-                'type' => $destination['type'],
-                'organization_name' => $destination['organization'] ?? $destination['name'],
-                'branch_name' => $destination['branch'] ?? null,
-                'aliases' => $destination['aliases'] ?? [],
-                'source_url' => $destination['source'] ?? null,
-                'latitude' => $destination['latitude'],
-                'longitude' => $destination['longitude'],
-                'active' => true,
-            ]);
-        }
-
         if (! DB::getSchemaBuilder()->hasTable('listings') || ! Listing::query()->exists()) {
             return;
         }
@@ -143,7 +99,7 @@ class DatabaseSeeder extends Seeder
             DB::table('ai_model_versions')->where('purpose', 'search')->update(['active' => false, 'updated_at' => now()]);
             DB::table('ai_model_versions')->updateOrInsert(
                 ['purpose' => 'search', 'version' => 'smart-bodim-minilm-v1'],
-                ['base_model' => 'sentence-transformers/all-MiniLM-L6-v2', 'manifest' => json_encode(['profile' => 'fine-tuned', 'dataset' => 'smart-bodim-synthetic-domain-v1', 'trainPairs' => 34, 'heldOutPairs' => 14, 'loss' => 'MultipleNegativesRankingLoss']), 'active' => true, 'created_at' => now(), 'updated_at' => now()]
+                ['base_model' => 'sentence-transformers/all-MiniLM-L6-v2', 'manifest' => json_encode(['profile' => 'fine-tuned', 'dataset' => 'smart-bodim-synthetic-domain-v3', 'trainPairs' => 5376, 'heldOutPairs' => 2304, 'loss' => 'CosineTripletMarginLoss']), 'active' => true, 'created_at' => now(), 'updated_at' => now()]
             );
         }
     }

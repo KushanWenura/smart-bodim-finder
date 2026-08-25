@@ -11,30 +11,7 @@ import re
 from pathlib import Path
 
 
-ICBT_SOURCE = "https://icbt.lk/branches/"
-
-DESTINATIONS = [
-    ("University of Moratuwa", "University of Moratuwa", None, "Moratuwa", "campus"),
-    ("University of Colombo", "University of Colombo", None, "Colombo", "campus"),
-    ("University of Sri Jayewardenepura", "University of Sri Jayewardenepura", None, "Nugegoda", "campus"),
-    ("SLIIT Malabe Campus", "SLIIT", "Malabe", "Malabe", "campus"),
-    ("NSBM Green University", "NSBM Green University", None, "Homagama", "campus"),
-    ("University of Kelaniya", "University of Kelaniya", None, "Kelaniya", "campus"),
-    ("University of Peradeniya", "University of Peradeniya", None, "Peradeniya", "campus"),
-    ("University of Ruhuna", "University of Ruhuna", None, "Matara", "campus"),
-    ("University of Jaffna", "University of Jaffna", None, "Jaffna", "campus"),
-    ("Kotelawala Defence University", "Kotelawala Defence University", None, "Ratmalana", "campus"),
-    *[(f"ICBT Campus - {branch}", "ICBT Campus", branch, branch, "campus") for branch in
-      ["Colombo", "Kandy", "Galle", "Nugegoda", "Batticaloa", "Matara", "Jaffna", "Kurunegala", "Gampaha", "Anuradhapura"]],
-    ("World Trade Center Colombo", "World Trade Center Colombo", None, "Colombo Fort", "workplace"),
-    ("Orion City IT Park", "Orion City IT Park", None, "Colombo", "workplace"),
-    ("TRACE Expert City", "TRACE Expert City", None, "Maradana", "workplace"),
-    ("Kandy City Centre", "Kandy City Centre", None, "Kandy", "workplace"),
-    ("Galle City Centre", "Galle City Centre", None, "Galle", "workplace"),
-    ("Colombo South Teaching Hospital", "Colombo South Teaching Hospital", None, "Kalubowila", "workplace"),
-    ("National Hospital of Sri Lanka", "National Hospital of Sri Lanka", None, "Colombo", "workplace"),
-    ("Teaching Hospital Karapitiya", "Teaching Hospital Karapitiya", None, "Karapitiya", "workplace"),
-]
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 SCENARIOS = [
     ("private room", "female-only", ["WiFi", "attached bathroom"], 30000, 5),
@@ -63,17 +40,28 @@ def slug(value: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", value.casefold()).strip("-")
 
 
-def generate() -> list[dict]:
+def load_destinations(path: Path) -> list[dict]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    return payload["destinations"]
+
+
+def generate(catalog_path: Path) -> list[dict]:
+    destinations = load_destinations(catalog_path)
     rows: list[dict] = []
     counter = 1
-    for destination_index, (destination, organization, branch, area, destination_type) in enumerate(DESTINATIONS):
+    for destination_index, record in enumerate(destinations):
+        destination = record["name"]
+        organization = record["organization"]
+        branch = record["branch"]
+        area = record["town"]
+        destination_type = record["type"]
         for scenario_index, (property_type, gender, facilities, budget, radius) in enumerate(SCENARIOS, 1):
             group_id = f"{slug(destination)}-{scenario_index:02d}"
-            if organization == "ICBT Campus":
-                other_branches = [item for item in DESTINATIONS if item[1] == organization and item[0] != destination]
-                wrong_destination = other_branches[(scenario_index + destination_index) % len(other_branches)][0]
+            other_branches = [item for item in destinations if item["organization"] == organization and item["name"] != destination]
+            if other_branches:
+                wrong_destination = other_branches[(scenario_index + destination_index) % len(other_branches)]["name"]
             else:
-                wrong_destination = DESTINATIONS[(destination_index + scenario_index + 5) % len(DESTINATIONS)][0]
+                wrong_destination = destinations[(destination_index + scenario_index + 5) % len(destinations)]["name"]
             facility_text = " and ".join(facilities)
             positive_price = budget - 1500 - (scenario_index * 125)
             positive = (
@@ -106,8 +94,8 @@ def generate() -> list[dict]:
                     "languageStyle": style,
                     "constraints": {"propertyType": property_type, "gender": gender, "facilities": facilities, "maxBudgetLkr": budget, "radiusKm": radius},
                     "hardNegativeReasons": ["wrong destination or branch", "over budget", "missing required facility"],
-                    "destinationSource": ICBT_SOURCE if organization == "ICBT Campus" else "project-curated synthetic academic directory",
-                    "source": "smart-bodim-synthetic-domain-v2",
+                    "destinationSource": record["sourceUrl"],
+                    "source": "smart-bodim-synthetic-domain-v3",
                     "license": "CC0-1.0",
                 })
                 counter += 1
@@ -116,12 +104,13 @@ def generate() -> list[dict]:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--output", type=Path, default=Path("../datasets/raw/smart_bodim_search_pairs.jsonl"))
+    parser.add_argument("--catalog", type=Path, default=PROJECT_ROOT / "datasets/catalog/sri_lanka_higher_education_destinations.json")
+    parser.add_argument("--output", type=Path, default=PROJECT_ROOT / "datasets/raw/smart_bodim_search_pairs.jsonl")
     args = parser.parse_args()
-    rows = generate()
+    rows = generate(args.catalog)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text("\n".join(json.dumps(row, ensure_ascii=False) for row in rows) + "\n", encoding="utf-8")
-    print(json.dumps({"output": str(args.output), "rows": len(rows), "groups": len({row['groupId'] for row in rows}), "branches": len({row['destination'] for row in rows})}, indent=2))
+    print(json.dumps({"output": str(args.output), "rows": len(rows), "groups": len({row['groupId'] for row in rows}), "destinations": len({row['destination'] for row in rows})}, indent=2))
 
 
 if __name__ == "__main__":

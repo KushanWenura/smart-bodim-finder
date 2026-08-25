@@ -78,9 +78,9 @@ class SmartBodimApiTest extends TestCase
 
     public function test_destination_search_orders_verified_listings_by_distance(): void
     {
-        $response = $this->getJson('/api/v1/proximity?destination=University%20of%20Moratuwa&radiusKm=20')
+        $response = $this->getJson('/api/v1/proximity?destination=University%20of%20Moratuwa%20Katubedda&radiusKm=20')
             ->assertOk()
-            ->assertJsonPath('destination.name', 'University of Moratuwa')
+            ->assertJsonPath('destination.name', 'University of Moratuwa - Katubedda')
             ->assertJsonPath('meta.distanceMethod', 'Haversine straight-line distance');
 
         $rows = collect($response->json('data'));
@@ -105,9 +105,9 @@ class SmartBodimApiTest extends TestCase
         Http::fake(['*/v1/search' => Http::response(['mode' => 'fixture-tfidf', 'results' => []])]);
 
         $response = $this->postJson('/api/v1/assistant/chat', [
-            'message' => 'Find a WiFi room within 20 km of University of Moratuwa under Rs. 40000',
+            'message' => 'Find a WiFi room within 20 km of University of Moratuwa Katubedda under Rs. 40000',
         ])->assertOk()
-            ->assertJsonPath('interpreted.destination.name', 'University of Moratuwa');
+            ->assertJsonPath('interpreted.destination.name', 'University of Moratuwa - Katubedda');
 
         $this->assertNotEmpty($response->json('results'));
         collect($response->json('results'))->each(function (array $listing): void {
@@ -126,6 +126,30 @@ class SmartBodimApiTest extends TestCase
         $this->assertContains('Kandy', $branches->pluck('branchName'));
         $this->assertContains('Jaffna', $branches->pluck('branchName'));
         $branches->each(fn (array $branch) => $this->assertNotEmpty($branch['name']));
+    }
+
+    public function test_destination_directory_covers_nationwide_public_and_non_state_networks(): void
+    {
+        $destinations = collect($this->getJson('/api/v1/destinations')->assertOk()->json('data'));
+        $campuses = $destinations->where('type', 'campus');
+
+        $this->assertCount(160, $destinations);
+        $this->assertCount(152, $campuses);
+        $this->assertCount(41, $campuses->pluck('organizationName')->unique());
+        $this->assertCount(38, $campuses->where('organizationName', 'ESOFT Metro Campus'));
+        $this->assertCount(27, $campuses->where('organizationName', 'Open University of Sri Lanka'));
+        $this->assertCount(10, $campuses->where('organizationName', 'ICBT Campus'));
+        $this->assertCount(8, $campuses->where('organizationName', 'Sri Lanka Institute of Information Technology'));
+        $this->assertCount(8, $campuses->where('organizationName', 'National Institute of Business Management'));
+        $this->assertCount(4, $campuses->where('organizationName', 'CINEC Campus'));
+    }
+
+    public function test_chatbot_clarifies_large_islandwide_branch_networks(): void
+    {
+        $this->postJson('/api/v1/assistant/chat', ['message' => 'Find a room near ESOFT'])
+            ->assertOk()
+            ->assertJsonPath('search.mode', 'branch-clarification')
+            ->assertJsonCount(38, 'suggestions');
     }
 
     public function test_generic_multi_branch_destination_requires_clarification(): void
