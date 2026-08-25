@@ -236,7 +236,66 @@ export function AiChatbot() {
   </div>;
 }
 
-export function PublicLayout({ children }: { children: ReactNode }) { return <><Header /><main id="main">{children}</main><Footer /><AiChatbot /></>; }
+function MotionOrchestrator() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const selector = [
+      '#main > section',
+      '#main .bb-property-hero',
+      '#main .bb-detail-story > *',
+      '#main .bb-featured-grid > div',
+      '#main .bb-destination-list > a',
+      '#main .bb-how-grid > article',
+      '#main .sb-nearby-preview > article',
+      '#main .bb-original-review-grid > article',
+      '#main .client-action-grid > a',
+      '#main .client-content-card',
+      '#main .panel',
+      '#main .form-card',
+      '#main .table-wrap',
+    ].join(',');
+    let order = 0;
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -5% 0px' });
+
+    const register = (root: ParentNode) => {
+      const elements = Array.from(root.querySelectorAll<HTMLElement>(selector));
+      if (root instanceof HTMLElement && root.matches(selector)) elements.unshift(root);
+      elements.forEach(element => {
+        if (element.classList.contains('bb-motion-item')) return;
+        element.classList.add('bb-motion-item');
+        element.dataset.motionKind = element.matches('article, a, .panel, .form-card, .client-content-card, .table-wrap, .bb-featured-grid > div') ? 'card' : 'section';
+        element.style.setProperty('--bb-motion-order', String(order++ % 6));
+        observer.observe(element);
+      });
+    };
+
+    const frame = window.requestAnimationFrame(() => register(document));
+    const mutations = new MutationObserver(records => records.forEach(record => record.addedNodes.forEach(node => {
+      if (node instanceof HTMLElement) register(node);
+    })));
+    const main = document.getElementById('main');
+    if (main) mutations.observe(main, { childList: true, subtree: true });
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      mutations.disconnect();
+      observer.disconnect();
+    };
+  }, [location.pathname, location.search]);
+
+  return null;
+}
+
+export function PublicLayout({ children }: { children: ReactNode }) { return <><MotionOrchestrator /><Header /><main id="main">{children}</main><Footer /><AiChatbot /></>; }
 
 const links: Record<Role, Array<[string, string, string]>> = {
   tenant: [['dashboard', 'bi-grid', 'Overview'], ['favorites', 'bi-heart', 'Favorites'], ['messages', 'bi-chat-dots', 'Messages'], ['saved-searches', 'bi-bell', 'Search alerts'], ['reviews', 'bi-star', 'Reviews'], ['profile', 'bi-person', 'Preferences'], ['security', 'bi-shield-lock', 'Security'], ['notifications', 'bi-inbox', 'Notifications']],
@@ -246,7 +305,7 @@ const links: Record<Role, Array<[string, string, string]>> = {
 
 export function RoleLayout({ role, children }: { role: Role; children: ReactNode }) {
   const { user } = useAuth();
-  return <><Header workspaceRole={role} /><main id="main" className={`sb-workspace sb-workspace-${role}`}>
+  return <><MotionOrchestrator /><Header workspaceRole={role} /><main id="main" className={`sb-workspace sb-workspace-${role}`}>
     <aside className="sb-sidebar">
       <div className="sb-side-profile"><span>{initials(user?.name)}</span><div><strong>{user?.name}</strong><small>{role === 'admin' ? 'Platform operations' : role === 'owner' ? 'Verified property partner' : 'Tenant account'}</small></div></div>
       <nav aria-label={`${role} workspace navigation`}>{links[role].map(([path, icon, label]) => <NavLink key={path} className={({ isActive }) => isActive ? 'active' : ''} to={`/${role}/${path}`}><i className={`bi ${icon}`} /><span>{label}</span></NavLink>)}</nav>
