@@ -74,6 +74,6 @@ export default function Home() {
       ].map(([number, title, copy]) => <article key={number}><span>{number}</span><i className={`bi ${number === '01' ? 'bi-chat-heart' : number === '02' ? 'bi-shield-check' : number === '03' ? 'bi-bar-chart' : 'bi-lightbulb'}`} /><h3>{title}</h3><p>{copy}</p></article>)}</div>
     </div></section>
 
-    <section className="bb-home-end"><div className="container"><div><i className="bi bi-shield-heart" /><span><small>Friendly does not mean careless</small><h2>View the place. Meet the owner. Pay only when you are sure.</h2></span></div><Link to="/safety">Our safety promise <i className="bi bi-arrow-right" /></Link></div></section>
+    <section className="bb-home-end"><div className="container"><div><BuddyMark /><span><small>Friendly does not mean careless</small><h2>View the place. Meet the owner. Pay only when you are sure.</h2></span></div><Link to="/safety">Our safety promise <i className="bi bi-arrow-right" /></Link></div></section>
   </PublicLayout>;
 }

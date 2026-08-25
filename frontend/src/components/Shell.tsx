@@ -200,7 +200,7 @@ export function AiChatbot() {
       </form>
       <footer><span><i className="bi bi-funnel" /> Hard filters first</span><span><i className="bi bi-bar-chart" /> Suitability ranked second</span></footer>
     </section>}
-    <button className="sb-ai-launcher" aria-label={open ? 'Close Buddy AI assistant' : 'Open Buddy AI assistant'} aria-expanded={open} onClick={() => setOpen(!open)}><span><BuddyMark /></span><b>Ask Buddy</b><small>Your stay sidekick</small></button>
+    <button className="sb-ai-launcher" title={open ? 'Close Buddy AI' : 'Ask Buddy AI'} aria-label={open ? 'Close Buddy AI assistant' : 'Open Buddy AI assistant'} aria-expanded={open} onClick={() => setOpen(!open)}><span><BuddyMark /></span><b>Ask Buddy</b><small>Your stay sidekick</small></button>
   </div>;
 }
 
