@@ -37,7 +37,7 @@ test('guest can search and open a public listing without a private address', asy
 test('Bodim AI asks for an exact branch before ranking a multi-branch campus', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Open Bodim AI assistant' }).click();
-  await page.getByPlaceholder(/Campus, workplace, budget/i).fill('Find a room near ICBT Campus');
+  await page.getByPlaceholder(/Campus, budget, WiFi, AC, parking/i).fill('Find a room near ICBT Campus');
   await page.getByRole('button', { name: 'Send to Bodim AI' }).click();
 
   await expect(page.getByText(/has several branches in Sri Lanka/i)).toBeVisible();
@@ -45,8 +45,23 @@ test('Bodim AI asks for an exact branch before ranking a multi-branch campus', a
   await expect(branches.getByRole('button')).toHaveCount(10);
   await branches.getByRole('button', { name: 'ICBT Campus - Kandy' }).click();
 
-  await expect(page.getByText(/verified places near ICBT Campus - Kandy/i)).toBeVisible();
+  await expect(page.getByText(/exact eligible matches near ICBT Campus - Kandy/i)).toBeVisible();
   await expect(page.locator('.sb-ai-results > a').first()).toBeVisible();
+});
+
+test('Bodim AI applies strict requirements and explains the ranked best matches', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Open Bodim AI assistant' }).click();
+  await page.getByPlaceholder(/Campus, budget, WiFi, AC, parking/i).fill('Near University of Moratuwa Katubedda with WiFi, AC and car park under Rs. 35,000');
+  await page.getByRole('button', { name: 'Send to Bodim AI' }).click();
+
+  await expect(page.getByText(/exact eligible matches near University of Moratuwa - Katubedda/i)).toBeVisible();
+  const requirements = page.getByLabel('Applied requirements');
+  await expect(requirements.getByText('Air conditioning', { exact: true })).toBeVisible();
+  await expect(requirements.getByText('Parking', { exact: true })).toBeVisible();
+  await expect(page.getByText(/#1 Best match/i)).toBeVisible();
+  await expect(page.getByText(/% fit/i).first()).toBeVisible();
+  await expect(page.getByText(/Includes all 3 requested facilities/i).first()).toBeVisible();
 });
 
 test('tenant reaches protected shortlist, messages and saved-search workflows', async ({ page }) => {

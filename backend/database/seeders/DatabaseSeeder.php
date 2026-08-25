@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(InstitutionSeeder::class);
+        $this->syncSampleListingFacilities();
         $this->seedProximityData();
 
         if (User::where('email', 'admin@smartbodim.lk')->exists()) {
@@ -45,7 +46,7 @@ class DatabaseSeeder extends Seeder
         $facilities = collect($names)->mapWithKeys(fn ($name) => [$name => Facility::create(['code' => str($name)->slug('_'), 'name' => $name, 'category' => 'amenity'])]);
         $titles = ['Sunlit private room', 'Quiet student annex', 'Modern shared residence', 'Garden studio', 'City-view boarding room', 'Calm work-friendly room'];
         $types = ['private_room', 'annex', 'shared_room', 'studio', 'boarding_room', 'hostel'];
-        $sets = [['WiFi', 'Fan', 'Attached bathroom', 'Study area'], ['WiFi', 'Kitchen access', 'Hot water', 'Security/CCTV'], ['Meals', 'Laundry', 'Parking', 'Fan'], ['WiFi', 'Air conditioning', 'Attached bathroom', 'Electricity/water included']];
+        $sets = $this->sampleFacilitySets();
         $photos = ['photo-1522708323590-d24dbb6b0267d', 'photo-1560448204-e02f11c3d0e2', 'photo-1502672260266-1c1ef2d93688', 'photo-1493809842364-78817add7ffb', 'photo-1484154218962-a197022b5858', 'photo-1560185007-c5ca9d2c014d'];
         $listings = collect();
         for ($i = 0; $i < 24; $i++) {
@@ -66,6 +67,39 @@ class DatabaseSeeder extends Seeder
         $owner->notifyNow(new PlatformNotification('listing', 'Listing approved', 'Your listing is live.', '/owner/listings'));
         DB::table('ai_model_versions')->insert([['purpose' => 'search', 'version' => 'fixture-tfidf-1.0.0', 'base_model' => 'deterministic-tfidf', 'manifest' => json_encode(['profile' => 'tiny-cpu-fixture']), 'active' => true, 'created_at' => now(), 'updated_at' => now()], ['purpose' => 'sentiment', 'version' => 'fixture-lexicon-1.0.0', 'base_model' => 'lexicon-template', 'manifest' => json_encode(['profile' => 'tiny-cpu-fixture']), 'active' => true, 'created_at' => now(), 'updated_at' => now()]]);
         $this->seedProximityData();
+    }
+
+    private function sampleFacilitySets(): array
+    {
+        return [
+            ['WiFi', 'Fan', 'Attached bathroom', 'Study area'],
+            ['WiFi', 'Air conditioning', 'Parking', 'Study area'],
+            ['Meals', 'Laundry', 'Parking', 'Fan'],
+            ['WiFi', 'Air conditioning', 'Parking', 'Attached bathroom'],
+            ['WiFi', 'Kitchen access', 'Hot water', 'Security/CCTV'],
+            ['WiFi', 'Air conditioning', 'Parking', 'Kitchen access'],
+        ];
+    }
+
+    private function syncSampleListingFacilities(): void
+    {
+        if (! DB::getSchemaBuilder()->hasTable('facilities') || ! DB::getSchemaBuilder()->hasTable('listings')) {
+            return;
+        }
+
+        $sets = $this->sampleFacilitySets();
+        $names = collect($sets)->flatten()->unique()->values();
+        $facilities = Facility::query()->whereIn('name', $names)->get()->keyBy('name');
+        if ($facilities->count() !== $names->count()) {
+            return;
+        }
+
+        for ($index = 0; $index < 24; $index++) {
+            $listing = Listing::query()->where('public_slug', 'SBF-'.str_pad((string) ($index + 1), 4, '0', STR_PAD_LEFT))->first();
+            if ($listing) {
+                $listing->facilities()->sync(collect($sets[$index % count($sets)])->map(fn ($name) => $facilities[$name]->id));
+            }
+        }
     }
 
     private function seedProximityData(): void

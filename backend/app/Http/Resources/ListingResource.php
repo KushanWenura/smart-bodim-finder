@@ -29,6 +29,11 @@ class ListingResource extends JsonResource
             'destinationName' => $this->when($this->resource->getAttribute('destination_name') !== null, fn () => $this->resource->getAttribute('destination_name')),
             'commuteEstimateMinutes' => $this->when($this->resource->getAttribute('commute_estimate_minutes') !== null, fn () => (int) $this->resource->getAttribute('commute_estimate_minutes')),
             'nearbyPlaces' => $this->whenLoaded('nearbyPlaces', fn () => $this->nearbyPlaces->sortBy('distance_m')->values()->map(fn ($place) => ['type' => $place->type, 'name' => $place->name, 'distanceM' => $place->distance_m, 'latitude' => $place->latitude ? (float) $place->latitude : null, 'longitude' => $place->longitude ? (float) $place->longitude : null])),
+            'matchRank' => $this->when($this->resource->getAttribute('match_rank') !== null, fn () => (int) $this->resource->getAttribute('match_rank')),
+            'matchScore' => $this->when($this->resource->getAttribute('match_score') !== null, fn () => (int) $this->resource->getAttribute('match_score')),
+            'matchLabel' => $this->when($this->resource->getAttribute('match_label') !== null, fn () => $this->resource->getAttribute('match_label')),
+            'matchedRequirements' => $this->when($this->resource->getAttribute('matched_requirements') !== null, fn () => $this->resource->getAttribute('matched_requirements')),
+            'matchReasons' => $this->when($this->resource->getAttribute('match_reasons') !== null, fn () => $this->resource->getAttribute('match_reasons')),
         ];
     }
 }

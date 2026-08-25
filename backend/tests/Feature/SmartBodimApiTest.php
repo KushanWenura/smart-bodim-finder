@@ -116,6 +116,35 @@ class SmartBodimApiTest extends TestCase
         });
     }
 
+    public function test_assistant_strictly_matches_facility_aliases_and_returns_explainable_ranking(): void
+    {
+        Http::fake(['*/v1/search' => Http::response(['mode' => 'fixture-tfidf', 'results' => []])]);
+
+        $response = $this->postJson('/api/v1/assistant/chat', [
+            'message' => 'Near University of Moratuwa Katubedda with WiFi, AC and car park under Rs. 35,000',
+        ])->assertOk()
+            ->assertJsonPath('interpreted.destination.name', 'University of Moratuwa - Katubedda')
+            ->assertJsonPath('interpreted.maxPrice', 35000)
+            ->assertJsonPath('search.rankingMethod', 'strict filters followed by weighted suitability scoring')
+            ->assertJsonPath('results.0.matchRank', 1)
+            ->assertJsonPath('results.0.matchLabel', 'Best match');
+
+        $this->assertEqualsCanonicalizing(['WiFi', 'Parking', 'Air conditioning'], $response->json('interpreted.facilities'));
+        $this->assertNotEmpty($response->json('results'));
+        $results = collect($response->json('results'));
+        $this->assertSame(range(1, $results->count()), $results->pluck('matchRank')->all());
+        $this->assertSame($results->pluck('matchScore')->sortDesc()->values()->all(), $results->pluck('matchScore')->all());
+        $results->each(function (array $listing): void {
+            $this->assertLessThanOrEqual(35000, $listing['price']);
+            $this->assertEqualsCanonicalizing(
+                ['WiFi', 'Parking', 'Air conditioning'],
+                collect($listing['facilities'])->intersect(['WiFi', 'Parking', 'Air conditioning'])->values()->all()
+            );
+            $this->assertNotEmpty($listing['matchReasons']);
+            $this->assertNotEmpty($listing['matchedRequirements']);
+        });
+    }
+
     public function test_destination_directory_exposes_verified_icbt_branches(): void
     {
         $response = $this->getJson('/api/v1/destinations')->assertOk();
@@ -164,13 +193,16 @@ class SmartBodimApiTest extends TestCase
 
     public function test_chatbot_offers_branch_buttons_instead_of_guessing(): void
     {
-        $response = $this->postJson('/api/v1/assistant/chat', ['message' => 'Find a room near ICBT Campus'])
+        $response = $this->postJson('/api/v1/assistant/chat', ['message' => 'Find a WiFi room near ICBT Campus under Rs. 35000'])
             ->assertOk()
             ->assertJsonPath('search.mode', 'branch-clarification')
             ->assertJsonPath('interpreted.destination.status', 'ambiguous');
 
         $this->assertEmpty($response->json('results'));
         $this->assertCount(10, $response->json('suggestions'));
+        $this->assertStringContainsString('WiFi', $response->json('suggestions.0.query'));
+        $this->assertStringContainsString('35000', $response->json('suggestions.0.query'));
+        $this->assertStringContainsString($response->json('suggestions.0.name'), $response->json('suggestions.0.query'));
     }
 
     public function test_chatbot_resolves_a_named_institution_branch(): void

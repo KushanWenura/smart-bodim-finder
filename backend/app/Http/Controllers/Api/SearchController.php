@@ -18,7 +18,7 @@ class SearchController extends Controller
         $data = $request->validate(['message' => 'required|string|min:2|max:500']);
         $message = trim($data['message']);
         $normalized = mb_strtolower($message);
-        $query = Listing::publiclyVisible()->with(['owner', 'facilities', 'images', 'nearbyPlaces']);
+        $query = Listing::publiclyVisible()->with(['owner.ownerProfile', 'facilities', 'images', 'nearbyPlaces']);
         $interpreted = [];
         $destinationResolution = $proximity->resolution($message);
         if ($destinationResolution['status'] === 'ambiguous') {
@@ -26,6 +26,7 @@ class SearchController extends Controller
                 'id' => $place->id,
                 'name' => $place->name,
                 'branchName' => $place->branch_name,
+                'query' => $message.' — use '.$place->name.' as the exact destination',
             ])->values();
             $organization = $destinationResolution['organization'] ?? 'That institution';
             $interpreted['destination'] = ['status' => 'ambiguous', 'organization' => $organization];
@@ -86,8 +87,18 @@ class SearchController extends Controller
             $query->where('gender_rule', 'male_only');
             $interpreted['gender'] = 'male_only';
         }
-        $facilityAliases = ['wifi' => 'WiFi', 'parking' => 'Parking', 'meals' => 'Meals', 'kitchen' => 'Kitchen access', 'attached bathroom' => 'Attached bathroom', 'hot water' => 'Hot water', 'air conditioning' => 'Air conditioning'];
-        $facilities = collect($facilityAliases)->filter(fn ($name, $needle) => str_contains($normalized, $needle))->values();
+        $facilityPatterns = [
+            'WiFi' => '/\bwi[\s-]?fi\b/i',
+            'Parking' => '/\b(?:parking|car\s*park(?:ing)?|vehicle\s*parking)\b/i',
+            'Meals' => '/\b(?:meals?|food\s+provided)\b/i',
+            'Kitchen access' => '/\b(?:kitchen|cooking\s+facilit(?:y|ies))\b/i',
+            'Attached bathroom' => '/\b(?:attached|private|ensuite)\s+bathroom\b/i',
+            'Hot water' => '/\bhot\s+water\b/i',
+            'Air conditioning' => '/\b(?:a\s*\/?\s*c|air[\s-]*condition(?:ing|ed)?|aircon)\b/i',
+            'Security/CCTV' => '/\b(?:cctv|security\s+camera)\b/i',
+            'Study area' => '/\b(?:study\s+(?:area|space|desk))\b/i',
+        ];
+        $facilities = collect($facilityPatterns)->filter(fn ($pattern) => preg_match($pattern, $message) === 1)->keys()->values();
         foreach ($facilities as $facility) {
             $query->whereHas('facilities', fn ($builder) => $builder->where('name', $facility));
         }
@@ -96,6 +107,7 @@ class SearchController extends Controller
         }
 
         $eligible = $query->limit(200)->get();
+        $radiusKm = null;
         if ($destination) {
             $radiusKm = 15.0;
             if (preg_match('/(?:within|inside|less than|under)\s*([0-9]+(?:\.[0-9]+)?)\s*km/i', $message, $distanceMatch)) {
@@ -104,24 +116,105 @@ class SearchController extends Controller
             $eligible = $proximity->annotate($eligible, $destination)->filter(fn ($listing) => (float) $listing->distance_km <= $radiusKm)->values();
             $interpreted['radiusKm'] = $radiusKm;
         }
-        $ranked = $ai->search($message, $eligible->map(fn ($listing) => ['id' => $listing->id, 'title' => $listing->title, 'description' => $listing->description, 'area' => $listing->public_area, 'city' => $listing->city, 'facilities' => $listing->facilities->pluck('name')->all()])->all(), 12);
+        $ranked = $ai->search($message, $eligible->map(fn ($listing) => ['id' => $listing->id, 'title' => $listing->title, 'description' => $listing->description, 'area' => $listing->public_area, 'city' => $listing->city, 'facilities' => $listing->facilities->pluck('name')->all()])->all(), 50);
         $scores = collect($ranked['results'] ?? [])->pluck('score', 'id');
-        $ordered = $eligible->filter(fn ($listing) => $scores->has($listing->id))->sortByDesc(fn ($listing) => $scores[$listing->id])->values();
-        if ($ordered->isEmpty() && $eligible->isNotEmpty()) {
-            $ordered = $eligible->sortByDesc(fn ($listing) => ($listing->average_rating * 10) + $listing->favorite_count)->values();
+        if ($scores->isEmpty() && $eligible->isNotEmpty()) {
             $ranked['mode'] = 'structured-nearby-fallback';
         }
-        if ($destination) {
-            $ordered = $ordered->sortBy('distance_km')->values();
-        }
+        $ordered = $eligible->map(function (Listing $listing) use ($scores, $destination, $radiusKm, $facilities, $interpreted): Listing {
+            $ranking = $this->assistantRanking($listing, (float) ($scores[$listing->id] ?? 0.35), $destination?->name, $destination ? $radiusKm : null, $facilities->all(), $interpreted);
+            foreach ($ranking as $attribute => $value) {
+                $listing->setAttribute($attribute, $value);
+            }
+
+            return $listing;
+        })->sortByDesc('match_score')->values();
+        $ordered->each(function (Listing $listing, int $index): void {
+            $rank = $index + 1;
+            $listing->setAttribute('match_rank', $rank);
+            $listing->setAttribute('match_label', $rank === 1 ? 'Best match' : ($rank <= 3 ? 'Top match' : 'Strong match'));
+        });
         $results = $ordered->take(5);
         $locationText = $destination ? ' near '.$destination->name : (isset($interpreted['location']) ? ' around '.$interpreted['location'] : '');
+        $requirements = $this->requirementLabels($interpreted);
         $answer = $results->isEmpty()
-            ? "I couldn't find a published place matching every part of that request. Try a nearby area or a slightly wider budget."
-            : 'I found '.$results->count().' verified '.str('place')->plural($results->count()).$locationText.'. '.($destination ? 'They are ordered by straight-line distance, with nearby transport, food, supermarket and hospital information.' : 'I ranked these by your wording, then kept hard filters such as budget and facilities.');
+            ? "I couldn't find a published place matching every required facility, budget and location rule. Try a wider radius, a slightly higher budget, or remove one must-have facility."
+            : 'I found '.$results->count().' exact eligible '.str('match')->plural($results->count()).$locationText.'. Every result passes your hard requirements; the badges rank suitability using distance, semantic fit, rating, value, verified ownership and nearby essentials.';
         SearchLog::create(['user_id' => $request->user()?->id, 'sanitized_query' => $message, 'filters' => $interpreted, 'result_count' => $results->count(), 'mode' => 'assistant:'.($ranked['mode'] ?? 'semantic'), 'latency_ms' => 0]);
 
-        return response()->json(['answer' => $answer, 'results' => ListingResource::collection($results), 'interpreted' => $interpreted, 'search' => ['mode' => $ranked['mode'] ?? 'semantic', 'aiOnline' => $ranked['online'] ?? false, 'warning' => $ranked['warning'] ?? null], 'disclaimer' => 'Bodim AI recommends published listings only. Verify the property in person before paying; exact addresses remain private.']);
+        return response()->json(['answer' => $answer, 'results' => ListingResource::collection($results), 'requirements' => $requirements, 'interpreted' => $interpreted, 'search' => ['mode' => $ranked['mode'] ?? 'semantic', 'aiOnline' => $ranked['online'] ?? false, 'warning' => $ranked['warning'] ?? null, 'rankingMethod' => 'strict filters followed by weighted suitability scoring'], 'disclaimer' => 'Suitability scores compare only eligible published listings; they are not guarantees. Verify the property, facilities and route in person before paying; exact addresses remain private.']);
+    }
+
+    private function assistantRanking(Listing $listing, float $semanticScore, ?string $destinationName, ?float $radiusKm, array $facilities, array $interpreted): array
+    {
+        $semantic = max(0.0, min(1.0, $semanticScore));
+        $distance = (float) ($listing->getAttribute('distance_km') ?? 0);
+        $distanceFit = $radiusKm ? max(0.0, 1 - ($distance / $radiusKm)) : 0.65;
+        $ratingFit = max(0.0, min(1.0, ((float) $listing->average_rating) / 5));
+        $maxPrice = isset($interpreted['maxPrice']) ? (int) $interpreted['maxPrice'] : null;
+        $budgetHeadroom = $maxPrice ? max(0.0, min(1.0, ($maxPrice - (int) $listing->monthly_price_lkr) / $maxPrice)) : 0.5;
+        $valueFit = 0.5 + ($budgetHeadroom * 0.5);
+        $verified = ($listing->owner?->ownerProfile?->verification_status ?? null) === 'verified';
+        $nearbyTypes = $listing->nearbyPlaces->pluck('type')->unique()->count();
+        $nearbyFit = min(1.0, $nearbyTypes / 5);
+        $score = (int) round(35 + ($semantic * 20) + ($distanceFit * 20) + ($ratingFit * 10) + ($valueFit * 5) + (($verified ? 1 : 0.6) * 5) + ($nearbyFit * 5));
+        $matched = collect($facilities)->map(fn ($facility) => $facility.' included');
+        if ($maxPrice) {
+            $matched->push('Under Rs. '.number_format($maxPrice));
+        }
+        if ($destinationName && $radiusKm) {
+            $matched->push('Within '.rtrim(rtrim(number_format($radiusKm, 1), '0'), '.').' km of '.$destinationName);
+        }
+        if (isset($interpreted['propertyType'])) {
+            $matched->push(str((string) $interpreted['propertyType'])->replace('_', ' ')->title()->toString());
+        }
+        if (isset($interpreted['gender'])) {
+            $matched->push($interpreted['gender'] === 'female_only' ? 'Female only' : 'Male only');
+        }
+        $reasons = collect();
+        if ($facilities !== []) {
+            $reasons->push('Includes all '.count($facilities).' requested facilities');
+        }
+        if ($destinationName) {
+            $reasons->push(number_format($distance, 1).' km from '.$destinationName);
+        }
+        if ($maxPrice) {
+            $reasons->push('Rs. '.number_format($maxPrice - (int) $listing->monthly_price_lkr).' below budget');
+        }
+        if ($verified) {
+            $reasons->push('Verified property owner');
+        }
+        if ((float) $listing->average_rating > 0) {
+            $reasons->push(number_format((float) $listing->average_rating, 1).'/5 resident rating');
+        }
+
+        return [
+            'match_score' => min(99, max(1, $score)),
+            'matched_requirements' => $matched->values()->all(),
+            'match_reasons' => $reasons->take(4)->values()->all(),
+        ];
+    }
+
+    private function requirementLabels(array $interpreted): array
+    {
+        $requirements = collect($interpreted['facilities'] ?? []);
+        if (isset($interpreted['maxPrice'])) {
+            $requirements->push('Max Rs. '.number_format((int) $interpreted['maxPrice']));
+        }
+        if (isset($interpreted['radiusKm'], $interpreted['destination']['name'])) {
+            $requirements->push('Within '.rtrim(rtrim(number_format((float) $interpreted['radiusKm'], 1), '0'), '.').' km of '.$interpreted['destination']['name']);
+        }
+        if (isset($interpreted['propertyType'])) {
+            $requirements->push(str((string) $interpreted['propertyType'])->replace('_', ' ')->title()->toString());
+        }
+        if (isset($interpreted['gender'])) {
+            $requirements->push($interpreted['gender'] === 'female_only' ? 'Female only' : 'Male only');
+        }
+        if (isset($interpreted['location'])) {
+            $requirements->push('Around '.$interpreted['location']);
+        }
+
+        return $requirements->values()->all();
     }
 
     public function recommendations(Request $request, AiServiceClient $ai)
