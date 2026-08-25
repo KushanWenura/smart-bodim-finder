@@ -5,14 +5,17 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ListingResource;
 use App\Models\AdminAuditLog;
+use App\Models\AiFeedback;
 use App\Models\Conversation;
 use App\Models\Listing;
+use App\Models\ListingAiRiskAssessment;
 use App\Models\OwnerProfile;
 use App\Models\Review;
 use App\Models\SearchLog;
 use App\Models\User;
 use App\Notifications\PlatformNotification;
 use App\Services\AiServiceClient;
+use App\Services\ListingRiskService;
 use App\Services\ListingWorkflow;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -50,6 +53,63 @@ class AdminController extends Controller
         }
 
         return ListingResource::collection($q->latest()->paginate(min(50, max(1, $r->integer('perPage', 20)))));
+    }
+
+    public function riskAssessments(Request $request, ListingRiskService $risk): JsonResponse
+    {
+        if ($request->boolean('refresh')) {
+            Listing::whereIn('status', ['pending_review', 'change_pending'])->with('images')->each(fn (Listing $listing) => $risk->assess($listing));
+        }
+
+        return response()->json(['data' => ListingAiRiskAssessment::with('listing:id,title,public_slug,status')->orderByDesc('risk_score')->paginate(30)]);
+    }
+
+    public function aiMetrics(): JsonResponse
+    {
+        $feedback = DB::table('ai_feedback');
+        $helpful = (clone $feedback)->where('event_type', 'helpful')->count();
+        $notHelpful = (clone $feedback)->where('event_type', 'not_helpful')->count();
+        $latencies = SearchLog::where('created_at', '>=', now()->subDays(30))->orderBy('latency_ms')->pluck('latency_ms')->values();
+        $p95 = $latencies->isEmpty() ? null : $latencies->get((int) floor(($latencies->count() - 1) * .95));
+        $total = SearchLog::where('created_at', '>=', now()->subDays(30))->count();
+
+        return response()->json([
+            'feedback' => [
+                'total' => (clone $feedback)->count(), 'helpful' => $helpful, 'notHelpful' => $notHelpful,
+                'helpfulRate' => ($helpful + $notHelpful) > 0 ? round($helpful / ($helpful + $notHelpful), 4) : null,
+                'resultClicks' => (clone $feedback)->where('event_type', 'result_click')->count(),
+                'enquiries' => (clone $feedback)->where('event_type', 'enquiry')->count(),
+            ],
+            'search' => [
+                'last30Days' => $total,
+                'noResultRate' => $total > 0 ? round(SearchLog::where('created_at', '>=', now()->subDays(30))->where('result_count', 0)->count() / $total, 4) : null,
+                'p95LatencyMs' => $p95,
+                'languages' => SearchLog::whereNotNull('filters')->get()->groupBy(fn ($log) => data_get($log->filters, 'language', 'unknown'))->map->count(),
+                'modelVersions' => SearchLog::select('model_version', DB::raw('COUNT(*) as total'))->whereNotNull('model_version')->groupBy('model_version')->get(),
+            ],
+            'evaluation' => ['consented' => DB::table('ai_evaluation_samples')->where('consent_confirmed', true)->count(), 'labelled' => DB::table('ai_evaluation_samples')->where('annotation_status', 'labelled')->count()],
+            'risk' => ['assessed' => DB::table('listing_ai_risk_assessments')->count(), 'highRisk' => DB::table('listing_ai_risk_assessments')->where('risk_score', '>=', 50)->count()],
+        ]);
+    }
+
+    public function feedbackTrainingExport(): JsonResponse
+    {
+        $positive = ['favorite', 'enquiry', 'moved_in'];
+        $negative = ['hide', 'not_helpful'];
+        $rows = AiFeedback::query()
+            ->whereNotNull('listing_id')
+            ->whereIn('event_type', array_merge($positive, $negative))
+            ->get()
+            ->filter(fn ($event) => is_array(data_get($event->metadata, 'breakdown')))
+            ->map(fn ($event) => [
+                'id' => $event->id,
+                'sessionGroup' => hash_hmac('sha256', (string) ($event->search_log_id ?? 'user-'.$event->user_id), (string) config('app.key')),
+                'features' => data_get($event->metadata, 'breakdown'),
+                'label' => in_array($event->event_type, $positive, true) ? 1 : 0,
+                'outcome' => $event->event_type,
+            ])->values();
+
+        return response()->json(['data' => $rows, 'privacy' => 'Contains numeric ranking features and pseudonymous groups only; no query, contact, address or message text.', 'minimumTrainingRows' => 100]);
     }
 
     public function moderate(Request $r, Listing $listing, string $action, ListingWorkflow $workflow): JsonResponse

@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SearchLog extends Model
+class AiFeedback extends Model
 {
+    protected $table = 'ai_feedback';
+
     protected $guarded = [];
 
     protected function casts(): array
     {
-        return ['filters' => 'array', 'intent_confidence' => 'array'];
+        return ['metadata' => 'array', 'occurred_at' => 'datetime'];
     }
 }

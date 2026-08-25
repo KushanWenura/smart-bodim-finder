@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\AccountController;
 use App\Http\Controllers\Api\AdminController;
+use App\Http\Controllers\Api\AiEvaluationController;
+use App\Http\Controllers\Api\AiFeedbackController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ConversationController;
 use App\Http\Controllers\Api\FavoriteController;
@@ -49,6 +51,8 @@ Route::prefix('v1')->group(function () {
         Route::post('/conversations/{conversation}/archive', [ConversationController::class, 'archive']);
 
         Route::middleware('role:tenant')->group(function () {
+            Route::post('/ai/feedback', [AiFeedbackController::class, 'store'])->middleware('throttle:search');
+            Route::post('/ai/evaluation-samples', [AiEvaluationController::class, 'store'])->middleware('throttle:search');
             Route::get('/favorites', [FavoriteController::class, 'index']);
             Route::get('/recommendations', [SearchController::class, 'recommendations']);
             Route::put('/favorites/{listing}', [FavoriteController::class, 'store']);
@@ -76,6 +80,11 @@ Route::prefix('v1')->group(function () {
             Route::get('/dashboard', [AdminController::class, 'dashboard']);
             Route::get('/search', [AdminController::class, 'search']);
             Route::get('/listings', [AdminController::class, 'listings']);
+            Route::get('/ai/risk-assessments', [AdminController::class, 'riskAssessments']);
+            Route::get('/ai/metrics', [AdminController::class, 'aiMetrics']);
+            Route::get('/ai/feedback-training-export', [AdminController::class, 'feedbackTrainingExport']);
+            Route::get('/ai/evaluation-samples', [AiEvaluationController::class, 'index']);
+            Route::put('/ai/evaluation-samples/{sample}', [AiEvaluationController::class, 'label']);
             Route::post('/listings/{listing}/{action}', [AdminController::class, 'moderate'])->whereIn('action', ['approve', 'reject', 'suspend', 'restore']);
             Route::get('/owners', [AdminController::class, 'owners']);
             Route::post('/owners/{ownerProfile}/verify', [AdminController::class, 'verifyOwner']);

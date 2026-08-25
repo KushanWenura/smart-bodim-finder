@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\AiFeedback;
 use App\Models\Conversation;
 use App\Models\Listing;
 use App\Models\User;
 use App\Notifications\PlatformNotification;
 use App\Services\Analytics;
+use App\Services\PersonalizationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -26,7 +28,7 @@ class ConversationController extends Controller
         return response()->json($items);
     }
 
-    public function store(Request $r): JsonResponse
+    public function store(Request $r, PersonalizationService $personalization): JsonResponse
     {
         $data = $r->validate(['listingId' => 'required|exists:listings,id', 'subject' => 'nullable|string|max:160', 'text' => 'required|string|min:2|max:2000']);
         $listing = Listing::where('status', 'published')->findOrFail($data['listingId']);
@@ -35,6 +37,8 @@ class ConversationController extends Controller
         $c->touch();
         $listing->owner->notify(new PlatformNotification('message', 'New tenant enquiry', "{$r->user()->name} asked about {$listing->title}.", '/owner/messages'));
         Analytics::record('contact_started', $listing->id);
+        AiFeedback::create(['user_id' => $r->user()->id, 'listing_id' => $listing->id, 'event_type' => 'enquiry', 'occurred_at' => now()]);
+        $personalization->learn($r->user(), 'enquiry', $listing->load('facilities'));
 
         return response()->json(['data' => $c->load(['listing', 'messages'])], 201);
     }

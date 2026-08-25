@@ -22,6 +22,17 @@ if (Test-Path -LiteralPath $pidFile) {
     Write-Host 'Removed an old launcher state from services that had already stopped.' -ForegroundColor Yellow
 }
 
+$servicePorts = @(5100, 5173, 8000)
+$occupiedPorts = @(
+    Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue |
+        Where-Object { $_.LocalPort -in $servicePorts } |
+        Select-Object -ExpandProperty LocalPort -Unique
+)
+if ($occupiedPorts.Count -gt 0) {
+    $portList = ($occupiedPorts | Sort-Object) -join ', '
+    throw "Local service port(s) $portList are already in use. Run .\Run\stop-all.ps1, then start again."
+}
+
 $preferredPhp = 'C:\wamp64\bin\php\php8.3.14\php.exe'
 $php = if (Test-Path -LiteralPath $preferredPhp) { $preferredPhp } else {
     Get-ChildItem -LiteralPath 'C:\wamp64\bin\php' -Filter 'php.exe' -Recurse -ErrorAction SilentlyContinue |
@@ -119,14 +130,14 @@ do {
     Start-Sleep -Seconds 2
     try {
         $health = Invoke-RestMethod -Uri 'http://127.0.0.1:5100/health' -TimeoutSec 2
-        $ready = $health.service -eq 'healthy'
+        $ready = $health.service -eq 'healthy' -and $health.modelReady -and $health.queryIntentReady
     } catch {
         $ready = $false
     }
 } while (-not $ready -and (Get-Date) -lt $deadline -and -not $processes[2].HasExited)
 
 if ($ready) {
-    Write-Host 'Smart Bodim Finder started. Trained AI is ready.' -ForegroundColor Green
+    Write-Host 'BodimBuddy.lk started. Search and query-intent models are ready.' -ForegroundColor Green
 } elseif ($processes[2].HasExited) {
     Write-Warning 'The website started, but the AI process exited. Search will use its safe fallback until the AI service is restarted.'
 } else {

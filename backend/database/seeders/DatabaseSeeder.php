@@ -114,6 +114,17 @@ class DatabaseSeeder extends Seeder
                 'updated_at' => now(),
             ]
         );
+        DB::table('ai_model_versions')->where('purpose', 'query_intent')->update(['active' => false, 'updated_at' => now()]);
+        DB::table('ai_model_versions')->updateOrInsert(
+            ['purpose' => 'query_intent', 'version' => 'query-intent-v1'],
+            [
+                'base_model' => 'character-tfidf-logistic-regression',
+                'manifest' => json_encode(['profile' => 'trained-local', 'dataset' => 'query_intent_examples.jsonl', 'rows' => 960, 'languages' => ['en', 'si', 'ta', 'singlish']]),
+                'active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
     }
 
     private function seedNotifications(User $owner, User $tenant): void

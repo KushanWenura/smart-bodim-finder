@@ -55,7 +55,7 @@ class ProximityController extends Controller
         return response()->json([
             'destination' => ['id' => $destination->id, 'name' => $destination->name, 'type' => $destination->type, 'organizationName' => $destination->organization_name, 'branchName' => $destination->branch_name, 'latitude' => $destination->latitude, 'longitude' => $destination->longitude],
             'data' => ListingResource::collection($ranked),
-            'meta' => ['total' => $ranked->count(), 'radiusKm' => $radius, 'distanceMethod' => 'Haversine straight-line distance', 'commuteEstimate' => 'Distance-based estimate at 22 km/h; not live route time'],
+            'meta' => ['total' => $ranked->count(), 'radiusKm' => $radius, 'distanceMethod' => 'Haversine straight-line distance', 'commuteEstimate' => $ranked->first()?->getAttribute('route_method') ?? 'Offline distance-derived estimate (not live traffic)', 'commuteModes' => ['walking', 'driving', 'publicTransport']],
         ]);
     }
 }

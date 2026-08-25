@@ -17,12 +17,15 @@ models/*
 !models/.gitkeep
 !models/smart-bodim-minilm-v1/
 !models/smart-bodim-minilm-v1/**
+!models/query-intent-v1/
+!models/query-intent-v1/**
 models/smart-bodim-minilm-v1/checkpoint-*/
 datasets/raw/*
 !datasets/raw/.gitkeep
 !datasets/raw/fixture_reviews.jsonl
 !datasets/raw/fixture_search_pairs.jsonl
 !datasets/raw/smart_bodim_search_pairs.jsonl
+!datasets/raw/query_intent_examples.jsonl
 datasets/processed/*
 !datasets/processed/.gitkeep
 !datasets/processed/smart-bodim-v1/

@@ -8,8 +8,12 @@ const details: Record<string, { label: string; icon: string; colour: string }> =
   supermarket: { label: 'Cargills & markets', icon: 'bi-cart3', colour: '#ef6b3a' },
   hospital: { label: 'Hospitals', icon: 'bi-hospital', colour: '#d84d57' },
   food: { label: 'Food places', icon: 'bi-cup-hot', colour: '#d59620' },
+  pharmacy: { label: 'Pharmacies', icon: 'bi-capsule', colour: '#cb4f86' },
+  bank_atm: { label: 'Banks & ATMs', icon: 'bi-bank', colour: '#397a56' },
+  police: { label: 'Police stations', icon: 'bi-shield-check', colour: '#3856a6' },
+  laundry: { label: 'Laundry', icon: 'bi-droplet', colour: '#348da8' },
 };
-const order = ['bus_station', 'train_station', 'supermarket', 'hospital', 'food'];
+const order = ['bus_station', 'train_station', 'supermarket', 'hospital', 'food', 'pharmacy', 'bank_atm', 'police', 'laundry'];
 const distance = (metres: number) => metres < 1000 ? `${metres} m` : `${(metres / 1000).toFixed(1)} km`;
 
 export function NeighbourhoodExplorer({ latitude, longitude, label, places, autoOpen = false }: { latitude: number; longitude: number; label: string; places: NearbyPlace[]; autoOpen?: boolean }) {
@@ -22,13 +26,13 @@ export function NeighbourhoodExplorer({ latitude, longitude, label, places, auto
   useEffect(() => { const listener = () => openExplorer(); window.addEventListener('smartbodim:open-neighbourhood', listener); return () => window.removeEventListener('smartbodim:open-neighbourhood', listener); }, [openExplorer]);
 
   return <section className="sb-detail-section sb-neighbourhood" id="neighbourhood-explorer">
-    <header className="sb-neighbourhood-head"><div><span className="sb-kicker"><i className="bi bi-stars" /> Buddy neighbourhood view</span><h2>See what your daily life looks like here.</h2><p>Compare the nearest transport, shopping, healthcare and food options around the approximate property area.</p></div><button className="btn sb-nearby-ai-button" aria-expanded={open} onClick={() => open ? setOpen(false) : openExplorer()}><i className="bi bi-stars" />{open ? 'Hide nearby map' : 'Explore nearby with Buddy'}<i className={`bi ${open ? 'bi-chevron-up' : 'bi-arrow-right'}`} /></button></header>
+    <header className="sb-neighbourhood-head"><div><span className="sb-kicker"><i className="bi bi-stars" /> Buddy neighbourhood view</span><h2>See what your daily life looks like here.</h2><p>Compare transport, shopping, healthcare, food, banking, safety and daily services around the approximate property area.</p></div><button className="btn sb-nearby-ai-button" aria-expanded={open} onClick={() => open ? setOpen(false) : openExplorer()}><i className="bi bi-stars" />{open ? 'Hide nearby map' : 'Explore nearby with Buddy'}<i className={`bi ${open ? 'bi-chevron-up' : 'bi-arrow-right'}`} /></button></header>
     {!open && <div className="sb-nearby-preview">{places.map(place => { const item = details[place.type] || { label: place.type.replaceAll('_', ' '), icon: 'bi-geo-alt', colour: '#16745e' }; return <article key={place.type}><span style={{ '--place-colour': item.colour } as React.CSSProperties}><i className={`bi ${item.icon}`} /></span><div><small>{item.label}</small><strong>{place.name}</strong></div><b>{distance(place.distanceM)}</b></article>; })}</div>}
     {open && <div className="sb-nearby-explorer">
       <div className="sb-ai-method"><span><i className="bi bi-cpu" /></span><div><strong>How this result is produced</strong><p>Buddy AI helps match the property to your request. Nearby-place distances are then calculated from coordinates, so the map remains clear and verifiable.</p></div></div>
       <div className="sb-place-filters" role="group" aria-label="Filter nearby places"><button className={selected === 'all' ? 'active' : ''} onClick={() => setSelected('all')}><i className="bi bi-grid" /> All essentials</button>{available.map(type => { const item = details[type]; return <button className={selected === type ? 'active' : ''} style={{ '--place-colour': item.colour } as React.CSSProperties} key={type} onClick={() => setSelected(type)}><i className={`bi ${item.icon}`} /> {item.label}</button>; })}</div>
       <div className="sb-nearby-layout"><div className="sb-nearby-map-wrap"><MapView latitude={latitude} longitude={longitude} label={label} places={places} highlightedType={selected} /><div className="sb-map-legend"><span><i /> Approximate property area</span>{available.map(type => <span key={type}><i style={{ background: details[type].colour }} /> {details[type].label}</span>)}</div></div><div className="sb-nearby-list">{visible.map(place => { const item = details[place.type] || { label: place.type.replaceAll('_', ' '), icon: 'bi-geo-alt', colour: '#16745e' }; return <article key={place.type}><span style={{ '--place-colour': item.colour } as React.CSSProperties}><i className={`bi ${item.icon}`} /></span><div><small>{item.label}</small><strong>{place.name}</strong><p>Straight-line distance from the approximate property marker</p></div><b>{distance(place.distanceM)}</b></article>; })}</div></div>
-      <small className="sb-distance-disclaimer"><i className="bi bi-info-circle" /> Distances are straight-line estimates, not live walking or traffic routes. Confirm the route before making a decision.</small>
+      <small className="sb-distance-disclaimer"><i className="bi bi-info-circle" /> Place records show source and coordinate confidence through the API. Confirm changing businesses and routes before making a decision.</small>
     </div>}
   </section>;
 }

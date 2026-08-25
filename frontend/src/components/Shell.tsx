@@ -75,7 +75,9 @@ export function Footer() {
 }
 
 type AssistantPrompt = { id?: number; name: string; query?: string };
-type AssistantSearch = { mode?: string; aiOnline?: boolean; warning?: string; rankingMethod?: string };
+type AssistantSearch = { mode?: string; aiOnline?: boolean; warning?: string; rankingMethod?: string; rankingDetails?: string; searchLogId?: number; personalized?: boolean };
+type Understanding = { language?: string; confidence?: { overall?: number; recognizedSlots?: number }; hardFacilities?: string[]; preferredFacilities?: string[]; excludedFacilities?: string[] };
+type Relaxation = { constraint: string; blockedListings: number; matchesIfRelaxed: number };
 type AssistantMessage = {
   id: number;
   role: 'assistant' | 'user';
@@ -86,6 +88,8 @@ type AssistantMessage = {
   requirements?: string[];
   disclaimer?: string;
   search?: AssistantSearch;
+  understanding?: Understanding;
+  relaxationAnalysis?: Relaxation[];
 };
 type AssistantResponse = {
   answer: string;
@@ -95,6 +99,8 @@ type AssistantResponse = {
   requirements?: string[];
   disclaimer: string;
   search?: AssistantSearch;
+  understanding?: Understanding;
+  relaxationAnalysis?: Relaxation[];
 };
 
 const starterPrompts = [
@@ -105,11 +111,14 @@ const starterPrompts = [
 ];
 
 export function AiChatbot() {
+  const { user } = useAuth();
   const welcome: AssistantMessage = { id: 1, role: 'assistant', text: 'Ayubowan! I’m Buddy, your Sri Lankan stay-finding sidekick. Tell me where you study or work, your maximum monthly budget, and anything you cannot compromise on.' };
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState('');
   const [busy, setBusy] = useState(false);
   const [messages, setMessages] = useState<AssistantMessage[]>([welcome]);
+  const [feedbackSent, setFeedbackSent] = useState<Record<number, boolean>>({});
+  const [donated, setDonated] = useState<Record<number, boolean>>({});
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const userContext = useMemo(() => messages.filter(message => message.role === 'user').slice(-3).map(message => message.text), [messages]);
@@ -158,6 +167,8 @@ export function AiChatbot() {
         requirements: response.requirements,
         disclaimer: response.disclaimer,
         search: response.search,
+        understanding: response.understanding,
+        relaxationAnalysis: response.relaxationAnalysis,
       }]);
     } catch (error) {
       const detail = error as { response?: { data?: { message?: string } }; message?: string };
@@ -165,6 +176,20 @@ export function AiChatbot() {
     } finally {
       setBusy(false);
     }
+  };
+  const recordFeedback = async (message: AssistantMessage, event: 'result_click' | 'helpful' | 'not_helpful', listing?: Listing) => {
+    if (!user || user.role !== 'tenant') return;
+    try {
+      await api.post('/ai/feedback', { event, searchLogId: message.search?.searchLogId, listingId: listing?.id, position: listing?.matchRank, matchScore: listing?.matchScore, breakdown: listing?.matchBreakdown });
+      if (event !== 'result_click') setFeedbackSent(current => ({ ...current, [message.id]: true }));
+    } catch { /* Feedback must never interrupt search or navigation. */ }
+  };
+  const donateEvaluation = async (message: AssistantMessage) => {
+    if (!message.search?.searchLogId || user?.role !== 'tenant') return;
+    try {
+      await api.post('/ai/evaluation-samples', { searchLogId: message.search.searchLogId, candidateListingIds: message.results?.map(item => item.id) || [], consentConfirmed: true });
+      setDonated(current => ({ ...current, [message.id]: true }));
+    } catch { /* Optional research participation cannot interrupt Buddy. */ }
   };
   const submit = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); void ask(draft); };
 
@@ -183,14 +208,18 @@ export function AiChatbot() {
             <div className="sb-ai-bubble">{message.text}</div>
             {message.prompts?.length ? <div className="sb-ai-clarifications" aria-label="Choose a destination branch">{message.prompts.map(prompt => <button key={prompt.name} onClick={() => void ask(prompt.query || `Find a room near ${prompt.name}`)}><i className="bi bi-geo-alt" /><span>{prompt.name}</span><i className="bi bi-chevron-right" /></button>)}</div> : null}
             {message.requirements?.length ? <div className="sb-ai-criteria" aria-label="Applied requirements"><b>Requirements understood</b><div>{message.requirements.map(requirement => <span key={requirement}><i className="bi bi-check2" />{requirement}</span>)}</div></div> : null}
-            {message.results?.length ? <div className="sb-ai-results">{message.results.map(listing => <Link className={listing.matchRank === 1 ? 'is-best' : ''} to={`/listing/${listing.id}`} onClick={() => setOpen(false)} key={listing.id}>
+            {message.understanding?.confidence?.overall !== undefined && <div className="sb-ai-understanding"><span><i className="bi bi-translate" />{message.understanding.language?.toUpperCase()}</span><span><i className="bi bi-bullseye" />{Math.round(message.understanding.confidence.overall * 100)}% intent confidence</span>{message.search?.personalized && <span><i className="bi bi-person-check" />Personalized</span>}</div>}
+            {message.results?.length ? <div className="sb-ai-results">{message.results.map(listing => <Link className={listing.matchRank === 1 ? 'is-best' : ''} to={`/listing/${listing.id}`} onClick={() => { setOpen(false); void recordFeedback(message, 'result_click', listing); }} key={listing.id}>
               <div className="sb-ai-result-photo"><img src={listing.image || listing.images?.[0]?.thumbnail} alt="" /><span>#{listing.matchRank}</span></div>
               <div className="sb-ai-result-copy"><div><span className="sb-ai-match-label">{listing.matchRank === 1 && <i className="bi bi-trophy-fill" />} {listing.matchLabel}</span><b>{listing.matchScore}% fit</b></div><strong>{listing.title}</strong><p>{listing.area} · {money(listing.price)} / month</p>{listing.distanceKm !== undefined && <small><i className="bi bi-signpost-split" /> {listing.distanceKm} km · about {listing.commuteEstimateMinutes} min</small>}<div className="sb-ai-result-reasons">{listing.matchReasons?.slice(0, 3).map(reason => <span key={reason}><i className="bi bi-check-circle-fill" />{reason}</span>)}</div></div>
               <i className="bi bi-arrow-up-right sb-ai-open-result" />
             </Link>)}</div> : null}
+            {message.relaxationAnalysis?.length ? <div className="sb-ai-relaxation"><b>Why nothing matched</b>{message.relaxationAnalysis.slice(0, 4).map(item => <div key={item.constraint}><span>{item.constraint}</span><small>{item.matchesIfRelaxed ? `${item.matchesIfRelaxed} recovered if you approve relaxing it` : `${item.blockedListings} listings fail this condition`}</small></div>)}</div> : null}
             {message.search?.warning && <div className="sb-ai-warning"><i className="bi bi-info-circle" /> {message.search.warning}</div>}
             {message.followUps?.length ? <div className="sb-ai-followups"><b>Refine this search</b>{message.followUps.map(prompt => <button key={prompt.name} onClick={() => void ask(prompt.query || prompt.name)}>{prompt.name}<i className="bi bi-arrow-right" /></button>)}</div> : null}
             {message.disclaimer && <small className="sb-ai-disclaimer"><i className="bi bi-shield-exclamation" /> {message.disclaimer}</small>}
+            {message.role === 'assistant' && message.search?.searchLogId && user?.role === 'tenant' && <div className="sb-ai-feedback">{feedbackSent[message.id] ? <span><i className="bi bi-check2" /> Feedback saved</span> : <><span>Was this useful?</span><button onClick={() => void recordFeedback(message, 'helpful')} aria-label="This answer was helpful"><i className="bi bi-hand-thumbs-up" /></button><button onClick={() => void recordFeedback(message, 'not_helpful')} aria-label="This answer was not helpful"><i className="bi bi-hand-thumbs-down" /></button></>}</div>}
+            {message.role === 'assistant' && message.search?.searchLogId && user?.role === 'tenant' && <button className="sb-ai-donate" disabled={donated[message.id]} onClick={() => void donateEvaluation(message)}><i className={`bi ${donated[message.id] ? 'bi-check2-circle' : 'bi-clipboard-data'}`} />{donated[message.id] ? 'Anonymized query donated' : 'Donate this anonymized query to improve Buddy'}</button>}
           </div>
         </div>)}
         {busy && <div className="sb-ai-turn assistant"><span className="sb-ai-mini-avatar"><i className="bi bi-stars" /></span><div className="sb-ai-turn-content"><div className="sb-ai-bubble sb-ai-thinking"><span /><span /><span /><b>Checking every hard requirement, then ranking the eligible stays</b></div></div></div>}

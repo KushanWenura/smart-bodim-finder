@@ -7,6 +7,7 @@ use App\Http\Resources\ListingResource;
 use App\Models\Listing;
 use App\Models\ListingImage;
 use App\Services\ListingImageService;
+use App\Services\ListingRiskService;
 use App\Services\ListingWorkflow;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -59,12 +60,22 @@ class OwnerListingController extends Controller
         return response()->json(['data' => new ListingResource($listing->fresh()->load(['owner', 'facilities', 'images']))]);
     }
 
-    public function submit(Request $r, Listing $listing, ListingWorkflow $workflow): JsonResponse
+    public function submit(Request $r, Listing $listing, ListingWorkflow $workflow, ListingRiskService $risk): JsonResponse
     {
         abort_unless($listing->owner_id === $r->user()->id, 403);
         abort_if($listing->images()->count() === 0, 422, 'At least one image is required before submission.');
 
-        return response()->json(['data' => new ListingResource($workflow->transition($listing, 'pending_review', $r->user(), 'Submitted by owner'))]);
+        $assessment = $risk->assess($listing);
+        $updated = $workflow->transition($listing, 'pending_review', $r->user(), 'Submitted by owner');
+
+        return response()->json([
+            'data' => new ListingResource($updated),
+            'qualityCheck' => [
+                'riskScore' => $assessment->risk_score,
+                'flags' => $assessment->flags,
+                'message' => 'Automated checks assist administrator review and never reject a listing automatically.',
+            ],
+        ]);
     }
 
     public function deactivate(Request $r, Listing $listing, ListingWorkflow $workflow): JsonResponse

@@ -15,6 +15,7 @@ from flask import Flask, g, jsonify, request
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from model_runtime import ModelRuntime
+from query_intent_runtime import QueryIntentRuntime
 
 VERSION = "fixture-tfidf-1.0.0"
 SENTIMENT_VERSION = "fixture-lexicon-1.0.0"
@@ -24,20 +25,22 @@ HOST = os.environ.get("AI_HOST", "127.0.0.1")
 MAX_BODY = 1_000_000
 PROFILE = os.environ.get("AI_PROFILE", "fixture")
 runtime = ModelRuntime(profile=PROFILE)
+intent_runtime = QueryIntentRuntime()
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = MAX_BODY
 
-POSITIVE = {"clean", "quiet", "safe", "friendly", "reliable", "good", "great", "excellent", "helpful", "peaceful", "convenient", "quickly", "comfortable"}
-NEGATIVE = {"dirty", "noisy", "noise", "unsafe", "rude", "poor", "bad", "broken", "slow", "expensive", "crowded", "smell", "unreliable"}
+POSITIVE = {"clean", "quiet", "safe", "friendly", "reliable", "good", "great", "excellent", "helpful", "peaceful", "convenient", "quickly", "comfortable", "පිරිසිදු", "නිස්කලංක", "ආරක්ෂිත", "හොඳ", "සුවපහසු", "சுத்தம்", "அமைதி", "பாதுகாப்பான", "நல்ல", "வசதியான"}
+NEGATIVE = {"dirty", "noisy", "noise", "unsafe", "rude", "poor", "bad", "broken", "slow", "expensive", "crowded", "smell", "unreliable", "අපිරිසිදු", "ශබ්ද", "අනාරක්ෂිත", "නරක", "කැඩුණු", "அழுக்கு", "சத்தம்", "பாதுகாப்பற்ற", "மோசம்", "உடைந்த"}
+NEGATIONS = {"not", "no", "never", "without", "isn't", "wasn't", "නැහැ", "නොවේ", "නෑ", "இல்லை", "அல்ல"}
 ASPECTS = {
-    "cleanliness": {"clean", "cleaner", "dirty", "tidy", "smell"},
+    "cleanliness": {"clean", "cleaner", "dirty", "tidy", "smell", "පිරිසිදු", "අපිරිසිදු", "சுத்தம்", "அழுக்கு"},
     "owner responsiveness": {"owner", "responds", "reply", "helpful", "friendly", "rude"},
-    "noise": {"noise", "noisy", "quiet", "peaceful", "traffic"},
-    "safety": {"safe", "unsafe", "security", "cctv"},
-    "WiFi": {"wifi", "internet", "online"},
-    "food": {"food", "meals", "meal"},
-    "bathroom": {"bathroom", "washroom", "hot water"},
-    "transport": {"bus", "train", "transport", "commute"},
+    "noise": {"noise", "noisy", "quiet", "peaceful", "traffic", "ශබ්ද", "නිස්කලංක", "சத்தம்", "அமைதி"},
+    "safety": {"safe", "unsafe", "security", "cctv", "ආරක්ෂිත", "අනාරක්ෂිත", "பாதுகாப்பான", "பாதுகாப்பற்ற"},
+    "WiFi": {"wifi", "internet", "online", "වයිෆයි", "ඉන්ටර්නෙට්", "வைஃபை", "இணையம்"},
+    "food": {"food", "meals", "meal", "කෑම", "ආහාර", "உணவு", "சாப்பாடு"},
+    "bathroom": {"bathroom", "washroom", "hot water", "බාත්රූම්", "නාන කාමරය", "குளியலறை"},
+    "transport": {"bus", "train", "transport", "commute", "බස්", "දුම්රිය", "பேருந்து", "ரயில்"},
     "location": {"location", "near", "convenient"},
     "price/value": {"price", "value", "rent", "expensive", "affordable"},
     "utilities": {"electricity", "water", "utilities"},
@@ -45,7 +48,18 @@ ASPECTS = {
 
 
 def tokens(text: str) -> list[str]:
-    return [word for word in re.findall(r"[a-z0-9]+", text.lower()) if len(word) > 1]
+    return [word for word in re.findall(r"[^\W_]+|[0-9]+", text.lower(), flags=re.UNICODE) if len(word) > 1]
+
+
+def detect_language(text: str) -> str:
+    sinhala = bool(re.search(r"[\u0d80-\u0dff]", text))
+    tamil = bool(re.search(r"[\u0b80-\u0bff]", text))
+    english = bool(re.search(r"[a-zA-Z]", text))
+    if sinhala:
+        return "si-en" if english else "si"
+    if tamil:
+        return "ta-en" if english else "ta"
+    return "en"
 
 
 def canonical_listing(item: dict[str, Any]) -> str:
@@ -86,8 +100,19 @@ def cosine_rank(query: str, listings: list[dict[str, Any]], limit: int = 12) -> 
 
 def analyze_review(text: str) -> dict[str, Any]:
     words = tokens(text)[:600]
-    positive = sum(word in POSITIVE for word in words)
-    negative = sum(word in NEGATIVE for word in words)
+    positive = negative = 0
+    negate_for = 0
+    for word in words:
+        if word in NEGATIONS:
+            negate_for = 3
+            continue
+        if word in POSITIVE:
+            negative += 1 if negate_for else 0
+            positive += 0 if negate_for else 1
+        elif word in NEGATIVE:
+            positive += 1 if negate_for else 0
+            negative += 0 if negate_for else 1
+        negate_for = max(0, negate_for - 1)
     total = positive + negative
     score = (positive - negative) / max(total, 1)
     if total == 0 or abs(score) < 0.2:
@@ -95,12 +120,19 @@ def analyze_review(text: str) -> dict[str, Any]:
     else:
         label = "positive" if score > 0 else "negative"
         confidence = min(0.97, 0.62 + abs(score) * 0.33)
-    found = []
+    found, evidence, aspect_sentiment = [], {}, {}
     lowered = text.lower()
+    sentences = [part.strip() for part in re.split(r"(?<=[.!?])\s+|[\n]+", text) if part.strip()]
     for aspect, phrases in ASPECTS.items():
         if any(phrase in lowered for phrase in phrases):
             found.append(aspect)
-    return {"label": label, "confidence": round(confidence, 4), "aspects": found, "modelVersion": SENTIMENT_VERSION}
+            snippets = [sentence[:240] for sentence in sentences if any(phrase in sentence.lower() for phrase in phrases)][:2]
+            evidence[aspect] = snippets
+            joined = " ".join(snippets).lower()
+            positive_hits = sum(term in joined for term in POSITIVE)
+            negative_hits = sum(term in joined for term in NEGATIVE)
+            aspect_sentiment[aspect] = "positive" if positive_hits > negative_hits else "negative" if negative_hits > positive_hits else "mixed"
+    return {"label": label, "confidence": round(confidence, 4), "aspects": found, "aspectSentiment": aspect_sentiment, "evidence": evidence, "language": detect_language(text), "modelVersion": SENTIMENT_VERSION}
 
 
 def summarize_reviews(reviews: list[str]) -> dict[str, Any]:
@@ -167,12 +199,21 @@ def response_metadata(response):
 
 @app.get("/health")
 def health():
-    return jsonify(service="healthy", modelReady=runtime.model_ready, indexReady=runtime.index_ready, mode=runtime.mode, searchModel=runtime.search_version, sentimentModel=runtime.sentiment_version, indexSize=runtime.index_size)
+    return jsonify(service="healthy", modelReady=runtime.model_ready, indexReady=runtime.index_ready, mode=runtime.mode, searchModel=runtime.search_version, sentimentModel=runtime.sentiment_version, queryIntentReady=intent_runtime.ready, queryIntentModel=intent_runtime.version, indexSize=runtime.index_size)
 
 
 @app.get("/v1/models")
 def models():
-    return jsonify(models=runtime.model_metadata())
+    return jsonify(models=runtime.model_metadata(), queryIntent={"ready": intent_runtime.ready, "version": intent_runtime.version})
+
+
+@app.post("/v1/query/understand")
+def query_understand():
+    body = request.get_json() or {}
+    text = str(body.get("text", ""))[:500]
+    if len(text.strip()) < 2:
+        raise ValueError("text must contain at least two characters")
+    return jsonify(intent_runtime.predict(text))
 
 
 @app.post("/v1/search")
@@ -183,7 +224,7 @@ def search():
     if not isinstance(listings, list) or len(listings) > 1000:
         raise ValueError("listings must be an array with at most 1000 items")
     results = runtime.rank(query, listings, int(body.get("limit", 12))) if runtime.model_ready else cosine_rank(query, listings, int(body.get("limit", 12)))
-    return jsonify(mode=runtime.mode, modelVersion=runtime.search_version, constraints=extract_constraints(query), results=results)
+    return jsonify(mode=runtime.mode, modelVersion=runtime.search_version, constraints=extract_constraints(query), intent=intent_runtime.predict(query), results=results)
 
 
 @app.post("/v1/recommendations")
@@ -197,8 +238,12 @@ def recommendations():
 def review_analyze():
     body = request.get_json() or {}
     text = str(body.get("text", ""))[:4000]
-    result = runtime.analyze_sentiment(text) if runtime.sentiment_ready else analyze_review(text)
-    result["aspects"] = analyze_review(text)["aspects"]
+    evidence_result = analyze_review(text)
+    result = runtime.analyze_sentiment(text) if runtime.sentiment_ready and evidence_result["language"] == "en" else evidence_result
+    result["aspects"] = evidence_result["aspects"]
+    result["aspectSentiment"] = evidence_result["aspectSentiment"]
+    result["evidence"] = evidence_result["evidence"]
+    result["language"] = evidence_result["language"]
     return jsonify(result)
 
 

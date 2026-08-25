@@ -8,6 +8,12 @@ return [
         'timeout' => env('AI_TIMEOUT_SECONDS', 1.5),
     ],
 
+    'routing' => [
+        // Optional OSRM-compatible base URL. Empty keeps the complete offline fallback.
+        'url' => env('ROUTING_SERVICE_URL', ''),
+        'timeout' => env('ROUTING_TIMEOUT_SECONDS', 1.2),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Third Party Services

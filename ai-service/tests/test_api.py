@@ -33,6 +33,16 @@ def test_search_contract_and_correlation_id():
     assert response.status_code == 200
     assert response.json["results"][0]["id"] == 9
     assert response.headers["X-Correlation-ID"] == "contract-test-1"
+    assert "intent" in response.json
+
+
+def test_trained_query_intent_endpoint_returns_multilingual_labels():
+    response = client().post("/v1/query/understand", headers=auth(), json={"text": "ICBT Kandy ළඟ වයිෆයි බෝඩිමක් under 35000"})
+    assert response.status_code == 200
+    assert response.json["ready"] is True
+    labels = {row["label"] for row in response.json["labels"]}
+    assert "destination" in labels
+    assert "budget" in labels
 
 
 def test_review_summary_does_not_invent_evidence():

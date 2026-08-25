@@ -176,6 +176,10 @@ class SriLankanListingSeeder extends Seeder
                     'distance_m' => (int) round($this->distanceKm((float) $listing->latitude, (float) $listing->longitude, $nearest[2], $nearest[3]) * 1000),
                     'latitude' => $nearest[2],
                     'longitude' => $nearest[3],
+                    'source_provider' => 'project-fixture',
+                    'source_reference' => 'datasets/README.md#seeded-public-listing-corpus',
+                    'coordinate_confidence' => 0.60,
+                    'verified_at' => now(),
                 ]);
             }
         }
@@ -219,6 +223,10 @@ class SriLankanListingSeeder extends Seeder
                 ['supermarket', $market, $lat + .0005, $lng + .0010],
                 ['hospital', $hospital, $lat + .0018, $lng + .0015],
                 ['food', $food, $lat - .0008, $lng + .0006],
+                ['pharmacy', $name.' community pharmacy', $lat + .0012, $lng - .0004],
+                ['bank_atm', $name.' bank and ATM', $lat - .0011, $lng + .0012],
+                ['police', $name.' Police Station', $lat + .0015, $lng - .0010],
+                ['laundry', $name.' laundry service', $lat - .0014, $lng - .0005],
             ];
         })->all();
     }

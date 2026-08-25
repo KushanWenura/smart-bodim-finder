@@ -14,6 +14,11 @@ class TenantProfile extends Model
 
     protected function casts(): array
     {
-        return ['required_facilities' => 'array', 'preferred_facilities' => 'array'];
+        return [
+            'required_facilities' => 'array',
+            'preferred_facilities' => 'array',
+            'learned_preferences' => 'array',
+            'ai_learning_enabled' => 'boolean',
+        ];
     }
 }

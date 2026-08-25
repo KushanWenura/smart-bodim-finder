@@ -1,0 +1,26 @@
+{
+  "timestampUtc": "2026-08-25T12:04:00.832017+00:00",
+  "model": "character TF-IDF + one-vs-rest logistic regression",
+  "dataset": "datasets\\raw\\query_intent_examples.jsonl",
+  "datasetSha256": "d30034e4aa5f5e782735d6265e11e457ef9ec4fba9f3568bef2eb28eefbd17a6",
+  "trainRows": 768,
+  "testRows": 192,
+  "groupOverlap": 0,
+  "microF1": 1.0,
+  "macroF1": 1.0,
+  "labels": [
+    "budget",
+    "destination",
+    "excluded_facility",
+    "find_stay",
+    "hard_facility",
+    "preferred_facility",
+    "radius",
+    "singlish",
+    "sinhala",
+    "tamil"
+  ],
+  "seed": 42,
+  "python": "3.14.6",
+  "limitations": "Synthetic multilingual intent evidence; production accuracy requires consented human-labelled queries."
+}

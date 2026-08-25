@@ -52,6 +52,17 @@ class ReviewTests(unittest.TestCase):
         self.assertEqual(result["sampleSize"], 3)
         self.assertIn("Based on 3 reviews", result["summary"])
 
+    def test_negation_changes_sentiment_instead_of_counting_positive_word(self):
+        result = ai.analyze_review("The room was not clean and not safe")
+        self.assertEqual(result["label"], "negative")
+        self.assertIn("cleanliness", result["evidence"])
+
+    def test_sinhala_review_exposes_language_and_evidence(self):
+        result = ai.analyze_review("කාමරය පිරිසිදු සහ ආරක්ෂිතයි. වයිෆයි හොඳයි.")
+        self.assertEqual(result["language"], "si")
+        self.assertIn("cleanliness", result["aspects"])
+        self.assertIn("WiFi", result["aspects"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -9,6 +9,8 @@ use Illuminate\Support\Str;
 
 class ProximityService
 {
+    public function __construct(private readonly RouteEstimator $routes) {}
+
     private const LEGACY_ALIASES = [
         'University of Moratuwa' => ['uom', 'moratuwa university', 'katubedda campus'],
         'University of Colombo' => ['uoc', 'colombo university'],
@@ -93,7 +95,12 @@ class ProximityService
             $distance = $this->distanceKm((float) $listing->latitude, (float) $listing->longitude, $destination->latitude, $destination->longitude);
             $listing->setAttribute('distance_km', round($distance, 2));
             $listing->setAttribute('destination_name', $destination->name);
-            $listing->setAttribute('commute_estimate_minutes', max(4, (int) ceil(($distance / 22) * 60)));
+            $route = $this->routes->estimate((float) $listing->latitude, (float) $listing->longitude, $destination->latitude, $destination->longitude, $distance);
+            $recommended = $route['recommendedMode'];
+            $listing->setAttribute('commute_estimate_minutes', $route['modes'][$recommended]['minutes']);
+            $listing->setAttribute('commute_options', $route['modes']);
+            $listing->setAttribute('route_method', $route['method']);
+            $listing->setAttribute('recommended_commute_mode', $recommended);
 
             return $listing;
         })->sortBy('distance_km')->values();

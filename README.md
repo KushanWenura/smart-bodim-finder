@@ -2,9 +2,9 @@
 
 A complete academic full-stack application for Sri Lankan boarding accommodation. Guests browse verified places; tenants save, compare, message and review; owners manage moderated listings; administrators verify, publish, moderate, notify and audit. It contains no payment gateway and uses no paid AI API.
 
-The primary user journey is the floating **Buddy AI** conversation: a tenant can ask for a room near a campus or workplace, add a distance radius, budget, facility or gender requirement, and receive clickable verified listing cards without exposing private addresses. Requested budget, location and facilities—including aliases such as `AC` and `car park`—are enforced as hard filters. Eligible results receive numbered Best Match/Top Match badges, a transparent suitability score and concise reasons based on semantic fit, distance, value, rating, verified ownership and nearby essentials. The dedicated destination finder also ranks results by Haversine distance and shows the nearest bus stop, railway station, supermarket, hospital and food option.
+The primary user journey is the floating **Buddy AI** conversation: a tenant can use English, Sinhala, Tamil or common code-mixed wording to name a campus/workplace branch, radius, budget and must-have, preferred or excluded requirements. Buddy never silently relaxes a must-have. Eligible cards show rank, transparent score breakdown, route modes and reasons; a zero-result response identifies which single relaxation could recover candidates. Opt-in feedback can personalize ordering without overriding eligibility.
 
-Every public listing includes an **Explore nearby with Buddy** neighbourhood view. It plots the approximate bodim area and the five nearest essentials on an OpenStreetMap, lists their straight-line distances, and provides filters for bus stops, train stations, Cargills/markets, hospitals and food places. Buddy AI performs semantic property matching; deterministic coordinate calculations produce the displayed nearby distances so the result stays explainable and testable.
+Every public listing includes an **Explore nearby with Buddy** neighbourhood view. It plots the privacy-safe approximate area and sourced essentials for bus, rail, supermarkets/Cargills, hospitals, food, pharmacies, banks/ATMs, police and laundry. Haversine radius checks remain reproducible; optional cached OSRM road data improves driving distance while offline walking/driving/public-transport estimates stay clearly labelled.
 
 ## Architecture
 
@@ -55,6 +55,7 @@ $env:AI_PROFILE='base'
 $env:SEARCH_MODEL_PATH='..\models\smart-bodim-minilm-v1'
 $env:SEARCH_MODEL_VERSION='smart-bodim-minilm-v1'
 $env:AI_INTERNAL_SECRET='change-this-in-every-shared-environment'
+$env:ROUTING_SERVICE_URL='' # optional OSRM-compatible base URL
 ai-service\.venv312\Scripts\python ai-service\app.py
 ```
 
@@ -128,6 +129,11 @@ cd ai-service
 .venv312\Scripts\python generate_domain_dataset.py --output ..\datasets\raw\smart_bodim_search_pairs.jsonl
 .venv312\Scripts\python prepare_data.py ..\datasets\raw\smart_bodim_search_pairs.jsonl --kind search --out ..\datasets\processed\smart-bodim-v1 --seed 42
 .venv312\Scripts\python train_search.py --train ..\datasets\processed\smart-bodim-v1\search-train.jsonl --output ..\models\smart-bodim-minilm-v1 --base-model sentence-transformers/all-MiniLM-L6-v2 --epochs 2 --batch-size 16 --learning-rate 0.00002 --seed 42
+.venv312\Scripts\python generate_query_intent_dataset.py
+.venv312\Scripts\python train_intent_model.py
+
+# Only after exporting at least 100 consented numeric outcome rows with both classes:
+.venv312\Scripts\python train_feedback_reranker.py path\to\feedback.jsonl
 
 # Optional future sentiment fine-tune after adding a representative licensed review dataset:
 .venv\Scripts\python train_sentiment.py --train ..\datasets\processed\reviews-train.jsonl --validation ..\datasets\processed\reviews-validation.jsonl --output ..\models\sentiment-v1
@@ -135,7 +141,7 @@ cd ai-service
 
 Private data, credentials, uploads, virtual environments and build output are ignored. The delivery archive intentionally includes the trained search artifact and its model card.
 
-The submitted dataset is intentionally honest and reproducible: 24 individually written synthetic Sri Lankan listings across 24 areas are the live chatbot/search corpus; each has a distinct locally stored image generated specifically for this project. The training data contains 7,680 CC0 domain triples across 1,920 intent groups and 160 destinations, producing a group-aware 5,376/1,152/1,152 train/validation/test split; 5 synthetic review samples validate the review pipeline. The destination catalog contains 152 higher-education locations across 41 organizations plus 8 workplaces. Official physical branches are modelled separately and paired with same-organization wrong-branch hard negatives. No Kaggle dataset or third-party property photograph is bundled or claimed. See `datasets/README.md` for exact scope, provenance and limitations.
+The submitted data is intentionally honest and reproducible: 24 unique synthetic Sri Lankan listings and project-generated photos form the live corpus; 7,680 CC0 semantic triples train branch-aware retrieval; 960 CC0 multilingual examples train the local intent classifier; five review fixtures validate the review pipeline. The directory contains 152 higher-education locations across 41 organizations plus eight workplaces. Real-world accuracy is reported only after explicitly consented, anonymized queries receive human intent and relevance labels. No Kaggle dataset, scraped review or third-party property photograph is claimed.
 
 ## Documentation
 

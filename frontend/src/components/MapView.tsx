@@ -3,7 +3,7 @@ import {useEffect,useRef} from 'react';
 import type {NearbyPlace} from '../types';
 import 'leaflet/dist/leaflet.css';
 
-const placeColour:Record<string,string>={bus_station:'#2477d4',train_station:'#7856c8',supermarket:'#ef6b3a',hospital:'#d84d57',food:'#d59620'};
+const placeColour:Record<string,string>={bus_station:'#2477d4',train_station:'#7856c8',supermarket:'#ef6b3a',hospital:'#d84d57',food:'#d59620',pharmacy:'#cb4f86',bank_atm:'#397a56',police:'#3856a6',laundry:'#348da8'};
 const placeLabel=(type:string)=>type.replaceAll('_',' ').replace(/\b\w/g,letter=>letter.toUpperCase());
 const distanceLabel=(metres:number)=>metres<1000?`${metres} m`:`${(metres/1000).toFixed(1)} km`;
 

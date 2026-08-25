@@ -38,12 +38,16 @@ class ListingResource extends JsonResource
             'distanceKm' => $this->when($this->resource->getAttribute('distance_km') !== null, fn () => (float) $this->resource->getAttribute('distance_km')),
             'destinationName' => $this->when($this->resource->getAttribute('destination_name') !== null, fn () => $this->resource->getAttribute('destination_name')),
             'commuteEstimateMinutes' => $this->when($this->resource->getAttribute('commute_estimate_minutes') !== null, fn () => (int) $this->resource->getAttribute('commute_estimate_minutes')),
-            'nearbyPlaces' => $this->whenLoaded('nearbyPlaces', fn () => $this->nearbyPlaces->sortBy('distance_m')->values()->map(fn ($place) => ['type' => $place->type, 'name' => $place->name, 'distanceM' => $place->distance_m, 'latitude' => $place->latitude ? (float) $place->latitude : null, 'longitude' => $place->longitude ? (float) $place->longitude : null])),
+            'commuteOptions' => $this->when($this->resource->getAttribute('commute_options') !== null, fn () => $this->resource->getAttribute('commute_options')),
+            'routeMethod' => $this->when($this->resource->getAttribute('route_method') !== null, fn () => $this->resource->getAttribute('route_method')),
+            'recommendedCommuteMode' => $this->when($this->resource->getAttribute('recommended_commute_mode') !== null, fn () => $this->resource->getAttribute('recommended_commute_mode')),
+            'nearbyPlaces' => $this->whenLoaded('nearbyPlaces', fn () => $this->nearbyPlaces->sortBy('distance_m')->values()->map(fn ($place) => ['type' => $place->type, 'name' => $place->name, 'distanceM' => $place->distance_m, 'latitude' => $place->latitude ? (float) $place->latitude : null, 'longitude' => $place->longitude ? (float) $place->longitude : null, 'sourceProvider' => $place->source_provider, 'coordinateConfidence' => $place->coordinate_confidence ? (float) $place->coordinate_confidence : null, 'verifiedAt' => $place->verified_at?->toIso8601String()])),
             'matchRank' => $this->when($this->resource->getAttribute('match_rank') !== null, fn () => (int) $this->resource->getAttribute('match_rank')),
             'matchScore' => $this->when($this->resource->getAttribute('match_score') !== null, fn () => (int) $this->resource->getAttribute('match_score')),
             'matchLabel' => $this->when($this->resource->getAttribute('match_label') !== null, fn () => $this->resource->getAttribute('match_label')),
             'matchedRequirements' => $this->when($this->resource->getAttribute('matched_requirements') !== null, fn () => $this->resource->getAttribute('matched_requirements')),
             'matchReasons' => $this->when($this->resource->getAttribute('match_reasons') !== null, fn () => $this->resource->getAttribute('match_reasons')),
+            'matchBreakdown' => $this->when($this->resource->getAttribute('match_breakdown') !== null, fn () => $this->resource->getAttribute('match_breakdown')),
         ];
     }
 }

@@ -17,7 +17,9 @@ Application base path: `/api/v1`. Browser writes require a Sanctum session and C
 
 Search keys: `q`, `city`, `type`, `gender`, `facility`, `minPrice`, `maxPrice`, `minRating`, `occupancy`, `furnished`, `sort`, `page`, `perPage`. Sort is one of `relevance`, `newest`, `price_asc`, `price_desc`, `rating`. Pagination is bounded at 24 public/50 admin rows.
 
-Proximity keys: `destination` (branch name or supported alias), `radiusKm` (1–50), optional `maxPrice` and `facility`. Results are published/available listings ordered by Haversine `distanceKm`, with a disclosed commute estimate and nearest public `nearbyPlaces`. A generic multi-branch organization such as `ICBT Campus` returns HTTP 422 with `error.code=ambiguous_destination` and branch suggestions; `POST assistant/chat` returns the same choices as a conversational clarification. It is not a live traffic or road-routing API.
+Proximity keys: `destination` (branch name or supported alias), `radiusKm` (1–50), optional `maxPrice` and `facility`. Results are published/available listings ordered by Haversine `distanceKm`, with disclosed `commuteOptions`, route method and sourced public `nearbyPlaces`. A generic multi-branch organization such as `ICBT Campus` returns HTTP 422 with `error.code=ambiguous_destination` and branch suggestions; `POST assistant/chat` returns the same choices conversationally. OSRM routing is optional; offline estimates are explicitly labelled and are not live traffic.
+
+Assistant responses include structured `understanding`, confidence/language, hard/preferred/excluded requirements, match breakdowns, `relaxationAnalysis`, model/search metadata and a `searchLogId`. Authenticated tenants can post privacy-safe outcomes to `POST /api/v1/ai/feedback` and explicitly donate an anonymized search through `POST /api/v1/ai/evaluation-samples`. Profile learning is opt-in/resettable. Administrator AI routes expose metrics, risk assessments, the human annotation queue and a numeric-only feedback training export.
 
 ## Internal Flask API
 
@@ -28,6 +30,7 @@ All routes except `/health` require `X-Internal-Secret`; `X-Correlation-ID` is e
 | GET | `/health` | service/model/index readiness, versions and index size |
 | GET | `/v1/models` | loaded model metadata |
 | POST | `/v1/search` | `{query, listings[], limit}` → ranked IDs, constraints, version/mode |
+| POST | `/v1/query/understand` | `{text}` → trained intent labels and calibrated confidence |
 | POST | `/v1/recommendations` | `{preference, listings[], limit}` → ranked IDs |
 | POST | `/v1/reviews/analyze` | `{text}` → label, confidence, aspects, model version |
 | POST | `/v1/reviews/summarize` | `{reviews[]}` → safe summary, sample size and supporting aspects |

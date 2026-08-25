@@ -32,7 +32,7 @@ class SmartBodimApiTest extends TestCase
         $this->assertSame(24, Listing::query()->distinct()->count('description'));
         $this->assertSame(24, DB::table('listing_images')->count());
         $this->assertSame(24, DB::table('listing_images')->distinct()->count('storage_path'));
-        $this->assertSame(120, DB::table('listing_nearby_places')->count());
+        $this->assertSame(216, DB::table('listing_nearby_places')->count());
 
         DB::table('listing_images')->pluck('storage_path')->each(function (string $path): void {
             $this->assertStringStartsWith('/images/listings/', $path);
@@ -105,7 +105,7 @@ class SmartBodimApiTest extends TestCase
             $this->assertLessThanOrEqual(20, $listing['distanceKm']);
             $this->assertNotEmpty($listing['nearbyPlaces']);
             $places = collect($listing['nearbyPlaces']);
-            $this->assertEqualsCanonicalizing(['bus_station', 'train_station', 'supermarket', 'hospital', 'food'], $places->pluck('type')->all());
+            $this->assertEqualsCanonicalizing(['bus_station', 'train_station', 'supermarket', 'hospital', 'food', 'pharmacy', 'bank_atm', 'police', 'laundry'], $places->pluck('type')->all());
             $places->each(function (array $place): void {
                 $this->assertIsNumeric($place['distanceM']);
                 $this->assertIsNumeric($place['latitude']);
@@ -390,5 +390,96 @@ class SmartBodimApiTest extends TestCase
         $admin = User::where('role', 'admin')->firstOrFail();
         $response = $this->actingAs($admin)->getJson('/api/v1/admin/search?q=Availability')->assertOk()->assertJsonFragment(['subject' => 'Availability in September']);
         $this->assertStringNotContainsString('arrange a viewing this weekend', $response->getContent());
+    }
+
+    public function test_query_understanding_separates_hard_preferred_and_excluded_facilities(): void
+    {
+        Http::fake(['*/v1/search' => Http::response(['mode' => 'fixture-tfidf', 'results' => []])]);
+
+        $response = $this->postJson('/api/v1/assistant/chat', [
+            'message' => 'Near University of Moratuwa Katubedda I must have WiFi, prefer AC, without meals, under Rs. 50000',
+        ])->assertOk()
+            ->assertJsonPath('interpreted.facilities.0', 'WiFi')
+            ->assertJsonPath('interpreted.preferredFacilities.0', 'Air conditioning')
+            ->assertJsonPath('interpreted.excludedFacilities.0', 'Meals')
+            ->assertJsonPath('understanding.language', 'en');
+
+        collect($response->json('results'))->each(function (array $listing): void {
+            $this->assertContains('WiFi', $listing['facilities']);
+            $this->assertNotContains('Meals', $listing['facilities']);
+        });
+    }
+
+    public function test_query_understanding_accepts_sinhala_english_code_mixed_requirements(): void
+    {
+        Http::fake(['*/v1/search' => Http::response(['mode' => 'fixture-tfidf', 'results' => []])]);
+
+        $this->postJson('/api/v1/assistant/chat', [
+            'message' => 'University of Moratuwa Katubedda ළඟ අයවැය 40000 වයිෆයි සහ ඒසී බෝඩිමක්',
+        ])->assertOk()
+            ->assertJsonPath('understanding.language', 'si-en')
+            ->assertJsonPath('interpreted.maxPrice', 40000)
+            ->assertJsonPath('interpreted.destination.name', 'University of Moratuwa - Katubedda');
+    }
+
+    public function test_commute_results_expose_transparent_multimodal_estimates(): void
+    {
+        $listing = $this->getJson('/api/v1/proximity?destination=University%20of%20Moratuwa%20Katubedda&radiusKm=20')
+            ->assertOk()
+            ->assertJsonPath('meta.commuteModes.0', 'walking')
+            ->json('data.0');
+
+        $this->assertArrayHasKey('walking', $listing['commuteOptions']);
+        $this->assertArrayHasKey('driving', $listing['commuteOptions']);
+        $this->assertArrayHasKey('publicTransport', $listing['commuteOptions']);
+        $this->assertNotEmpty($listing['routeMethod']);
+    }
+
+    public function test_ai_feedback_is_private_to_tenant_and_updates_opt_in_learning(): void
+    {
+        $tenant = User::where('role', 'tenant')->firstOrFail();
+        $listing = Listing::publiclyVisible()->firstOrFail();
+        $response = $this->actingAs($tenant)->postJson('/api/v1/ai/feedback', [
+            'event' => 'favorite', 'listingId' => $listing->id, 'position' => 1, 'matchScore' => 91,
+        ])->assertCreated()->assertJsonPath('recorded', true);
+
+        $this->assertDatabaseHas('ai_feedback', ['user_id' => $tenant->id, 'listing_id' => $listing->id, 'event_type' => 'favorite']);
+        $this->assertSame(1, $response->json('signalCount'));
+        $this->assertSame(1, $tenant->tenantProfile->fresh()->learned_preferences['signals']);
+    }
+
+    public function test_consented_evaluation_sample_removes_contact_details(): void
+    {
+        $tenant = User::where('role', 'tenant')->firstOrFail();
+        $logId = DB::table('search_logs')->insertGetId([
+            'user_id' => $tenant->id,
+            'sanitized_query' => 'WiFi room near campus, call 0771234567 or me@example.com',
+            'filters' => json_encode(['language' => 'en', 'facilities' => ['WiFi']]),
+            'result_count' => 0,
+            'mode' => 'assistant:test',
+            'latency_ms' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $this->actingAs($tenant)->postJson('/api/v1/ai/evaluation-samples', [
+            'searchLogId' => $logId, 'candidateListingIds' => [], 'consentConfirmed' => true,
+        ])->assertCreated();
+        $sample = DB::table('ai_evaluation_samples')->where('search_log_id', $logId)->first();
+        $this->assertStringNotContainsString('0771234567', $sample->anonymized_query);
+        $this->assertStringNotContainsString('me@example.com', $sample->anonymized_query);
+        $this->assertTrue((bool) $sample->consent_confirmed);
+    }
+
+    public function test_listing_risk_assessment_is_advisory_and_evidence_backed(): void
+    {
+        $listing = Listing::firstOrFail();
+        $assessment = app(\App\Services\ListingRiskService::class)->assess($listing);
+
+        $this->assertSame($listing->id, $assessment->listing_id);
+        $this->assertIsArray($assessment->flags);
+        $this->assertGreaterThanOrEqual(0, $assessment->risk_score);
+        $this->assertLessThanOrEqual(100, $assessment->risk_score);
+        $this->assertSame('complete', $assessment->status);
+        $this->assertSame($listing->status, $listing->fresh()->status);
     }
 }

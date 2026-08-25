@@ -17,6 +17,12 @@ const popularNames = [
   'Kandy City Centre',
 ];
 
+const destinationFallbackLabels: Record<string, string> = {
+  'NSBM Green University': 'Homagama',
+  'World Trade Center Colombo': 'Colombo 01',
+  'Kandy City Centre': 'Kandy',
+};
+
 export default function Home() {
   const { data: featured = [] } = useQuery({ queryKey: ['featured'], queryFn: async () => (await api.get('/listings/featured')).data.data as Listing[] });
   const { data: destinations = [] } = useQuery({ queryKey: ['destinations'], queryFn: async () => (await api.get('/destinations')).data.data as Destination[] });
@@ -52,7 +58,7 @@ export default function Home() {
       </div>
     </div></section>
 
-    <section className="bb-proof"><div className="container"><div><strong>24</strong><span>original verified stays</span></div><div><strong>{destinations.length || 160}+</strong><span>campuses, branches & workplaces</span></div><div><strong>5</strong><span>nearby essential categories</span></div><div><i className="bi bi-heart-fill" /><span><b>Human first</b> AI explains every rank</span></div></div></section>
+    <section className="bb-proof"><div className="container"><div><strong>24</strong><span>original verified stays</span></div><div><strong>{destinations.length || 160}+</strong><span>campuses, branches & workplaces</span></div><div><strong>9</strong><span>nearby essential categories</span></div><div><i className="bi bi-heart-fill" /><span><b>Human first</b> AI explains every rank</span></div></div></section>
 
     <section className="bb-home-section bb-featured"><div className="container">
       <header className="bb-section-heading"><div><span>Places worth meeting</span><h2>Fresh stays with the details already checked.</h2></div><p>Every card brings the decision-making information forward—real rent, facilities, owner status and the neighbourhood around it.</p><Link to="/search">See all stays <i className="bi bi-arrow-right" /></Link></header>
@@ -61,7 +67,7 @@ export default function Home() {
 
     <section className="bb-commute"><div className="container bb-commute-layout">
       <div className="bb-commute-intro"><span>Start from your daily destination</span><h2>Pick the exact branch. Buddy handles the radius.</h2><p>ICBT Colombo and ICBT Kandy are not the same search. We calculate from the branch you choose, then show nearby transport, groceries, healthcare and food.</p><Link to="/nearby">Open commute matcher <i className="bi bi-arrow-up-right" /></Link></div>
-      <div className="bb-destination-list">{popularDestinations.map((place, index) => <Link to={`/nearby?destination=${encodeURIComponent(place.name)}`} key={place.id}><b>{String(index + 1).padStart(2, '0')}</b><span><small>{place.organizationName || (place.type === 'campus' ? 'Campus' : 'Workplace')}</small><strong>{place.branchName || place.name}</strong></span><i className={`bi ${place.type === 'campus' ? 'bi-mortarboard' : 'bi-briefcase'}`} /></Link>)}</div>
+      <div className="bb-destination-list">{popularDestinations.map((place, index) => <Link to={`/nearby?destination=${encodeURIComponent(place.name)}`} key={place.id}><b>{String(index + 1).padStart(2, '0')}</b><span><small>{place.organizationName || (place.type === 'campus' ? 'Campus' : 'Workplace')}</small><strong>{place.branchName || destinationFallbackLabels[place.name] || place.name}</strong></span><i className={`bi ${place.type === 'campus' ? 'bi-mortarboard' : 'bi-briefcase'}`} /></Link>)}</div>
     </div></section>
 
     <section className="bb-how"><div className="container">
