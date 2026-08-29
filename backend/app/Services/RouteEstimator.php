@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Http;
 
 class RouteEstimator
 {
+    private bool $remoteUnavailable = false;
+
     /**
      * Return transparent multimodal estimates. An OSRM-compatible service is
      * used when configured; otherwise conservative Sri Lankan urban estimates
@@ -28,13 +30,14 @@ class RouteEstimator
                 'publicTransport' => ['distanceKm' => $roadDistance, 'minutes' => max(8, (int) ceil(($roadDistance / 19) * 60) + 8)],
             ],
             'recommendedMode' => $roadDistance <= 1.5 ? 'walking' : 'publicTransport',
+            'geometry' => $road['geometry'] ?? [[$fromLat, $fromLon], [$toLat, $toLon]],
         ];
     }
 
     private function roadRoute(float $fromLat, float $fromLon, float $toLat, float $toLon): ?array
     {
         $baseUrl = rtrim((string) config('services.routing.url'), '/');
-        if ($baseUrl === '') {
+        if ($baseUrl === '' || $this->remoteUnavailable) {
             return null;
         }
         $key = 'route:'.hash('sha256', implode(',', array_map(fn ($value) => round($value, 5), [$fromLat, $fromLon, $toLat, $toLon])));
@@ -44,17 +47,22 @@ class RouteEstimator
                 $coordinates = $fromLon.','.$fromLat.';'.$toLon.','.$toLat;
                 $response = Http::timeout((float) config('services.routing.timeout', 1.2))
                     ->acceptJson()
-                    ->get($baseUrl.'/route/v1/driving/'.$coordinates, ['overview' => 'false', 'steps' => 'false']);
+                    ->get($baseUrl.'/route/v1/driving/'.$coordinates, ['overview' => 'full', 'geometries' => 'geojson', 'steps' => 'false']);
                 $route = $response->successful() ? $response->json('routes.0') : null;
                 if (! is_array($route) || ! isset($route['distance'], $route['duration'])) {
+                    $this->remoteUnavailable = true;
+
                     return null;
                 }
 
                 return [
                     'distanceKm' => round(((float) $route['distance']) / 1000, 2),
                     'durationMinutes' => max(1, (int) ceil(((float) $route['duration']) / 60)),
+                    'geometry' => collect(data_get($route, 'geometry.coordinates', []))->map(fn ($point) => [(float) $point[1], (float) $point[0]])->all(),
                 ];
             } catch (\Throwable) {
+                $this->remoteUnavailable = true;
+
                 return null;
             }
         });

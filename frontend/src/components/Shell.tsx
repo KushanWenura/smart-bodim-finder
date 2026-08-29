@@ -65,7 +65,7 @@ export function Footer() {
       <section className="bb-footer-cta"><BuddyMark /><div><span>Meet your new rental sidekick</span><h2>Tell Buddy where life happens. We’ll find the room around it.</h2></div><button onClick={openAi}>Chat with Buddy <i className="bi bi-arrow-up-right" /></button></section>
       <div className="bb-footer-grid">
         <div><Brand inverse /><p>A friendly, privacy-aware Sri Lankan accommodation companion combining verified listings, transparent AI matching and practical neighbourhood data.</p></div>
-        <div><h3>Find your place</h3><Link to="/search">Browse every stay</Link><Link to="/nearby">Match my commute</Link><button onClick={openAi}>Ask Buddy AI</button></div>
+        <div><h3>Find your place</h3><Link to="/search">Browse every stay</Link><Link to="/nearby">Match my commute</Link><button onClick={openAi}>Ask Buddy</button></div>
         <div><h3>Learn</h3><Link to="/about">How matching works</Link><Link to="/safety">Safety guide</Link><Link to="/privacy">Privacy</Link></div>
         <div><h3>For property owners</h3><Link to="/register">Create an account</Link><Link to="/owner/create">List a property</Link><Link to="/terms">Listing standards</Link></div>
       </div>
@@ -109,6 +109,14 @@ const starterPrompts = [
   { icon: 'bi-gender-female', label: 'Female-only stay', query: 'Female-only room near University of Colombo with WiFi under Rs. 35,000' },
   { icon: 'bi-wallet2', label: 'Best value', query: 'Cheapest WiFi room with a private bathroom and parking' },
 ];
+const assistantFeedbackIssues = [
+  ['wrong_destination', 'Wrong campus or branch'],
+  ['budget_ignored', 'Budget was ignored'],
+  ['missing_facility', 'A must-have was missed'],
+  ['distance_incorrect', 'Distance looks incorrect'],
+  ['irrelevant_results', 'Results were not relevant'],
+  ['unclear_explanation', 'Explanation was unclear'],
+] as const;
 
 export function AiChatbot() {
   const { user } = useAuth();
@@ -118,9 +126,11 @@ export function AiChatbot() {
   const [busy, setBusy] = useState(false);
   const [messages, setMessages] = useState<AssistantMessage[]>([welcome]);
   const [feedbackSent, setFeedbackSent] = useState<Record<number, boolean>>({});
+  const [feedbackIssueOpen, setFeedbackIssueOpen] = useState<Record<number, boolean>>({});
   const [donated, setDonated] = useState<Record<number, boolean>>({});
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const dialogRef = useRef<HTMLElement>(null);
   const userContext = useMemo(() => messages.filter(message => message.role === 'user').slice(-3).map(message => message.text), [messages]);
 
   useEffect(() => {
@@ -135,16 +145,30 @@ export function AiChatbot() {
   }, []);
 
   useEffect(() => {
-    const close = (event: KeyboardEvent) => { if (event.key === 'Escape') setOpen(false); };
-    window.addEventListener('keydown', close);
-    return () => window.removeEventListener('keydown', close);
-  }, []);
+    if (!open) return;
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 50);
+    const handleKeys = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { setOpen(false); return; }
+      if (event.key !== 'Tab' || !dialogRef.current) return;
+      const controls = Array.from(dialogRef.current.querySelectorAll<HTMLElement>('button:not([disabled]),a[href],textarea:not([disabled]),input:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])')).filter(element => element.offsetParent !== null);
+      if (!controls.length) return;
+      const first = controls[0];
+      const last = controls[controls.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
+    document.addEventListener('keydown', handleKeys);
+    return () => { window.clearTimeout(focusTimer); document.removeEventListener('keydown', handleKeys); previousFocus?.focus(); };
+  }, [open]);
 
   useEffect(() => {
     const list = listRef.current;
     if (!list) return;
     const latest = list.querySelector<HTMLElement>('.sb-ai-turn:last-of-type');
-    list.scrollTo({ top: latest?.offsetTop ? Math.max(0, latest.offsetTop - 14) : list.scrollHeight, behavior: 'smooth' });
+    const top = latest?.offsetTop ? Math.max(0, latest.offsetTop - 14) : list.scrollHeight;
+    if (typeof list.scrollTo === 'function') list.scrollTo({ top, behavior: 'smooth' });
+    else list.scrollTop = top;
   }, [messages, busy]);
 
   const reset = () => { setMessages([welcome]); setDraft(''); window.setTimeout(() => inputRef.current?.focus(), 50); };
@@ -177,11 +201,14 @@ export function AiChatbot() {
       setBusy(false);
     }
   };
-  const recordFeedback = async (message: AssistantMessage, event: 'result_click' | 'helpful' | 'not_helpful', listing?: Listing) => {
+  const recordFeedback = async (message: AssistantMessage, event: 'result_click' | 'helpful' | 'not_helpful', listing?: Listing, issueCategory?: string) => {
     if (!user || user.role !== 'tenant') return;
     try {
-      await api.post('/ai/feedback', { event, searchLogId: message.search?.searchLogId, listingId: listing?.id, position: listing?.matchRank, matchScore: listing?.matchScore, breakdown: listing?.matchBreakdown });
-      if (event !== 'result_click') setFeedbackSent(current => ({ ...current, [message.id]: true }));
+      await api.post('/ai/feedback', { event, searchLogId: message.search?.searchLogId, listingId: listing?.id, position: listing?.matchRank, matchScore: listing?.matchScore, breakdown: listing?.matchBreakdown, issueCategory });
+      if (event !== 'result_click') {
+        setFeedbackSent(current => ({ ...current, [message.id]: true }));
+        setFeedbackIssueOpen(current => ({ ...current, [message.id]: false }));
+      }
     } catch { /* Feedback must never interrupt search or navigation. */ }
   };
   const donateEvaluation = async (message: AssistantMessage) => {
@@ -194,8 +221,8 @@ export function AiChatbot() {
   const submit = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); void ask(draft); };
 
   return <div className={`sb-ai ${open ? 'is-open' : ''}`}>
-    {open && <button className="sb-ai-backdrop" aria-label="Close Buddy AI assistant" onClick={() => setOpen(false)} />}
-    {open && <section className="sb-ai-window" role="dialog" aria-modal="true" aria-label="Buddy AI assistant">
+    {open && <button className="sb-ai-backdrop" tabIndex={-1} aria-hidden="true" onClick={() => setOpen(false)} />}
+    {open && <section ref={dialogRef} className="sb-ai-window" role="dialog" aria-modal="true" aria-label="Buddy AI assistant">
       <header className="sb-ai-head">
         <div className="sb-ai-identity"><span className="sb-ai-avatar"><BuddyMark /></span><div><strong>Buddy AI</strong><small><i /> Friendly guidance · honest ranking</small></div></div>
         <div className="sb-ai-head-actions"><button aria-label="Start a new Buddy AI conversation" onClick={reset}><i className="bi bi-arrow-counterclockwise" /></button><button aria-label="Close Buddy AI assistant" onClick={() => setOpen(false)}><i className="bi bi-x-lg" /></button></div>
@@ -218,21 +245,22 @@ export function AiChatbot() {
             {message.search?.warning && <div className="sb-ai-warning"><i className="bi bi-info-circle" /> {message.search.warning}</div>}
             {message.followUps?.length ? <div className="sb-ai-followups"><b>Refine this search</b>{message.followUps.map(prompt => <button key={prompt.name} onClick={() => void ask(prompt.query || prompt.name)}>{prompt.name}<i className="bi bi-arrow-right" /></button>)}</div> : null}
             {message.disclaimer && <small className="sb-ai-disclaimer"><i className="bi bi-shield-exclamation" /> {message.disclaimer}</small>}
-            {message.role === 'assistant' && message.search?.searchLogId && user?.role === 'tenant' && <div className="sb-ai-feedback">{feedbackSent[message.id] ? <span><i className="bi bi-check2" /> Feedback saved</span> : <><span>Was this useful?</span><button onClick={() => void recordFeedback(message, 'helpful')} aria-label="This answer was helpful"><i className="bi bi-hand-thumbs-up" /></button><button onClick={() => void recordFeedback(message, 'not_helpful')} aria-label="This answer was not helpful"><i className="bi bi-hand-thumbs-down" /></button></>}</div>}
+            {message.role === 'assistant' && message.search?.searchLogId && user?.role === 'tenant' && <div className="sb-ai-feedback">{feedbackSent[message.id] ? <span><i className="bi bi-check2" /> Feedback saved—thank you</span> : <><span>Was this useful?</span><button onClick={() => void recordFeedback(message, 'helpful')} aria-label="This answer was helpful"><i className="bi bi-hand-thumbs-up" /></button><button onClick={() => setFeedbackIssueOpen(current => ({ ...current, [message.id]: !current[message.id] }))} aria-expanded={Boolean(feedbackIssueOpen[message.id])} aria-label="This answer was not helpful"><i className="bi bi-hand-thumbs-down" /></button></>}</div>}
+            {feedbackIssueOpen[message.id] && !feedbackSent[message.id] && <div className="sb-ai-feedback-reasons"><b>What should Buddy improve?</b><div>{assistantFeedbackIssues.map(([value,label])=><button type="button" key={value} onClick={() => void recordFeedback(message, 'not_helpful', undefined, value)}>{label}</button>)}</div><small>No message text or contact details are added to this feedback.</small></div>}
             {message.role === 'assistant' && message.search?.searchLogId && user?.role === 'tenant' && <button className="sb-ai-donate" disabled={donated[message.id]} onClick={() => void donateEvaluation(message)}><i className={`bi ${donated[message.id] ? 'bi-check2-circle' : 'bi-clipboard-data'}`} />{donated[message.id] ? 'Anonymized query donated' : 'Donate this anonymized query to improve Buddy'}</button>}
           </div>
         </div>)}
-        {busy && <div className="sb-ai-turn assistant"><span className="sb-ai-mini-avatar"><i className="bi bi-stars" /></span><div className="sb-ai-turn-content"><div className="sb-ai-bubble sb-ai-thinking"><span /><span /><span /><b>Checking every hard requirement, then ranking the eligible stays</b></div></div></div>}
+        {busy && <div className="sb-ai-turn assistant"><span className="sb-ai-mini-avatar"><BuddyMark className="is-symbol" /></span><div className="sb-ai-turn-content"><div className="sb-ai-bubble sb-ai-thinking"><span /><span /><span /><b>Checking every hard requirement, then ranking the eligible stays</b></div></div></div>}
       </div>
       {messages.length === 1 && <div className="sb-ai-starters"><span>Try a guided search</span><div>{starterPrompts.map(prompt => <button key={prompt.label} onClick={() => void ask(prompt.query)}><i className={`bi ${prompt.icon}`} /><span><b>{prompt.label}</b><small>{prompt.query}</small></span><i className="bi bi-arrow-right" /></button>)}</div></div>}
       <form className="sb-ai-compose" onSubmit={submit}>
-        <label className="visually-hidden" htmlFor="bodim-ai-question">Ask Buddy AI</label>
+        <label className="visually-hidden" htmlFor="bodim-ai-question">Ask Buddy</label>
         <textarea ref={inputRef} id="bodim-ai-question" rows={1} value={draft} onChange={event => setDraft(event.target.value)} onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); void ask(draft); } }} maxLength={500} placeholder="Campus, budget, WiFi, AC, parking…" />
         <div><small>{draft.length}/500</small><button aria-label="Send to Buddy AI" disabled={busy || draft.trim().length < 2}><i className="bi bi-arrow-up" /></button></div>
       </form>
       <footer><span><i className="bi bi-funnel" /> Hard filters first</span><span><i className="bi bi-bar-chart" /> Suitability ranked second</span></footer>
     </section>}
-    <button className="sb-ai-launcher" title={open ? 'Close Buddy AI' : 'Ask Buddy AI'} aria-label={open ? 'Close Buddy AI assistant' : 'Open Buddy AI assistant'} aria-expanded={open} onClick={() => setOpen(!open)}><span><BuddyMark /></span><b>Ask Buddy</b><small>Your stay sidekick</small></button>
+    <button className="sb-ai-launcher" title={open ? 'Close Buddy' : 'Ask Buddy'} aria-label={open ? 'Close Buddy AI assistant' : 'Open Buddy AI assistant'} aria-expanded={open} onClick={() => setOpen(!open)}><span><BuddyMark /></span><b>Ask Buddy</b><small>Your stay sidekick</small></button>
   </div>;
 }
 
@@ -298,9 +326,9 @@ function MotionOrchestrator() {
 export function PublicLayout({ children }: { children: ReactNode }) { return <><MotionOrchestrator /><Header /><main id="main">{children}</main><Footer /><AiChatbot /></>; }
 
 const links: Record<Role, Array<[string, string, string]>> = {
-  tenant: [['dashboard', 'bi-grid', 'Overview'], ['favorites', 'bi-heart', 'Favorites'], ['messages', 'bi-chat-dots', 'Messages'], ['saved-searches', 'bi-bell', 'Search alerts'], ['reviews', 'bi-star', 'Reviews'], ['profile', 'bi-person', 'Preferences'], ['security', 'bi-shield-lock', 'Security'], ['notifications', 'bi-inbox', 'Notifications']],
-  owner: [['dashboard', 'bi-grid', 'Overview'], ['listings', 'bi-buildings', 'Listings'], ['create', 'bi-plus-circle', 'Add property'], ['messages', 'bi-chat-dots', 'Messages'], ['reviews', 'bi-star', 'Reviews'], ['profile', 'bi-patch-check', 'Verification'], ['security', 'bi-shield-lock', 'Security'], ['notifications', 'bi-inbox', 'Notifications']],
-  admin: [['dashboard', 'bi-grid', 'Overview'], ['search', 'bi-search', 'Global search'], ['listings', 'bi-buildings', 'Listings'], ['owners', 'bi-patch-check', 'Owners'], ['users', 'bi-people', 'Users'], ['reviews', 'bi-star', 'Reviews'], ['notifications', 'bi-megaphone', 'Notify'], ['ai', 'bi-cpu', 'AI & data'], ['audit', 'bi-journal-text', 'Audit log']],
+  tenant: [['dashboard', 'bi-grid', 'Overview'], ['favorites', 'bi-heart', 'Favorites'], ['messages', 'bi-chat-dots', 'Messages'], ['journey', 'bi-calendar-check', 'Rental journey'], ['saved-searches', 'bi-bell', 'Search alerts'], ['reviews', 'bi-star', 'Reviews'], ['profile', 'bi-person', 'Preferences'], ['security', 'bi-shield-lock', 'Security'], ['notifications', 'bi-inbox', 'Notifications']],
+  owner: [['dashboard', 'bi-grid', 'Overview'], ['analytics', 'bi-bar-chart', 'Performance'], ['listings', 'bi-buildings', 'Listings'], ['create', 'bi-plus-circle', 'Add property'], ['messages', 'bi-chat-dots', 'Messages'], ['journey', 'bi-calendar-check', 'Visits & rentals'], ['reviews', 'bi-star', 'Reviews'], ['profile', 'bi-patch-check', 'Verification'], ['security', 'bi-shield-lock', 'Security'], ['notifications', 'bi-inbox', 'Notifications']],
+  admin: [['dashboard', 'bi-grid', 'Overview'], ['system', 'bi-activity', 'System health'], ['search', 'bi-search', 'Global search'], ['listings', 'bi-buildings', 'Listings'], ['owners', 'bi-patch-check', 'Owners'], ['trust', 'bi-shield-check', 'Trust centre'], ['users', 'bi-people', 'Users'], ['reviews', 'bi-star', 'Reviews'], ['notifications', 'bi-megaphone', 'Notify'], ['ai', 'bi-cpu', 'AI & data'], ['audit', 'bi-journal-text', 'Audit log']],
 };
 
 export function RoleLayout({ role, children }: { role: Role; children: ReactNode }) {

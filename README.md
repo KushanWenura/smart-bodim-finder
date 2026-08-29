@@ -1,90 +1,69 @@
-# BodimBuddy.lk — Smart Bodim Finder with Buddy AI
+# BodimBuddy.lk
 
-A complete academic full-stack application for Sri Lankan boarding accommodation. Guests browse verified places; tenants save, compare, message and review; owners manage moderated listings; administrators verify, publish, moderate, notify and audit. It contains no payment gateway and uses no paid AI API.
+Smart Sri Lankan boarding-room discovery platform with transparent AI matching, area insights and a safe visit-to-rental workflow.
 
-The primary user journey is the floating **Buddy AI** conversation: a tenant can use English, Sinhala, Tamil or common code-mixed wording to name a campus/workplace branch, radius, budget and must-have, preferred or excluded requirements. Buddy never silently relaxes a must-have. Eligible cards show rank, transparent score breakdown, route modes and reasons; a zero-result response identifies which single relaxation could recover candidates. Opt-in feedback can personalize ordering without overriding eligibility.
+## Main features
 
-Every public listing includes an **Explore nearby with Buddy** neighbourhood view. It plots the privacy-safe approximate area and sourced essentials for bus, rail, supermarkets/Cargills, hospitals, food, pharmacies, banks/ATMs, police and laundry. Haversine radius checks remain reproducible; optional cached OSRM road data improves driving distance while offline walking/driving/public-transport estimates stay clearly labelled.
+- Search verified bodims by campus or workplace branch, distance, budget and facilities.
+- Buddy AI understands English, Sinhala, Tamil and common mixed-language requests.
+- Exact-match filtering is applied before listings are ranked with clear suitability reasons.
+- Compare listings, save favourites and searches, receive alerts and message owners.
+- View commute estimates, nearby essentials and evidence-aware area safety insights.
+- Arrange property visits before requesting rental dates.
+- Protected reservation holds, availability calendars and downloadable rental agreements.
+- AI review summaries with an option to reveal the original resident reviews.
+- Owner tools for creating, editing and managing listings, visits and reservations.
+- Administrator tools for listing moderation, owner verification, reports and system health.
 
-## Architecture
+## Technology
 
-- `frontend/` — React 19, Bootstrap 5.3, Bootstrap Icons, Vite, TypeScript, Router, TanStack Query, React Hook Form/Zod and Leaflet/OpenStreetMap.
-- `backend/` — Laravel 13 REST API, Sanctum cookie authentication, policies/middleware, Eloquent, queues, uploads, notifications and analytics.
-- `ai-service/` — authenticated Flask service with fixture, configurable Hugging Face and FAISS profiles, plus training/evaluation scripts.
-- MySQL 8.4 — normalized authoritative data with foreign keys, indexes, transactions and seed data.
+- **Frontend:** React 19, TypeScript, Vite, Bootstrap and TanStack Query.
+- **Backend:** Laravel 13 REST API, Sanctum authentication, queues and scheduler.
+- **AI service:** Local Flask service with trained semantic-search and intent models.
+- **Database:** SQLite for zero-configuration assessment; MySQL is also supported.
+- **Maps:** Leaflet and OpenStreetMap with optional OSRM-compatible routing.
 
-The browser calls only Laravel. Laravel applies hard eligibility filters before asking the internal Python service to rank candidate IDs. If Python is unavailable, Laravel returns a visible warning and safe keyword/structured-filter results.
+The browser communicates with Laravel. Laravel enforces eligibility and permissions, then sends only eligible listing candidates to the internal AI service for ranking.
 
-## Quick start with Docker Compose
+## Requirements
 
-Requirements: Docker Desktop with Compose.
+- Windows 10 or 11
+- PHP 8.3+ or WAMP
+- Node.js 22+ and pnpm
+- Python 3.12+
 
-```powershell
-Copy-Item .env.example .env
-docker compose up --build
-```
+## Start the complete system
 
-Open `http://localhost:8080`. The API is also exposed at `http://localhost:8000`. MySQL is exposed on host port `3307`; the AI service remains internal. The first backend start migrates the database and seeds it only when the users table is empty.
-
-The default Compose profile uses the small deterministic CPU AI fixture so startup does not download model weights. To build the full model image, install `ai-service/requirements.txt`, download/train the documented artifacts, set `AI_PROFILE=base` or `production`, and build the AI Dockerfile with `AI_REQUIREMENTS=requirements.txt`.
-
-## Manual Windows setup (WAMP-compatible)
-
-Requirements: PHP 8.3+, Composer 2, MySQL 8+, Node 22+/pnpm, and Python 3.12.
-
-```powershell
-# MySQL: create an empty database first
-mysql -uroot -e "CREATE DATABASE smart_bodim_finder CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
-
-# Laravel API
-Copy-Item backend\.env.mysql.example backend\.env
-cd backend
-php ..\tools\composer.phar install
-php artisan key:generate
-php artisan migrate --seed
-php artisan storage:link
-php artisan serve --host=127.0.0.1 --port=8000
-```
-
-In a second terminal, run the included domain-fine-tuned search model:
+Open PowerShell in the project root:
 
 ```powershell
-python -m venv ai-service\.venv312
-ai-service\.venv312\Scripts\python -m pip install -r ai-service\requirements.txt
-$env:AI_PROFILE='base'
-$env:SEARCH_MODEL_PATH='..\models\smart-bodim-minilm-v1'
-$env:SEARCH_MODEL_VERSION='smart-bodim-minilm-v1'
-$env:AI_INTERNAL_SECRET='change-this-in-every-shared-environment'
-$env:ROUTING_SERVICE_URL='' # optional OSRM-compatible base URL
-ai-service\.venv312\Scripts\python ai-service\app.py
-```
-
-The first full-profile start may download the separate pretrained review sentiment classifier. The submitted semantic-search model is already present under `models/smart-bodim-minilm-v1`; it was fine-tuned for this project and is not merely an unchanged downloaded model.
-
-In a third terminal:
-
-```powershell
-cd frontend
-pnpm install
-pnpm dev
-```
-
-Open `http://127.0.0.1:5173`. Run a queue worker in a fourth terminal for index, sentiment and database-notification jobs:
-
-```powershell
-cd backend
-php artisan queue:work --tries=3
-```
-
-Windows users can install missing dependencies on the first run and start all four processes in the background with one command:
-
-```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\Run\start-all.ps1
 ```
 
-Stop only the processes created by that launcher with `.\Run\stop-all.ps1`. See `Run/README.md` for details.
+The first run installs missing dependencies, creates and seeds SQLite, rebuilds the AI index and starts Laravel, the queue worker, scheduler, AI service and frontend.
 
-## Local-only accounts
+Open: `http://127.0.0.1:5173`
+
+Service endpoints:
+
+- Website: `http://127.0.0.1:5173`
+- Laravel health: `http://127.0.0.1:8000/api/v1/health`
+- AI health: `http://127.0.0.1:5100/health`
+
+Stop the launcher-managed services:
+
+```powershell
+.\Run\stop-all.ps1
+```
+
+Create a local database and upload backup:
+
+```powershell
+.\Run\backup-project.ps1
+```
+
+## Local assessment accounts
 
 | Role | Email | Password |
 |---|---|---|
@@ -92,69 +71,33 @@ Stop only the processes created by that launcher with `.\Run\stop-all.ps1`. See 
 | Owner | `owner@smartbodim.lk` | `Owner@123` |
 | Administrator | `admin@smartbodim.lk` | `Admin@123` |
 
-These synthetic credentials are for local assessment only. Never deploy them.
+These accounts and all included listings are synthetic assessment data. Do not use these credentials in production.
 
-## Verification commands
+## Verification
+
+After the first startup has installed the dependencies:
 
 ```powershell
-# Laravel formatting, feature/security/contract tests
+# Backend
 cd backend
-php vendor\bin\pint --test
 php artisan test
 
-# React type-check, production build and component tests
+# Frontend
 cd ..\frontend
 pnpm run lint
-pnpm run build
 pnpm test
-# With Laravel, Flask and Vite running on their documented local ports:
-pnpm run test:e2e
+pnpm run build
 
-# Flask API/unit tests and trained-model evaluation
+# AI service
 cd ..
 ai-service\.venv312\Scripts\python -m pytest ai-service\tests -q
-cd ai-service
-.venv312\Scripts\python evaluate_search_model.py --model ..\models\smart-bodim-minilm-v1 --test ..\datasets\processed\smart-bodim-v1\search-test.jsonl --output ..\models\smart-bodim-minilm-v1\evaluation.json
 ```
 
-## Data and model pipeline
+## Project structure
 
-```powershell
-cd ai-service
-.venv\Scripts\python validate_dataset.py ..\datasets\raw\fixture_reviews.jsonl --kind reviews
-.venv\Scripts\python prepare_data.py ..\datasets\raw\fixture_reviews.jsonl --kind reviews --out ..\datasets\processed
-
-# Reproduce the submitted semantic-search fine-tune:
-.venv312\Scripts\python generate_institution_catalog.py --output ..\datasets\catalog\sri_lanka_higher_education_destinations.json
-.venv312\Scripts\python generate_domain_dataset.py --output ..\datasets\raw\smart_bodim_search_pairs.jsonl
-.venv312\Scripts\python prepare_data.py ..\datasets\raw\smart_bodim_search_pairs.jsonl --kind search --out ..\datasets\processed\smart-bodim-v1 --seed 42
-.venv312\Scripts\python train_search.py --train ..\datasets\processed\smart-bodim-v1\search-train.jsonl --output ..\models\smart-bodim-minilm-v1 --base-model sentence-transformers/all-MiniLM-L6-v2 --epochs 2 --batch-size 16 --learning-rate 0.00002 --seed 42
-.venv312\Scripts\python generate_query_intent_dataset.py
-.venv312\Scripts\python train_intent_model.py
-
-# Only after exporting at least 100 consented numeric outcome rows with both classes:
-.venv312\Scripts\python train_feedback_reranker.py path\to\feedback.jsonl
-
-# Optional future sentiment fine-tune after adding a representative licensed review dataset:
-.venv\Scripts\python train_sentiment.py --train ..\datasets\processed\reviews-train.jsonl --validation ..\datasets\processed\reviews-validation.jsonl --output ..\models\sentiment-v1
-```
-
-Private data, credentials, uploads, virtual environments and build output are ignored. The delivery archive intentionally includes the trained search artifact and its model card.
-
-The submitted data is intentionally honest and reproducible: 24 unique synthetic Sri Lankan listings and project-generated photos form the live corpus; 7,680 CC0 semantic triples train branch-aware retrieval; 960 CC0 multilingual examples train the local intent classifier; five review fixtures validate the review pipeline. The directory contains 152 higher-education locations across 41 organizations plus eight workplaces. Real-world accuracy is reported only after explicitly consented, anonymized queries receive human intent and relevance labels. No Kaggle dataset, scraped review or third-party property photograph is claimed.
-
-## Documentation
-
-- [Architecture and request flow](docs/ARCHITECTURE.md)
-- [Entity relationship diagram](docs/ERD.md)
-- [API contracts](docs/API.md)
-- [Data dictionary](docs/DATA_DICTIONARY.md)
-- [Roles and permissions](docs/ROLE_MATRIX.md)
-- [AI/training/model status](docs/AI.md)
-- [Security](docs/SECURITY.md)
-- [Test plan and actual results](docs/TEST_PLAN.md)
-- [Deployment and backups](docs/DEPLOYMENT.md)
-
-## Model state and limitations
-
-The submission contains `smart-bodim-minilm-v1`, fine-tuned from `sentence-transformers/all-MiniLM-L6-v2` for two CPU epochs using cosine triplet margin loss and explicit hard negatives. On the 200-query grouped synthetic held-out set, it records MRR 1.0 and Recall@1 1.0; the unchanged base model scores MRR 0.856167 and Recall@1 0.755, while the keyword baseline scores 0.937917/0.885. This validates the controlled branch-aware task but does not prove real-world superiority. Distance is straight-line Haversine and commute time is a disclosed estimate, not live routing. Sinhala/Tamil-script quality requires representative licensed data.
+- `frontend/` — public website and tenant, owner and administrator workspaces.
+- `backend/` — Laravel API, migrations, seeders, policies, jobs and tests.
+- `ai-service/` — local AI API, ranking logic, training tools and tests.
+- `models/` — submitted trained model artifacts.
+- `datasets/` — licensed/synthetic training and evaluation data.
+- `Run/` — Windows start, stop and backup scripts.

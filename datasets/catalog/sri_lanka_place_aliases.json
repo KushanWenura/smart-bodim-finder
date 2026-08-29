@@ -1,0 +1,27 @@
+{
+  "catalogVersion": "2026.08.26-v1",
+  "scope": "High-frequency rental localities used for privacy-safe address normalization; campus branches remain in the separate nationwide institution catalog.",
+  "limitations": "Project-curated aliases are not a postal authority or geocoding service. Owners must verify the map marker before publication.",
+  "places": [
+    {"area":"Katubedda","city":"Moratuwa","district":"Colombo","latitude":6.7951,"longitude":79.9009,"aliases":["katubadda","කටුබැද්ද","கட்டுபெத்த"]},
+    {"area":"Moratuwa","city":"Moratuwa","district":"Colombo","latitude":6.7881,"longitude":79.8913,"aliases":["moratuwa town","මොරටුව","மொரட்டுவை"]},
+    {"area":"Dehiwala","city":"Dehiwala-Mount Lavinia","district":"Colombo","latitude":6.8513,"longitude":79.8657,"aliases":["dehiwela","දෙහිවල","தெஹிவளை"]},
+    {"area":"Nugegoda","city":"Sri Jayewardenepura Kotte","district":"Colombo","latitude":6.8649,"longitude":79.8997,"aliases":["nugagoda","නුගේගොඩ","நுகேகொடை"]},
+    {"area":"Rajagiriya","city":"Sri Jayewardenepura Kotte","district":"Colombo","latitude":6.9095,"longitude":79.8943,"aliases":["rajagiriya town","රාජගිරිය","ராஜகிரிய"]},
+    {"area":"Malabe","city":"Malabe","district":"Colombo","latitude":6.9063,"longitude":79.9703,"aliases":["maalabe","මාලබේ","மாலபே"]},
+    {"area":"Homagama","city":"Homagama","district":"Colombo","latitude":6.8412,"longitude":80.0030,"aliases":["homagamaa","හෝමාගම","ஹோமாகம"]},
+    {"area":"Maharagama","city":"Maharagama","district":"Colombo","latitude":6.8480,"longitude":79.9265,"aliases":["maharagama town","මහරගම","மஹரகம"]},
+    {"area":"Kelaniya","city":"Kelaniya","district":"Gampaha","latitude":6.9745,"longitude":79.9158,"aliases":["kalaniya","කැලණිය","களனி"]},
+    {"area":"Ragama","city":"Ragama","district":"Gampaha","latitude":7.0250,"longitude":79.9170,"aliases":["raagama","රාගම","ராகம"]},
+    {"area":"Negombo","city":"Negombo","district":"Gampaha","latitude":7.2083,"longitude":79.8358,"aliases":["meegamuwa","මීගමුව","நீர்கொழும்பு"]},
+    {"area":"Peradeniya","city":"Kandy","district":"Kandy","latitude":7.2605,"longitude":80.5976,"aliases":["peradaniya","පේරාදෙණිය","பேராதனை"]},
+    {"area":"Kandy","city":"Kandy","district":"Kandy","latitude":7.2906,"longitude":80.6337,"aliases":["mahanuwara","මහනුවර","கண்டி"]},
+    {"area":"Karapitiya","city":"Galle","district":"Galle","latitude":6.0664,"longitude":80.2263,"aliases":["karapitiya hospital area","කරापිටිය","கராப்பிட்டிய"]},
+    {"area":"Galle","city":"Galle","district":"Galle","latitude":6.0329,"longitude":80.2168,"aliases":["galla","ගාල්ල","காலி"]},
+    {"area":"Matara","city":"Matara","district":"Matara","latitude":5.9549,"longitude":80.5550,"aliases":["mathara","මාතර","மாத்தறை"]},
+    {"area":"Jaffna Town","city":"Jaffna","district":"Jaffna","latitude":9.6615,"longitude":80.0255,"aliases":["jaffna","යාපනය","யாழ்ப்பாணம்"]},
+    {"area":"Anuradhapura Town","city":"Anuradhapura","district":"Anuradhapura","latitude":8.3114,"longitude":80.4037,"aliases":["anuradapura","අනුරාධපුර","அனுராதபுரம்"]},
+    {"area":"Kurunegala Town","city":"Kurunegala","district":"Kurunegala","latitude":7.4863,"longitude":80.3623,"aliases":["kurunagala","කුරුණෑගල","குருணாகல்"]},
+    {"area":"Batticaloa Town","city":"Batticaloa","district":"Batticaloa","latitude":7.7170,"longitude":81.7000,"aliases":["batticaloa","මඩකලපුව","மட்டக்களப்பு"]}
+  ]
+}

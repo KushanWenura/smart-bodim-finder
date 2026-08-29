@@ -10,6 +10,8 @@ use App\Models\Location;
 use App\Models\Review;
 use App\Services\AiServiceClient;
 use App\Services\Analytics;
+use App\Services\PriceIntelligenceService;
+use App\Services\ReservationAvailabilityService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -31,9 +33,14 @@ class ListingController extends Controller
         return ListingResource::collection($q->paginate($data['perPage'] ?? 12)->withQueryString());
     }
 
-    public function show(Request $request, Listing $listing, AiServiceClient $ai): JsonResponse
+    public function show(Request $request, Listing $listing, AiServiceClient $ai, ReservationAvailabilityService $availability, PriceIntelligenceService $prices): JsonResponse
     {
         abort_unless($listing->status === 'published', 404);
+        $snapshot = $availability->snapshot($listing);
+        $listing->setAttribute('availability_status', $snapshot['status']);
+        $listing->setAttribute('availability_label', $snapshot['label']);
+        $listing->setAttribute('next_available_from', $snapshot['nextAvailableFrom'] ?? null);
+        $listing->setAttribute('hold_expires_at', $snapshot['holdExpiresAt'] ?? null);
         $listing->increment('view_count');
         Analytics::record('listing_detail_viewed', $listing->id);
         $listing->load(['owner.ownerProfile', 'facilities', 'images', 'nearbyPlaces']);
@@ -41,7 +48,7 @@ class ListingController extends Controller
 
         $favorite = $request->user()?->role === 'tenant' && DB::table('favorites')->where(['user_id' => $request->user()->id, 'listing_id' => $listing->id])->exists();
 
-        return response()->json(['data' => new ListingResource($listing), 'favorite' => $favorite, 'reviews' => $reviews, 'reviewSummary' => $ai->summarize($reviews->pluck('body')->all()), 'related' => ListingResource::collection(Listing::publiclyVisible()->where('id', '!=', $listing->id)->where('city', $listing->city)->with(['owner', 'facilities', 'images'])->limit(3)->get())]);
+        return response()->json(['data' => new ListingResource($listing), 'favorite' => $favorite, 'reviews' => $reviews, 'reviewSummary' => $ai->summarize($reviews->pluck('body')->all()), 'priceIntelligence' => $prices->assess($listing), 'related' => ListingResource::collection(Listing::publiclyVisible()->where('id', '!=', $listing->id)->where('city', $listing->city)->with(['owner', 'facilities', 'images'])->limit(3)->get())]);
     }
 
     public function featured(): JsonResponse

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password as PasswordRule;
 
@@ -45,7 +46,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'This account is not active.'], 403);
         }
 
-return response()->json(['data' => $user->load(['tenantProfile', 'ownerProfile'])]);
+        return response()->json(['data' => $user->load(['tenantProfile', 'ownerProfile'])]);
     }
 
     public function me(Request $request): JsonResponse
@@ -75,7 +76,12 @@ return response()->json(['data' => $user->load(['tenantProfile', 'ownerProfile']
         $data = $request->validate(['token' => 'required', 'email' => 'required|email', 'password' => ['required', 'confirmed', PasswordRule::min(8)->mixedCase()->numbers()]]);
         $status = Password::reset($data, function (User $user, string $password) {
             $user->forceFill(['password' => Hash::make($password), 'remember_token' => Str::random(60)])->save();
-            $user->tokens()->delete();
+            if (Schema::hasTable('personal_access_tokens')) {
+                $user->tokens()->delete();
+            }
+            if (Schema::hasTable('sessions')) {
+                DB::table('sessions')->where('user_id', $user->id)->delete();
+            }
             event(new PasswordReset($user));
         });
 

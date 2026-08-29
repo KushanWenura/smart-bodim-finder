@@ -1,0 +1,35 @@
+{
+  "timestampUtc": "2026-08-25T17:16:34.542036+00:00",
+  "python": "3.14.6",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "task": "safety-aspect-fixture-evaluation",
+  "modelVersion": "buddy-safety-aspects-v1.0.0",
+  "dataset": "datasets\\processed\\safety-v1\\safety-test.jsonl",
+  "synthetic": true,
+  "realWorldClaim": false,
+  "slices": {
+    "en": {
+      "rows": 8,
+      "aspectRecall": 1.0,
+      "directionAccuracy": 1.0
+    },
+    "overall": {
+      "rows": 24,
+      "aspectRecall": 1.0,
+      "directionAccuracy": 1.0
+    },
+    "si": {
+      "rows": 8,
+      "aspectRecall": 1.0,
+      "directionAccuracy": 1.0
+    },
+    "ta": {
+      "rows": 8,
+      "aspectRecall": 1.0,
+      "directionAccuracy": 1.0
+    }
+  },
+  "errorCount": 0,
+  "errors": [],
+  "limitations": "Synthetic held-out performance verifies deterministic language coverage only; it is not a crime-risk or real-world safety benchmark."
+}

@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Storage;
 
 class ListingImageService
 {
+    public function __construct(private readonly ListingImageQualityService $quality) {}
+
     public function store(Listing $listing, UploadedFile $file, array $meta = []): ListingImage
     {
         $bytes = file_get_contents($file->getRealPath());
@@ -23,8 +25,9 @@ class ListingImageService
         if ($cover) {
             $listing->images()->update(['is_cover' => false]);
         }
+        $analysis = $this->quality->analyze($bytes, $info);
 
-        return $listing->images()->create(['storage_path' => $path, 'thumbnail_path' => $thumb, 'mime_type' => $info['mime'], 'byte_size' => $file->getSize(), 'width' => $info[0], 'height' => $info[1], 'caption' => $meta['caption'] ?? null, 'alt_text' => $meta['alt_text'] ?? $listing->title, 'sort_order' => $order, 'is_cover' => $cover]);
+        return $listing->images()->create(['storage_path' => $path, 'thumbnail_path' => $thumb, 'mime_type' => $info['mime'], 'byte_size' => $file->getSize(), 'width' => $info[0], 'height' => $info[1], 'quality_score' => $analysis['score'], 'quality_flags' => $analysis['flags'], 'perceptual_hash' => $analysis['perceptualHash'], 'analyzed_at' => now(), 'caption' => $meta['caption'] ?? null, 'alt_text' => $meta['alt_text'] ?? $listing->title, 'sort_order' => $order, 'is_cover' => $cover]);
     }
 
     private function thumbnail(string $bytes, array $info, string $path): string

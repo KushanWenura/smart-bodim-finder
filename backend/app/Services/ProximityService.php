@@ -50,20 +50,40 @@ class ProximityService
     {
         $normalized = $this->normalize($text);
         $matches = $this->destinations()->map(function (Institution $destination) use ($normalized): ?array {
-            $needles = collect([$destination->name, $destination->organization_name])
-                ->merge($destination->aliases ?? [])
+            $name = $this->normalize((string) $destination->name);
+            $organization = $this->normalize((string) $destination->organization_name);
+            $aliases = collect($destination->aliases ?? [])
                 ->merge(self::LEGACY_ALIASES[$destination->name] ?? [])
                 ->filter()
                 ->map(fn ($needle) => $this->normalize((string) $needle))
                 ->filter()
                 ->unique();
-            $score = (int) ($needles->filter(fn ($needle) => str_contains($normalized, $needle))->map(fn ($needle) => mb_strlen($needle))->max() ?? 0);
+
+            // A complete destination name is authoritative. Generic aliases such as
+            // "Kandy" must never outrank "Kandy City Centre" merely because another
+            // institution also has a Kandy branch.
+            $exactNameMatch = $name !== '' && $normalized === $name;
+            $fullNameMatch = $name !== '' && str_contains($normalized, $name);
+            $organizationMatch = $organization !== '' && str_contains($normalized, $organization);
+            $aliasLength = (int) ($aliases
+                ->filter(fn ($alias) => str_contains($normalized, $alias))
+                ->map(fn ($alias) => mb_strlen($alias))
+                ->max() ?? 0);
+
+            $score = match (true) {
+                $exactNameMatch => 20_000 + mb_strlen($name),
+                $fullNameMatch => 15_000 + mb_strlen($name),
+                $organizationMatch => 3_000 + mb_strlen($organization),
+                $aliasLength > 0 => 1_000 + $aliasLength,
+                default => 0,
+            };
             if ($score === 0) {
                 return null;
             }
+
             $branch = $this->normalize((string) $destination->branch_name);
-            if ($branch !== '' && str_contains($normalized, $branch)) {
-                $score += 1000;
+            if ($organizationMatch && $branch !== '' && str_contains($normalized, $branch)) {
+                $score += 5_000;
             }
 
             return ['destination' => $destination, 'score' => $score];
@@ -95,21 +115,35 @@ class ProximityService
         ];
     }
 
-    public function annotate(Collection $listings, Institution $destination): Collection
+    public function annotate(Collection $listings, Institution $destination, ?float $radiusKm = null, ?int $limit = null): Collection
     {
-        return $listings->map(function (Listing $listing) use ($destination): Listing {
+        $ranked = $listings->map(function (Listing $listing) use ($destination): Listing {
             $distance = $this->distanceKm((float) $listing->latitude, (float) $listing->longitude, $destination->latitude, $destination->longitude);
             $listing->setAttribute('distance_km', round($distance, 2));
             $listing->setAttribute('destination_name', $destination->name);
+
+            return $listing;
+        });
+        if ($radiusKm !== null) {
+            $ranked = $ranked->filter(fn (Listing $listing) => (float) $listing->distance_km <= $radiusKm);
+        }
+        $ranked = $ranked->sortBy('distance_km')->values();
+        if ($limit !== null) {
+            $ranked = $ranked->take($limit)->values();
+        }
+
+        return $ranked->map(function (Listing $listing) use ($destination): Listing {
+            $distance = (float) $listing->distance_km;
             $route = $this->routes->estimate((float) $listing->latitude, (float) $listing->longitude, $destination->latitude, $destination->longitude, $distance);
             $recommended = $route['recommendedMode'];
             $listing->setAttribute('commute_estimate_minutes', $route['modes'][$recommended]['minutes']);
             $listing->setAttribute('commute_options', $route['modes']);
             $listing->setAttribute('route_method', $route['method']);
             $listing->setAttribute('recommended_commute_mode', $recommended);
+            $listing->setAttribute('route_geometry', $route['geometry']);
 
             return $listing;
-        })->sortBy('distance_km')->values();
+        })->values();
     }
 
     public function distanceKm(float $lat1, float $lon1, float $lat2, float $lon2): float

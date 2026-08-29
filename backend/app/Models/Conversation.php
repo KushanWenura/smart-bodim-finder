@@ -29,4 +29,14 @@ class Conversation extends Model
     {
         return $this->belongsTo(User::class, 'owner_id');
     }
+
+    public function viewingRequests(): HasMany
+    {
+        return $this->hasMany(ViewingRequest::class);
+    }
+
+    public function reservations(): HasMany
+    {
+        return $this->hasMany(Reservation::class);
+    }
 }

@@ -1,0 +1,12 @@
+import {createContext,useContext,useEffect,useMemo,useState,type ReactNode} from 'react';
+
+type Locale='en'|'si'|'ta';
+const messages:Record<Locale,Record<string,string>>={
+  en:{discover:'Discover',commute:'Commute match',story:'Our story',safety:'Safety',ask:'Ask Buddy',login:'Log in',create:'Create free account',workspace:'My workspace',propertyWorkspace:'Property workspace',journeyTitle:'Visit first. Reserve when it feels right.',journeyIntro:'An enquiry never blocks a property. Availability changes only after the owner accepts a reservation request.',askStep:'Ask',visitStep:'Visit',requestStep:'Request',holdStep:'Hold',confirmStep:'Confirm'},
+  si:{discover:'සොයන්න',commute:'ගමන් දුර ගැළපීම',story:'අප ගැන',safety:'ආරක්ෂාව',ask:'Buddy අහන්න',login:'පිවිසෙන්න',create:'නොමිලේ ගිණුමක්',workspace:'මගේ වැඩබිම',propertyWorkspace:'දේපළ වැඩබිම',journeyTitle:'පළමුව බලන්න. සුදුසු නම් වෙන්කරන්න.',journeyIntro:'විමසීමක් මඟින් දේපළ අවහිර නොවේ. හිමිකරු වෙන්කිරීම අනුමත කළ පසු පමණක් ලබාගත හැකි තත්ත්වය වෙනස් වේ.',askStep:'විමසන්න',visitStep:'බලන්න',requestStep:'ඉල්ලන්න',holdStep:'තාවකාලිකව රඳවන්න',confirmStep:'තහවුරු කරන්න'},
+  ta:{discover:'தேடுங்கள்',commute:'பயண பொருத்தம்',story:'எங்களைப் பற்றி',safety:'பாதுகாப்பு',ask:'Buddy-யிடம் கேளுங்கள்',login:'உள்நுழைக',create:'இலவச கணக்கு',workspace:'என் பணியிடம்',propertyWorkspace:'சொத்து பணியிடம்',journeyTitle:'முதலில் பாருங்கள். சரியாக இருந்தால் முன்பதிவு செய்யுங்கள்.',journeyIntro:'விசாரணை மட்டும் சொத்தைத் தடுக்காது. உரிமையாளர் முன்பதிவு கோரிக்கையை ஏற்ற பிறகே கிடைக்கும் நிலை மாறும்.',askStep:'கேளுங்கள்',visitStep:'பார்வையிடுங்கள்',requestStep:'கோருங்கள்',holdStep:'தற்காலிக பிடிப்பு',confirmStep:'உறுதிசெய்யுங்கள்'},
+};
+const I18nContext=createContext<{locale:Locale;setLocale:(value:Locale)=>void;t:(key:string)=>string}>({locale:'en',setLocale:()=>undefined,t:key=>key});
+
+export function I18nProvider({children}:{children:ReactNode}){const[locale,setLocaleState]=useState<Locale>(()=>typeof window==='undefined'?'en':(localStorage.getItem('bodimbuddy.locale') as Locale)||'en');useEffect(()=>{document.documentElement.lang=locale;localStorage.setItem('bodimbuddy.locale',locale)},[locale]);const value=useMemo(()=>({locale,setLocale:(next:Locale)=>setLocaleState(next),t:(key:string)=>messages[locale][key]||messages.en[key]||key}),[locale]);return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>}
+export const useI18n=()=>useContext(I18nContext);

@@ -25,12 +25,15 @@ test('guest can search and open a public listing without a private address', asy
   await expect(page).toHaveURL(/\/listing\/\d+$/);
   await expect(page.getByRole('heading', { name: 'See the neighbourhood, not just the room.' })).toBeVisible();
   await page.getByRole('button', { name: /Open interactive map/i }).click();
-  await expect(page.getByRole('region', { name: /Map of .* and 5 nearby essential places/i })).toBeVisible();
+  const nearbyMap = page.getByRole('region', { name: /Map of .* and \d+ nearby essential places/i });
+  await expect(nearbyMap).toBeVisible();
   const nearbyFilters = page.getByRole('group', { name: 'Filter nearby places' });
   await expect(nearbyFilters.getByRole('button', { name: /Cargills & markets/i })).toBeVisible();
   await expect(nearbyFilters.getByRole('button', { name: /Bus stops/i })).toBeVisible();
   await expect(nearbyFilters.getByRole('button', { name: /Hospitals/i })).toBeVisible();
-  await expect(page.locator('.leaflet-interactive')).toHaveCount(6);
+  const nearbyCount = Number((await nearbyMap.getAttribute('aria-label'))?.match(/and (\d+) nearby/)?.[1] ?? 0);
+  expect(nearbyCount).toBeGreaterThan(0);
+  await expect(page.locator('.leaflet-interactive')).toHaveCount(nearbyCount + 1);
   await expect(page.locator('body')).not.toContainText(/exact street address/i);
 });
 
@@ -104,8 +107,8 @@ test('admin reaches moderation, AI health and privacy-safe global search', async
   await expect(page.getByRole('heading', { name: 'Everything important, in one view.' })).toBeVisible();
 
   await page.getByRole('link', { name: /AI & data/i }).click();
-  await expect(page.getByRole('heading', { name: 'AI service health' })).toBeVisible();
-  await expect(page.getByText('Models ready')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'AI quality & safety' })).toBeVisible();
+  await expect(page.getByText('Online', { exact: true })).toBeVisible();
 
   await page.getByRole('link', { name: /Global search/i }).click();
   await page.getByLabel('Search users, listings, reviews and conversation metadata').fill('Availability');

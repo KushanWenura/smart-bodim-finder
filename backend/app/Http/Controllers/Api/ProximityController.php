@@ -50,12 +50,12 @@ class ProximityController extends Controller
         $query->when($data['maxPrice'] ?? null, fn ($builder, $price) => $builder->where('monthly_price_lkr', '<=', $price));
         $query->when($data['facility'] ?? null, fn ($builder, $facility) => $builder->whereHas('facilities', fn ($facilities) => $facilities->where('name', $facility)));
         $radius = (float) ($data['radiusKm'] ?? 15);
-        $ranked = $proximity->annotate($query->limit(250)->get(), $destination)->filter(fn ($listing) => (float) $listing->distance_km <= $radius)->take(24)->values();
+        $ranked = $proximity->annotate($query->limit(250)->get(), $destination, $radius, 24);
 
         return response()->json([
             'destination' => ['id' => $destination->id, 'name' => $destination->name, 'type' => $destination->type, 'organizationName' => $destination->organization_name, 'branchName' => $destination->branch_name, 'latitude' => $destination->latitude, 'longitude' => $destination->longitude],
             'data' => ListingResource::collection($ranked),
-            'meta' => ['total' => $ranked->count(), 'radiusKm' => $radius, 'distanceMethod' => 'Haversine straight-line distance', 'commuteEstimate' => $ranked->first()?->getAttribute('route_method') ?? 'Offline distance-derived estimate (not live traffic)', 'commuteModes' => ['walking', 'driving', 'publicTransport']],
+            'meta' => ['total' => $ranked->count(), 'radiusKm' => $radius, 'distanceMethod' => 'Haversine eligibility radius', 'commuteEstimate' => $ranked->first()?->getAttribute('route_method') ?? 'Offline distance-derived estimate (not live traffic)', 'routeProvider' => str_contains((string) $ranked->first()?->getAttribute('route_method'), 'OSRM') ? 'osrm' : 'offline', 'commuteModes' => ['walking', 'driving', 'publicTransport']],
         ]);
     }
 }

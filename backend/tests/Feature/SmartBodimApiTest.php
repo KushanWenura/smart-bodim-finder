@@ -7,11 +7,15 @@ use App\Models\Listing;
 use App\Models\User;
 use App\Services\AiServiceClient;
 use App\Services\ListingRiskService;
+use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -24,6 +28,30 @@ class SmartBodimApiTest extends TestCase
     {
         parent::setUp();
         $this->seed();
+    }
+
+    public function test_password_recovery_keeps_account_discovery_private_and_resets_a_valid_account(): void
+    {
+        Notification::fake();
+        $user = User::where('role', 'tenant')->firstOrFail();
+
+        $this->postJson('/api/v1/auth/forgot-password', ['email' => $user->email])
+            ->assertOk()
+            ->assertJsonPath('message', 'If that account exists, a reset link has been sent.');
+        $this->postJson('/api/v1/auth/forgot-password', ['email' => 'missing@example.test'])
+            ->assertOk()
+            ->assertJsonPath('message', 'If that account exists, a reset link has been sent.');
+        Notification::assertSentTo($user, ResetPasswordNotification::class);
+
+        $token = Password::createToken($user);
+        $this->postJson('/api/v1/auth/reset-password', [
+            'token' => $token,
+            'email' => $user->email,
+            'password' => 'FreshPass123',
+            'password_confirmation' => 'FreshPass123',
+        ])->assertOk()->assertJsonPath('message', 'Password reset successfully.');
+
+        $this->assertTrue(Hash::check('FreshPass123', $user->fresh()->password));
     }
 
     public function test_seeded_catalogue_contains_24_unique_sri_lankan_listings_and_local_photos(): void
@@ -97,7 +125,7 @@ class SmartBodimApiTest extends TestCase
         $response = $this->getJson('/api/v1/proximity?destination=University%20of%20Moratuwa%20Katubedda&radiusKm=20')
             ->assertOk()
             ->assertJsonPath('destination.name', 'University of Moratuwa - Katubedda')
-            ->assertJsonPath('meta.distanceMethod', 'Haversine straight-line distance');
+            ->assertJsonPath('meta.distanceMethod', 'Haversine eligibility radius');
 
         $rows = collect($response->json('data'));
         $this->assertNotEmpty($rows);
@@ -250,6 +278,14 @@ class SmartBodimApiTest extends TestCase
         $this->assertCount(10, $response->json('suggestions'));
     }
 
+    public function test_exact_workplace_name_wins_over_generic_city_branch_aliases(): void
+    {
+        $this->getJson('/api/v1/proximity?destination=Kandy%20City%20Centre&radiusKm=15')
+            ->assertOk()
+            ->assertJsonPath('destination.name', 'Kandy City Centre')
+            ->assertJsonPath('destination.type', 'workplace');
+    }
+
     public function test_chatbot_offers_branch_buttons_instead_of_guessing(): void
     {
         $response = $this->postJson('/api/v1/assistant/chat', ['message' => 'Find a WiFi room near ICBT Campus under Rs. 35000'])
@@ -303,6 +339,53 @@ class SmartBodimApiTest extends TestCase
         $this->assertDatabaseHas('admin_audit_logs', ['target_id' => $listing->id, 'action' => 'listing.published']);
     }
 
+    public function test_owner_can_securely_edit_a_published_listing_and_admin_can_review_changes(): void
+    {
+        Queue::fake();
+        $owner = User::where('role', 'owner')->firstOrFail();
+        $admin = User::where('role', 'admin')->firstOrFail();
+        $listing = Listing::where('owner_id', $owner->id)->where('status', 'published')->with('facilities')->firstOrFail();
+        $listing->update(['private_address' => '42 Test Lane, Katubedda']);
+
+        $this->actingAs($owner)->getJson("/api/v1/owner/listings/{$listing->id}")
+            ->assertOk()
+            ->assertJsonPath('data.privateAddress', '42 Test Lane, Katubedda');
+
+        $otherOwner = User::create([
+            'role' => 'owner', 'name' => 'Other Property Owner', 'email' => 'other-owner@example.test',
+            'phone' => '0770000099', 'password' => Hash::make('Owner@123'), 'status' => 'active',
+        ]);
+        $this->actingAs($otherOwner)->getJson("/api/v1/owner/listings/{$listing->id}")->assertForbidden();
+
+        $payload = [
+            'title' => $listing->title.' Updated', 'description' => $listing->description,
+            'propertyType' => $listing->property_type, 'price' => $listing->monthly_price_lkr + 1000,
+            'deposit' => $listing->deposit_lkr, 'privateAddress' => $listing->private_address,
+            'area' => $listing->public_area, 'city' => $listing->city, 'district' => $listing->district,
+            'latitude' => (float) $listing->latitude, 'longitude' => (float) $listing->longitude,
+            'genderRule' => $listing->gender_rule, 'occupancy' => $listing->occupancy_limit,
+            'availableFrom' => $listing->available_from?->toDateString(), 'sharingAllowed' => (bool) $listing->sharing_allowed,
+            'furnished' => (bool) $listing->furnished, 'houseRules' => $listing->house_rules,
+            'facilityIds' => $listing->facilities->pluck('id')->all(),
+        ];
+
+        $this->actingAs($owner)->putJson("/api/v1/owner/listings/{$listing->id}", $payload)
+            ->assertOk()
+            ->assertJsonPath('data.status', 'change_pending')
+            ->assertJsonPath('data.title', $payload['title']);
+        $this->assertDatabaseHas('listing_status_history', ['listing_id' => $listing->id, 'previous_status' => 'published', 'new_status' => 'change_pending']);
+
+        $this->actingAs($admin)->postJson("/api/v1/admin/listings/{$listing->id}/approve", ['reason' => 'Updated public details and facilities were verified.'])
+            ->assertOk()->assertJsonPath('data.status', 'published');
+
+        $payload['title'] .= ' Again';
+        $this->actingAs($owner)->putJson("/api/v1/owner/listings/{$listing->id}", $payload)->assertOk()->assertJsonPath('data.status', 'change_pending');
+        $this->actingAs($admin)->postJson("/api/v1/admin/listings/{$listing->id}/reject", ['reason' => 'Please correct the updated public description.'])
+            ->assertOk()->assertJsonPath('data.status', 'rejected_changes');
+        $this->actingAs($owner)->postJson("/api/v1/owner/listings/{$listing->id}/submit")
+            ->assertOk()->assertJsonPath('data.status', 'change_pending');
+    }
+
     public function test_non_participant_cannot_read_or_send_conversation_messages(): void
     {
         $admin = User::where('role', 'admin')->first();
@@ -324,7 +407,14 @@ class SmartBodimApiTest extends TestCase
 
     public function test_ai_failure_keeps_search_available_with_fallback(): void
     {
-        Http::fake(fn () => Http::failedConnection());
+        $this->mock(AiServiceClient::class, function ($mock): void {
+            $mock->shouldReceive('search')->once()->andReturn([
+                'online' => false,
+                'mode' => 'keyword-fallback',
+                'warning' => 'AI search is temporarily unavailable. Structured filters remain active.',
+                'results' => [['id' => Listing::publiclyVisible()->firstOrFail()->id, 'score' => 1.0]],
+            ]);
+        });
         $response = $this->getJson('/api/v1/search?q=quiet%20room%20with%20WiFi&maxPrice=40000')->assertOk();
         $this->assertFalse($response->json('search.aiOnline'));
         $this->assertSame('keyword-fallback', $response->json('search.mode'));
@@ -360,7 +450,14 @@ class SmartBodimApiTest extends TestCase
 
     public function test_sql_injection_like_search_input_is_treated_as_plain_text(): void
     {
-        Http::fake(fn () => Http::failedConnection());
+        $this->mock(AiServiceClient::class, function ($mock): void {
+            $mock->shouldReceive('search')->once()->andReturn([
+                'online' => false,
+                'mode' => 'keyword-fallback',
+                'warning' => 'AI search is temporarily unavailable. Structured filters remain active.',
+                'results' => [],
+            ]);
+        });
         $this->getJson("/api/v1/search?q='%20OR%201=1--")->assertOk();
         $this->assertDatabaseHas('users', ['email' => 'admin@smartbodim.lk']);
     }
@@ -381,6 +478,21 @@ class SmartBodimApiTest extends TestCase
         (new SynchronizeListingIndex($listing->id))->handle(app(AiServiceClient::class));
         $this->assertDatabaseHas('ai_index_records', ['listing_id' => $listing->id, 'status' => 'indexed']);
         $this->assertSame('published', $listing->fresh()->status);
+    }
+
+    public function test_synchronous_index_rebuild_replaces_the_ai_index_with_only_public_listings(): void
+    {
+        Http::fake(['*/v1/index/rebuild' => Http::response(['status' => 'indexed', 'indexSize' => Listing::publiclyVisible()->count()])]);
+
+        $this->artisan('ai:index-rebuild', ['--sync' => true])->assertSuccessful();
+
+        Http::assertSent(function ($request): bool {
+            $payload = $request->data()['listings'] ?? [];
+
+            return str_ends_with($request->url(), '/v1/index/rebuild')
+                && count($payload) === Listing::publiclyVisible()->count()
+                && collect($payload)->every(fn (array $listing) => isset($listing['id'], $listing['title'], $listing['facilities']));
+        });
     }
 
     public function test_listing_reports_are_deduplicated_per_tenant(): void
@@ -498,5 +610,362 @@ class SmartBodimApiTest extends TestCase
         $this->assertLessThanOrEqual(100, $assessment->risk_score);
         $this->assertSame('complete', $assessment->status);
         $this->assertSame($listing->status, $listing->fresh()->status);
+    }
+
+    public function test_area_safety_insight_is_explainable_confidence_aware_and_privacy_safe(): void
+    {
+        $listing = Listing::publiclyVisible()->firstOrFail();
+        $response = $this->getJson("/api/v1/listings/{$listing->id}/area-safety")
+            ->assertOk()
+            ->assertJsonPath('data.listingId', $listing->id)
+            ->assertJsonPath('data.method.scoreEngine', 'Deterministic weighted evidence model')
+            ->assertJsonStructure(['data' => [
+                'score', 'label', 'summary', 'disclaimer', 'dataGaps', 'guidance',
+                'confidence' => ['level', 'score', 'reason'],
+                'dimensions' => [['key', 'label', 'score', 'weight', 'status', 'explanation']],
+                'signals' => [['type', 'label', 'name', 'distanceM', 'sourceProvider', 'sourceConfidence', 'needsConfirmation']],
+                'map' => ['latitude', 'longitude', 'privacy', 'highlightTypes'],
+                'method' => ['name', 'version', 'scoreEngine', 'explanationEngine', 'trainingReadiness'],
+            ]]);
+
+        $payload = $response->json('data');
+        $this->assertGreaterThanOrEqual(0, $payload['score']);
+        $this->assertLessThanOrEqual(100, $payload['score']);
+        $this->assertContains($payload['confidence']['level'], ['Low', 'Medium', 'High']);
+        $this->assertNotEmpty($payload['dataGaps']);
+        $this->assertStringContainsString('not a guarantee', mb_strtolower($payload['disclaimer']));
+        $this->assertArrayNotHasKey('privateAddress', $payload);
+        $this->assertSame(round((float) $listing->latitude, 3), $payload['map']['latitude']);
+        $this->assertNotSame((float) $listing->latitude, $payload['map']['latitude']);
+    }
+
+    public function test_area_safety_insight_is_unavailable_for_non_public_listing(): void
+    {
+        $listing = Listing::firstOrFail();
+        $listing->forceFill(['status' => 'draft'])->save();
+
+        $this->getJson("/api/v1/listings/{$listing->id}/area-safety")->assertNotFound();
+    }
+
+    public function test_moderated_consented_safety_observations_require_a_minimum_sample_before_scoring(): void
+    {
+        Http::fake(['*/v1/safety/analyze' => Http::response([
+            'reportCount' => 3,
+            'verifiedReportCount' => 0,
+            'themes' => [['key' => 'lighting', 'label' => 'Street lighting', 'supportive' => 2, 'concerns' => 1, 'mentions' => 3, 'verifiedMentions' => 0, 'direction' => 'supportive']],
+            'concernCount' => 1,
+            'languageMix' => ['en' => 3],
+            'modelVersion' => 'buddy-safety-aspects-v1.0.0',
+            'method' => 'Transparent multilingual safety-aspect extraction',
+            'evidencePolicy' => 'Opinion themes are not crime statistics.',
+        ])]);
+
+        $listing = Listing::publiclyVisible()->firstOrFail();
+        $admin = User::where('role', 'admin')->firstOrFail();
+        $tenants = User::factory()->count(3)->create(['role' => 'tenant', 'status' => 'active']);
+        $payloads = [
+            ['visitPeriod' => 'both', 'comment' => 'The main road was well lit, but the final lane became quiet after nine at night.'],
+            ['visitPeriod' => 'evening', 'comment' => 'Buses run late and there are houses nearby, although one crossing has no pavement.'],
+            ['visitPeriod' => 'day', 'comment' => 'A hospital is nearby and the road stayed dry after rain during my regular commute.'],
+        ];
+
+        foreach ($tenants as $index => $tenant) {
+            $response = $this->actingAs($tenant)->postJson("/api/v1/listings/{$listing->id}/area-safety/reports", [
+                'visitBasis' => $index === 2 ? 'regular_commute' : 'viewing',
+                'visitPeriod' => $payloads[$index]['visitPeriod'],
+                'visitedOn' => now()->subDays($index + 1)->toDateString(),
+                'lightingRating' => 4,
+                'transportRating' => 4,
+                'publicActivityRating' => 3,
+                'roadSafetyRating' => 3,
+                'emergencyAccessRating' => 4,
+                'comment' => $payloads[$index]['comment'],
+                'consentForResearch' => true,
+            ])->assertCreated()->assertJsonPath('data.moderation_status', 'pending');
+
+            $reportId = $response->json('data.id');
+            $this->actingAs($admin)->postJson("/api/v1/admin/area-safety-reports/{$reportId}/approve", [
+                'reason' => 'Approved after checking privacy, provenance wording and content quality.',
+            ])->assertOk()->assertJsonPath('data.moderation_status', 'visible');
+        }
+
+        $response = $this->getJson("/api/v1/listings/{$listing->id}/area-safety")->assertOk();
+        $community = collect($response->json('data.dimensions'))->firstWhere('key', 'community_observations');
+        $this->assertSame('available', $community['status']);
+        $this->assertGreaterThanOrEqual(0, $community['score']);
+        $this->assertSame(3, $response->json('data.communityInsights.moderatedReportCount'));
+        $this->assertSame('Street lighting', $response->json('data.communityInsights.themes.0.label'));
+        $this->assertDatabaseCount('area_safety_reports', 3);
+        $this->assertDatabaseHas('admin_audit_logs', ['action' => 'area_safety_report.approve']);
+    }
+
+    public function test_synthetic_safety_training_rows_are_not_database_evidence(): void
+    {
+        $listing = Listing::publiclyVisible()->firstOrFail();
+
+        $this->assertDatabaseCount('area_safety_reports', 0);
+        $response = $this->getJson("/api/v1/listings/{$listing->id}/area-safety")->assertOk();
+        $this->assertSame(0, $response->json('data.communityInsights.moderatedReportCount'));
+        $this->assertStringContainsString('synthetic corpus', $response->json('data.method.trainingReadiness'));
+    }
+
+    public function test_enquiry_viewing_and_reservation_follow_the_safe_rental_journey(): void
+    {
+        Queue::fake();
+        $tenant = User::where('role', 'tenant')->firstOrFail();
+        $listing = Listing::publiclyVisible()->firstOrFail();
+        $owner = User::findOrFail($listing->owner_id);
+
+        $conversationId = $this->actingAs($tenant)->postJson('/api/v1/conversations', [
+            'listingId' => $listing->id,
+            'text' => 'I would like to ask a few questions before arranging a viewing.',
+        ])->assertCreated()->json('data.id');
+
+        $this->assertTrue($listing->fresh()->available, 'An enquiry must never block a listing.');
+
+        $viewingId = $this->postJson("/api/v1/conversations/{$conversationId}/viewings", [
+            'proposedAt' => now('Asia/Colombo')->addDays(2)->setTime(12, 15)->utc()->toIso8601String(),
+            'note' => 'I can visit after class.',
+        ])->assertCreated()->assertJsonPath('data.status', 'requested')->json('data.id');
+
+        $this->assertTrue($listing->fresh()->available, 'A viewing request must not block a listing.');
+
+        $this->actingAs($owner)->postJson("/api/v1/owner/viewings/{$viewingId}/accept")
+            ->assertOk()->assertJsonPath('data.status', 'accepted');
+        $safetyUrl = $this->actingAs($tenant)->postJson("/api/v1/viewings/{$viewingId}/safety-contact", [
+            'emergencyContactName' => 'Trusted Contact', 'emergencyContactPhone' => '0774567890',
+        ])->assertOk()->assertJsonStructure(['shareUrl'])->json('shareUrl');
+        $shareToken = basename(parse_url($safetyUrl, PHP_URL_PATH));
+        $this->getJson("/api/v1/visit-share/{$shareToken}")->assertOk()
+            ->assertJsonPath('data.status', 'accepted')->assertJsonMissing(['emergencyContactPhone' => '0774567890']);
+        $this->actingAs($tenant)->postJson("/api/v1/viewings/{$viewingId}/attendance/check-out")->assertStatus(409);
+        $this->postJson("/api/v1/viewings/{$viewingId}/attendance/check-in")->assertOk()
+            ->assertJsonPath('data.tenant_attendance', 'attended');
+        $this->postJson("/api/v1/viewings/{$viewingId}/attendance/check-out")->assertOk();
+        $this->actingAs($owner)->postJson("/api/v1/owner/viewings/{$viewingId}/complete")
+            ->assertOk()->assertJsonPath('data.status', 'completed');
+
+        $reservationId = $this->actingAs($tenant)->postJson("/api/v1/conversations/{$conversationId}/reservations", [
+            'viewingId' => $viewingId,
+            'moveInDate' => today()->addDays(7)->toDateString(),
+            'moveOutDate' => today()->addMonths(6)->toDateString(),
+            'occupants' => 1,
+            'message' => 'The visit went well and I would like to reserve this room.',
+        ])->assertCreated()->assertJsonPath('data.status', 'requested')->json('data.id');
+
+        $this->assertTrue($listing->fresh()->available, 'A pending request does not block the listing until owner approval.');
+
+        $this->actingAs($owner)->postJson("/api/v1/owner/reservations/{$reservationId}/accept")
+            ->assertOk()->assertJsonPath('data.status', 'held');
+        $this->assertFalse($listing->fresh()->available, 'An accepted hold blocks overlapping reservations.');
+
+        $this->actingAs($tenant)->postJson("/api/v1/reservations/{$reservationId}/confirm")
+            ->assertOk()->assertJsonPath('data.status', 'confirmed');
+        $this->assertDatabaseHas('rental_agreements', ['reservation_id' => $reservationId, 'status' => 'pending_acceptance']);
+        $this->getJson("/api/v1/reservations/{$reservationId}/agreement")->assertOk()
+            ->assertJsonPath('data.reservation_id', $reservationId);
+        $this->postJson("/api/v1/reservations/{$reservationId}/agreement/accept", ['confirm' => true])
+            ->assertOk()->assertJsonPath('data.status', 'pending_acceptance');
+        $this->actingAs($owner)->postJson("/api/v1/reservations/{$reservationId}/agreement/accept", ['confirm' => true])
+            ->assertOk()->assertJsonPath('data.status', 'accepted');
+        $this->get("/api/v1/reservations/{$reservationId}/agreement.pdf")
+            ->assertOk()->assertHeader('Content-Type', 'application/pdf');
+        $this->actingAs($tenant)->postJson("/api/v1/reservations/{$reservationId}/disputes", [
+            'category' => 'property_condition',
+            'details' => 'The condition during follow-up differed from the documented agreement and needs administrator review.',
+        ])->assertCreated();
+        $this->postJson("/api/v1/reservations/{$reservationId}/disputes", [
+            'category' => 'payment', 'details' => 'A second duplicate report must not be silently accepted by the system.',
+        ])->assertStatus(409);
+        $this->getJson("/api/v1/listings/{$listing->id}")
+            ->assertOk()->assertJsonPath('data.availabilityStatus', 'reserved');
+    }
+
+    public function test_owner_availability_rules_and_tenant_decision_support_are_enforced(): void
+    {
+        $listing = Listing::publiclyVisible()->firstOrFail();
+        $owner = User::findOrFail($listing->owner_id);
+        $tenant = User::where('role', 'tenant')->firstOrFail();
+        $second = Listing::publiclyVisible()->whereKeyNot($listing->id)->firstOrFail();
+
+        $this->actingAs($owner)->putJson("/api/v1/owner/listings/{$listing->id}/rental-settings", [
+            'minimumStayMonths' => 2, 'maximumStayMonths' => 12, 'minimumNoticeDays' => 4,
+            'viewingNoticeHours' => 24, 'viewingWindowStart' => '09:00', 'viewingWindowEnd' => '17:30',
+            'utilitiesEstimateLkr' => 4500, 'mealsEstimateLkr' => 14000, 'transportEstimateLkr' => 6000,
+            'cancellationPolicy' => 'Cancel a viewing at least twelve hours before the agreed time.',
+        ])->assertOk()->assertJsonPath('data.costEstimate.utilities', 4500);
+
+        $from = today()->addDays(10)->toDateString();
+        $to = today()->addDays(12)->toDateString();
+        $this->postJson("/api/v1/owner/listings/{$listing->id}/availability-blocks", [
+            'startDate' => $from, 'endDate' => $to, 'type' => 'maintenance', 'reason' => 'Scheduled plumbing maintenance.',
+        ])->assertCreated();
+        $this->getJson("/api/v1/listings/{$listing->id}/availability")->assertOk()
+            ->assertJsonFragment(['startDate' => $from, 'endDate' => $to, 'type' => 'maintenance']);
+
+        $decision = $this->actingAs($tenant)->postJson('/api/v1/decision-support/compare', [
+            'listingIds' => [$listing->id, $second->id], 'maxMonthlyTotalLkr' => 70000,
+        ])->assertOk()->assertJsonStructure(['data' => [['listingId', 'rank', 'score', 'monthlyCost', 'reasons']], 'recommendation', 'method']);
+        $firstRow = collect($decision->json('data'))->firstWhere('listingId', $listing->id);
+        $this->assertSame((int) $listing->monthly_price_lkr + 4500 + 14000 + 6000, $firstRow['monthlyCost']['total']);
+        $this->actingAs($owner)->postJson('/api/v1/decision-support/compare', [
+            'listingIds' => [$listing->id, $second->id],
+        ])->assertForbidden();
+    }
+
+    public function test_verification_and_dispute_queues_require_human_admin_decisions(): void
+    {
+        $tenant = User::where('role', 'tenant')->firstOrFail();
+        $admin = User::where('role', 'admin')->firstOrFail();
+        $evidenceId = $this->actingAs($tenant)->postJson('/api/v1/verification-evidence', [
+            'type' => 'phone', 'reference' => 'OTP support reference BB-PHONE-1042',
+        ])->assertCreated()->json('data.id');
+        $this->actingAs($admin)->getJson('/api/v1/admin/verification-evidence')->assertOk()
+            ->assertJsonFragment(['id' => $evidenceId, 'status' => 'pending']);
+        $this->putJson("/api/v1/admin/verification-evidence/{$evidenceId}", [
+            'status' => 'verified', 'reviewNote' => 'Phone ownership reference was checked by an administrator.',
+        ])->assertOk()->assertJsonPath('data.status', 'verified');
+        $this->assertNotNull($tenant->fresh()->phone_verified_at);
+    }
+
+    public function test_address_normalizer_resolves_local_language_aliases_and_explains_scope(): void
+    {
+        $this->getJson('/api/v1/address/normalize?q='.urlencode('කටුබැද්ද'))
+            ->assertOk()
+            ->assertJsonPath('data.area', 'Katubedda')
+            ->assertJsonPath('data.city', 'Moratuwa')
+            ->assertJsonPath('data.district', 'Colombo')
+            ->assertJsonPath('data.confidence', 'high')
+            ->assertJsonPath('data.source', 'locality-catalog')
+            ->assertJsonStructure(['data' => ['latitude', 'longitude'], 'disclaimer']);
+    }
+
+    public function test_price_intelligence_uses_published_peer_statistics_without_claiming_a_valuation(): void
+    {
+        $listing = Listing::publiclyVisible()->firstOrFail();
+        $response = $this->getJson("/api/v1/listings/{$listing->id}/price-intelligence")
+            ->assertOk()
+            ->assertJsonStructure(['data' => ['available', 'label', 'confidence', 'peerCount', 'method']]);
+
+        if ($response->json('data.available')) {
+            $response->assertJsonStructure(['data' => [
+                'listingPriceLkr', 'peerMedianLkr', 'peerRangeLkr' => ['low', 'high'],
+                'priceVsMedianPercent', 'marketPercentile', 'facilitySignals', 'disclaimer',
+            ]]);
+            $this->assertStringContainsString('not an official valuation', $response->json('data.disclaimer'));
+        }
+    }
+
+    public function test_owner_analytics_is_private_and_excludes_tenant_contact_details(): void
+    {
+        $owner = User::where('role', 'owner')->firstOrFail();
+        $tenant = User::where('role', 'tenant')->firstOrFail();
+
+        $this->actingAs($tenant)->getJson('/api/v1/owner/analytics')->assertForbidden();
+        $response = $this->actingAs($owner)->getJson('/api/v1/owner/analytics')
+            ->assertOk()
+            ->assertJsonStructure([
+                'summary' => ['listings', 'views', 'favorites', 'enquiries', 'viewings', 'confirmedRentals'],
+                'listings' => [['listingId', 'views', 'enquiries', 'viewToEnquiryRate', 'priceIntelligence', 'recommendations']],
+                'trend', 'privacy',
+            ]);
+        $encoded = json_encode($response->json(), JSON_THROW_ON_ERROR);
+        $this->assertStringNotContainsString((string) $tenant->email, $encoded);
+        $this->assertStringNotContainsString((string) $tenant->phone, $encoded);
+    }
+
+    public function test_user_can_review_and_revoke_only_their_own_masked_sessions(): void
+    {
+        $tenant = User::where('email', 'tenant@smartbodim.lk')->firstOrFail();
+        $otherTenant = User::where('role', 'tenant')->whereKeyNot($tenant->id)->firstOrFail();
+        DB::table('sessions')->insert([
+            ['id' => 'tenant-visible-session', 'user_id' => $tenant->id, 'ip_address' => '192.168.10.42', 'user_agent' => 'Mozilla/5.0 (Windows NT 10.0) Chrome/128.0.0.0', 'payload' => 'fixture', 'last_activity' => now()->timestamp],
+            ['id' => 'other-user-private-session', 'user_id' => $otherTenant->id, 'ip_address' => '10.0.0.55', 'user_agent' => 'Private Agent', 'payload' => 'fixture', 'last_activity' => now()->timestamp],
+        ]);
+
+        $response = $this->actingAs($tenant)->getJson('/api/v1/account/sessions')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.device', 'Google Chrome on Windows')
+            ->assertJsonPath('data.0.ipAddress', '192.168.*.*');
+        $fingerprint = $response->json('data.0.id');
+        $this->assertNotSame('tenant-visible-session', $fingerprint);
+        $this->assertStringNotContainsString('Private Agent', json_encode($response->json(), JSON_THROW_ON_ERROR));
+
+        $this->deleteJson("/api/v1/account/sessions/{$fingerprint}")->assertOk();
+        $this->assertDatabaseMissing('sessions', ['id' => 'tenant-visible-session']);
+        $this->assertDatabaseHas('sessions', ['id' => 'other-user-private-session']);
+    }
+
+    public function test_admin_system_health_is_private_and_exposes_no_credentials(): void
+    {
+        $tenant = User::where('role', 'tenant')->firstOrFail();
+        $admin = User::where('role', 'admin')->firstOrFail();
+        $this->actingAs($tenant)->getJson('/api/v1/admin/system-health')->assertForbidden();
+        Cache::put('system:scheduler-heartbeat', now()->toIso8601String(), now()->addMinutes(10));
+        $this->mock(AiServiceClient::class, function ($mock): void {
+            $mock->shouldReceive('health')->once()->andReturn(['online' => true]);
+        });
+
+        $response = $this->actingAs($admin)->getJson('/api/v1/admin/system-health')
+            ->assertOk()
+            ->assertJsonPath('status', 'healthy')
+            ->assertJsonStructure(['checkedAt', 'checks' => [['key', 'label', 'status', 'detail']], 'environment', 'fallbackPolicy']);
+        $encoded = json_encode($response->json(), JSON_THROW_ON_ERROR);
+        $this->assertStringNotContainsString('APP_KEY', $encoded);
+        $this->assertStringNotContainsString('password', strtolower($encoded));
+    }
+
+    public function test_answer_feedback_is_idempotent_explained_and_user_scoped(): void
+    {
+        $tenant = User::where('email', 'tenant@smartbodim.lk')->firstOrFail();
+        $admin = User::where('role', 'admin')->firstOrFail();
+        $searchId = DB::table('search_logs')->insertGetId([
+            'user_id' => $tenant->id,
+            'sanitized_query' => 'A room near my campus',
+            'filters' => json_encode(['language' => 'en']),
+            'result_count' => 3,
+            'mode' => 'assistant:semantic',
+            'latency_ms' => 18,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->actingAs($tenant)->postJson('/api/v1/ai/feedback', [
+            'event' => 'not_helpful', 'searchLogId' => $searchId, 'issueCategory' => 'wrong_destination',
+        ])->assertCreated();
+        $this->postJson('/api/v1/ai/feedback', [
+            'event' => 'not_helpful', 'searchLogId' => $searchId, 'issueCategory' => 'distance_incorrect',
+        ])->assertOk();
+        $this->assertSame(1, DB::table('ai_feedback')->where('user_id', $tenant->id)->where('search_log_id', $searchId)->count());
+        $this->assertSame('distance_incorrect', data_get(json_decode((string) DB::table('ai_feedback')->where('search_log_id', $searchId)->value('metadata'), true), 'issueCategory'));
+
+        $this->actingAs($admin)->getJson('/api/v1/admin/ai/metrics')->assertOk()
+            ->assertJsonFragment(['category' => 'distance_incorrect', 'count' => 1]);
+        $this->actingAs($tenant)->postJson('/api/v1/ai/feedback', [
+            'event' => 'helpful', 'searchLogId' => $searchId,
+        ])->assertCreated();
+        $this->assertDatabaseMissing('ai_feedback', ['user_id' => $tenant->id, 'search_log_id' => $searchId, 'event_type' => 'not_helpful']);
+        $this->assertDatabaseHas('ai_feedback', ['user_id' => $tenant->id, 'search_log_id' => $searchId, 'event_type' => 'helpful']);
+    }
+
+    public function test_listing_risk_review_flags_contact_payment_and_extreme_deposit_signals_without_auto_rejection(): void
+    {
+        $listing = Listing::firstOrFail();
+        $originalStatus = $listing->status;
+        $listing->forceFill([
+            'description' => 'Contact 077 123 4567 or visit https://example.test. Send money by bank transfer to reserve before viewing this otherwise clearly described room.',
+            'deposit_lkr' => (int) $listing->monthly_price_lkr * 7,
+        ])->save();
+
+        $assessment = app(ListingRiskService::class)->assess($listing->fresh());
+        $codes = collect($assessment->flags)->pluck('code');
+        $this->assertContains('off_platform_contact', $codes);
+        $this->assertContains('external_contact_link', $codes);
+        $this->assertContains('unsafe_payment_instruction', $codes);
+        $this->assertContains('extreme_deposit', $codes);
+        $this->assertSame(ListingRiskService::VERSION, $assessment->model_version);
+        $this->assertSame($originalStatus, $listing->fresh()->status);
+        $this->assertStringNotContainsString('077', json_encode($assessment->evidence, JSON_THROW_ON_ERROR));
     }
 }

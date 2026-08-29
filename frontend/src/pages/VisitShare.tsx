@@ -1,0 +1,8 @@
+import {useQuery} from '@tanstack/react-query';
+import {useParams} from 'react-router-dom';
+import {api} from '../api';
+import {BuddyMark,PublicLayout} from '../components/Shell';
+
+type VisitShareData={listing:string;area:string;scheduledAt:string;status:string;tenantCheckedInAt?:string;tenantCheckedOutAt?:string;privacy:string};
+const time=(value?:string)=>value?new Date(value).toLocaleString('en-LK',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Colombo'}):'Not yet';
+export default function VisitShare(){const{token}=useParams();const{data,error}=useQuery({queryKey:['visit-share',token],queryFn:async()=>(await api.get(`/visit-share/${token}`)).data.data as VisitShareData,retry:false});return <PublicLayout><section className="visit-share-page"><div className="visit-share-card"><BuddyMark/><span className="client-kicker">Private visit safety status</span><h1>{data?.listing||'Opening visit status…'}</h1>{error&&<div className="notice notice-warning">This private link is invalid or no longer available.</div>}{data&&<><p>{data.area}</p><div className="visit-share-grid"><div><small>Scheduled</small><strong>{time(data.scheduledAt)}</strong></div><div><small>Visit status</small><strong>{data.status.replaceAll('_',' ')}</strong></div><div><small>Tenant checked in</small><strong>{time(data.tenantCheckedInAt)}</strong></div><div><small>Tenant checked out</small><strong>{time(data.tenantCheckedOutAt)}</strong></div></div><div className="notice notice-info"><i className="bi bi-shield-lock"/> {data.privacy}</div><p className="visit-emergency">If you believe someone is in immediate danger, contact the relevant Sri Lankan emergency service. This page is informational and is not an emergency monitoring service.</p></>}</div></section></PublicLayout>}

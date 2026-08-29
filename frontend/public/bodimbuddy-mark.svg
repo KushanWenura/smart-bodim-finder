@@ -1,14 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" role="img" aria-labelledby="title">
-  <title id="title">BodimBuddy house robot with a heart</title>
-  <path fill="#18213d" d="M12.5 30.5h47v24A11.5 11.5 0 0 1 48 66H24A11.5 11.5 0 0 1 12.5 54.5Z"/>
-  <path fill="#6257d8" d="M7.5 30.8 30 10.3a9 9 0 0 1 12 0l22.5 20.5-5.2 5.7L36 15.4 12.7 36.5Z"/>
-  <rect width="36" height="27" x="18" y="31" fill="#fff" rx="11"/>
-  <path fill="none" stroke="#18213d" stroke-linecap="round" stroke-width="2.7" d="M36 31v-4"/>
-  <circle cx="36" cy="26.5" r="2" fill="#18213d"/>
-  <circle cx="28" cy="42" r="2.7" fill="#ffbf69"/>
-  <circle cx="44" cy="42" r="2.7" fill="#ffbf69"/>
-  <circle cx="24.5" cy="49" r="1.6" fill="#f45f76"/>
-  <circle cx="47.5" cy="49" r="1.6" fill="#f45f76"/>
-  <path fill="none" stroke="#18213d" stroke-linecap="round" stroke-width="2.7" d="M29 49c4.2 3.4 9.8 3.4 14 0"/>
-  <path fill="#f45f76" stroke="#fff" stroke-width="2" d="M55.5 12.5c-4.5-5.3-13.2.7-4.6 8.4l4.6 3.9 4.6-3.9c8.6-7.7-.1-13.7-4.6-8.4Z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" role="img" aria-labelledby="title">
+  <title id="title">BodimBuddy smart home robot with a heart</title>
+  <path fill="#f0f2ff" d="M40 2.8c21.1 0 36.2 15.7 36.2 36.7S61 76.8 40 76.8 3.8 61 3.8 39.5 18.9 2.8 40 2.8Z"/>
+  <ellipse cx="40" cy="72.2" rx="21.5" ry="4.2" fill="#18213d" opacity=".14"/>
+  <path fill="#18213d" d="M13.5 34.2h53v27.1c0 7.5-6.1 13.6-13.6 13.6H27.1c-7.5 0-13.6-6.1-13.6-13.6Z"/>
+  <path fill="#6257d8" d="m7 35.2 26-25a10.2 10.2 0 0 1 14 0l26 25-7.1 7.3L40 17.6 14.1 42.5Z"/>
+  <path fill="#f45f76" d="M57.4 13.7h8.4v14.2l-8.4-8.1Z"/>
+  <rect width="41.6" height="30.2" x="19.2" y="35.2" fill="#fff" rx="14.2"/>
+  <path fill="none" stroke="#18213d" stroke-linecap="round" stroke-width="2.7" d="M40 35.2v-5.3"/>
+  <circle cx="40" cy="28.4" r="2.7" fill="#18213d"/>
+  <rect width="5.8" height="5.4" x="28.2" y="45" fill="#18213d" rx="2.7"/><rect width="5.8" height="5.4" x="46" y="45" fill="#18213d" rx="2.7"/>
+  <circle cx="25.7" cy="54.8" r="2" fill="#f45f76"/><circle cx="54.3" cy="54.8" r="2" fill="#f45f76"/>
+  <path fill="none" stroke="#18213d" stroke-linecap="round" stroke-width="2.7" d="M31.2 55.2c5.2 5 12.4 5 17.6 0"/>
+  <path fill="#f45f76" stroke="#fff" stroke-width="2" d="M60.8 7.4c-5.3-5.8-15 .9-5.1 9.8l5.1 4.4 5.1-4.4c9.9-8.9.2-15.6-5.1-9.8Z"/>
+  <path fill="#ffbf69" d="m9.7 13 1.7 4.2 4.2 1.7-4.2 1.7-1.7 4.2L8 20.6l-4.2-1.7L8 17.2Z"/>
+  <path fill="#ffbf69" d="m69.8 49.7 1.1 2.7 2.7 1.1-2.7 1.1-1.1 2.7-1.1-2.7-2.7-1.1 2.7-1.1Z"/>
 </svg>

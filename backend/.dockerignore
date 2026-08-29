@@ -1,8 +1,0 @@
-.env
-vendor
-storage/logs/*
-storage/framework/cache/*
-storage/framework/sessions/*
-storage/framework/views/*
-database/database.sqlite
-tests

@@ -10,6 +10,6 @@ class ListingImage extends Model
 
     protected function casts(): array
     {
-        return ['is_cover' => 'boolean'];
+        return ['is_cover' => 'boolean', 'quality_flags' => 'array', 'analyzed_at' => 'datetime'];
     }
 }

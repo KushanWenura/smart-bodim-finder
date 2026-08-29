@@ -13,7 +13,7 @@ use Illuminate\Validation\ValidationException;
 
 class ListingWorkflow
 {
-    private const TRANSITIONS = ['draft' => ['pending_review'], 'rejected' => ['pending_review'], 'pending_review' => ['published', 'rejected'], 'published' => ['change_pending', 'deactivated', 'suspended'], 'change_pending' => ['published', 'rejected_changes'], 'suspended' => ['published', 'archived']];
+    private const TRANSITIONS = ['draft' => ['pending_review'], 'rejected' => ['pending_review'], 'pending_review' => ['published', 'rejected'], 'published' => ['change_pending', 'deactivated', 'suspended'], 'change_pending' => ['published', 'rejected_changes'], 'rejected_changes' => ['change_pending'], 'suspended' => ['published', 'archived']];
 
     public function transition(Listing $listing, string $to, User $actor, string $reason): Listing
     {

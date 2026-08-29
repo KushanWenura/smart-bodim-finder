@@ -1,0 +1,17 @@
+{
+  "name": "BodimBuddy.lk",
+  "short_name": "BodimBuddy",
+  "description": "AI-assisted Sri Lankan boarding accommodation discovery and rental journey.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f7ff",
+  "theme_color": "#4338a8",
+  "icons": [
+    {
+      "src": "/bodimbuddy-mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

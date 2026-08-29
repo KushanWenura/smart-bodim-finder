@@ -29,7 +29,7 @@ class AdminController extends Controller
         $details = DB::table('analytics_events')->where('event_type', 'listing_detail_viewed')->count();
         $contacts = DB::table('analytics_events')->where('event_type', 'contact_started')->count();
 
-        return response()->json(['metrics' => ['users' => User::count(), 'tenants' => User::where('role', 'tenant')->count(), 'owners' => User::where('role', 'owner')->count(), 'suspendedUsers' => User::where('status', 'suspended')->count(), 'published' => Listing::where('status', 'published')->count(), 'available' => Listing::publiclyVisible()->count(), 'pending' => Listing::where('status', 'pending_review')->count(), 'flaggedReviews' => Review::where('moderation_status', 'flagged')->count(), 'conversations' => DB::table('conversations')->count(), 'searches' => $searches], 'conversions' => ['searchToDetail' => $searches ? round($details / $searches, 4) : null, 'detailToContact' => $details ? round($contacts / $details, 4) : null, 'searchToContact' => $searches ? round($contacts / $searches, 4) : null], 'topQueries' => SearchLog::select('sanitized_query', DB::raw('COUNT(*) as total'))->whereNotNull('sanitized_query')->where('sanitized_query', '!=', '')->groupBy('sanitized_query')->orderByDesc('total')->limit(10)->get(), 'popularAreas' => Listing::select('public_area', DB::raw('SUM(view_count) as views'))->where('status', 'published')->groupBy('public_area')->orderByDesc('views')->limit(10)->get(), 'recentSearches' => SearchLog::latest()->limit(8)->get(), 'pendingListings' => ListingResource::collection(Listing::where('status', 'pending_review')->with(['owner', 'facilities', 'images'])->latest('submitted_at')->get()), 'ai' => $ai->health()]);
+        return response()->json(['metrics' => ['users' => User::count(), 'tenants' => User::where('role', 'tenant')->count(), 'owners' => User::where('role', 'owner')->count(), 'suspendedUsers' => User::where('status', 'suspended')->count(), 'published' => Listing::where('status', 'published')->count(), 'available' => Listing::publiclyVisible()->count(), 'pending' => Listing::where('status', 'pending_review')->count(), 'flaggedReviews' => Review::where('moderation_status', 'flagged')->count(), 'conversations' => DB::table('conversations')->count(), 'searches' => $searches, 'viewings' => DB::table('viewing_requests')->count(), 'confirmedRentals' => DB::table('reservations')->where('status', 'confirmed')->count(), 'acceptedAgreements' => DB::table('rental_agreements')->where('status', 'accepted')->count(), 'openDisputes' => DB::table('rental_disputes')->whereIn('status', ['open', 'investigating'])->count()], 'conversions' => ['searchToDetail' => $searches ? round($details / $searches, 4) : null, 'detailToContact' => $details ? round($contacts / $details, 4) : null, 'searchToContact' => $searches ? round($contacts / $searches, 4) : null], 'topQueries' => SearchLog::select('sanitized_query', DB::raw('COUNT(*) as total'))->whereNotNull('sanitized_query')->where('sanitized_query', '!=', '')->groupBy('sanitized_query')->orderByDesc('total')->limit(10)->get(), 'popularAreas' => Listing::select('public_area', DB::raw('SUM(view_count) as views'))->where('status', 'published')->groupBy('public_area')->orderByDesc('views')->limit(10)->get(), 'recentSearches' => SearchLog::latest()->limit(8)->get(), 'pendingListings' => ListingResource::collection(Listing::where('status', 'pending_review')->with(['owner', 'facilities', 'images'])->latest('submitted_at')->get()), 'ai' => $ai->health()]);
     }
 
     public function search(Request $request): JsonResponse
@@ -72,6 +72,19 @@ class AdminController extends Controller
         $latencies = SearchLog::where('created_at', '>=', now()->subDays(30))->orderBy('latency_ms')->pluck('latency_ms')->values();
         $p95 = $latencies->isEmpty() ? null : $latencies->get((int) floor(($latencies->count() - 1) * .95));
         $total = SearchLog::where('created_at', '>=', now()->subDays(30))->count();
+        $negativeEvents = AiFeedback::query()->where('event_type', 'not_helpful')->get(['metadata', 'occurred_at']);
+        $issueCategories = $negativeEvents->groupBy(fn (AiFeedback $event) => data_get($event->metadata, 'issueCategory', 'unspecified'))
+            ->map->count()->sortDesc()->map(fn (int $count, string $category) => ['category' => $category, 'count' => $count])->values();
+        $recentFeedback = AiFeedback::query()->where('occurred_at', '>=', now()->subDays(13)->startOfDay())->get(['event_type', 'occurred_at']);
+        $feedbackTrend = collect(range(13, 0))->map(function (int $daysAgo) use ($recentFeedback): array {
+            $date = now()->subDays($daysAgo)->toDateString();
+            $events = $recentFeedback->filter(fn (AiFeedback $event) => $event->occurred_at?->toDateString() === $date);
+
+            return ['date' => $date, 'helpful' => $events->where('event_type', 'helpful')->count(), 'notHelpful' => $events->where('event_type', 'not_helpful')->count()];
+        });
+
+        $labelled = DB::table('ai_evaluation_samples')->where('annotation_status', 'labelled')->count();
+        $consented = DB::table('ai_evaluation_samples')->where('consent_confirmed', true)->count();
 
         return response()->json([
             'feedback' => [
@@ -79,6 +92,8 @@ class AdminController extends Controller
                 'helpfulRate' => ($helpful + $notHelpful) > 0 ? round($helpful / ($helpful + $notHelpful), 4) : null,
                 'resultClicks' => (clone $feedback)->where('event_type', 'result_click')->count(),
                 'enquiries' => (clone $feedback)->where('event_type', 'enquiry')->count(),
+                'issueCategories' => $issueCategories,
+                'trend' => $feedbackTrend,
             ],
             'search' => [
                 'last30Days' => $total,
@@ -86,10 +101,30 @@ class AdminController extends Controller
                 'p95LatencyMs' => $p95,
                 'languages' => SearchLog::whereNotNull('filters')->get()->groupBy(fn ($log) => data_get($log->filters, 'language', 'unknown'))->map->count(),
                 'modelVersions' => SearchLog::select('model_version', DB::raw('COUNT(*) as total'))->whereNotNull('model_version')->groupBy('model_version')->get(),
+                'noResultModes' => SearchLog::select('mode', DB::raw('COUNT(*) as total'))->where('created_at', '>=', now()->subDays(30))->where('result_count', 0)->groupBy('mode')->orderByDesc('total')->limit(8)->get(),
             ],
-            'evaluation' => ['consented' => DB::table('ai_evaluation_samples')->where('consent_confirmed', true)->count(), 'labelled' => DB::table('ai_evaluation_samples')->where('annotation_status', 'labelled')->count()],
-            'risk' => ['assessed' => DB::table('listing_ai_risk_assessments')->count(), 'highRisk' => DB::table('listing_ai_risk_assessments')->where('risk_score', '>=', 50)->count()],
+            'evaluation' => ['consented' => $consented, 'labelled' => $labelled, 'labelCoverage' => $consented > 0 ? round($labelled / $consented, 4) : null, 'productionClaimReady' => $labelled >= 500],
+            'risk' => ['assessed' => DB::table('listing_ai_risk_assessments')->count(), 'highRisk' => DB::table('listing_ai_risk_assessments')->where('risk_score', '>=', 50)->count(), 'mediumRisk' => DB::table('listing_ai_risk_assessments')->whereBetween('risk_score', [25, 49])->count()],
+            'benchmarks' => [
+                'semanticSearch' => $this->jsonArtifact(base_path('../models/smart-bodim-minilm-v1/evaluation.json')),
+                'queryIntent' => $this->jsonArtifact(base_path('../models/query-intent-v1/evaluation.json')),
+                'safetyLanguage' => $this->jsonArtifact(base_path('../datasets/evaluation/safety-v1-baseline.json')),
+            ],
+            'releaseGate' => ['minimumHumanLabels' => 500, 'minimumFeedbackRows' => 100, 'humanLabelsReady' => $labelled >= 500, 'feedbackRowsReady' => (clone $feedback)->count() >= 100, 'note' => 'Synthetic benchmarks are regression evidence only. Production claims require representative consented human evaluation.'],
         ]);
+    }
+
+    private function jsonArtifact(string $path): ?array
+    {
+        if (! is_file($path)) {
+            return null;
+        }
+
+        try {
+            return json_decode((string) file_get_contents($path), true, flags: JSON_THROW_ON_ERROR);
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     public function feedbackTrainingExport(): JsonResponse
@@ -114,7 +149,7 @@ class AdminController extends Controller
 
     public function moderate(Request $r, Listing $listing, string $action, ListingWorkflow $workflow): JsonResponse
     {
-        $map = ['approve' => 'published', 'reject' => 'rejected', 'suspend' => 'suspended', 'restore' => 'published'];
+        $map = ['approve' => 'published', 'reject' => $listing->status === 'change_pending' ? 'rejected_changes' : 'rejected', 'suspend' => 'suspended', 'restore' => 'published'];
         abort_unless(isset($map[$action]), 404);
         $data = $r->validate(['reason' => [$action === 'reject' ? 'required' : 'nullable', 'string', 'min:8', 'max:1000']]);
         $updated = $workflow->transition($listing, $map[$action], $r->user(), $data['reason'] ?? 'Approved after administrator verification.');

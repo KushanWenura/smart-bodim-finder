@@ -52,6 +52,20 @@ def test_review_summary_does_not_invent_evidence():
     assert "Based on 2 reviews" in response.json["summary"]
 
 
+def test_safety_analysis_endpoint_is_authenticated_and_bounded():
+    response = client().post("/v1/safety/analyze", headers=auth(), json={"reports": [
+        {"text": "The road is well lit and buses run late.", "verified": True},
+        {"text": "No pavement and speeding vehicles.", "verified": False},
+    ]})
+    assert response.status_code == 200
+    assert response.json["reportCount"] == 2
+    assert response.json["verifiedReportCount"] == 1
+    assert response.json["modelVersion"] == "buddy-safety-aspects-v1.0.0"
+
+    too_many = client().post("/v1/safety/analyze", headers=auth(), json={"reports": ["x"] * 201})
+    assert too_many.status_code == 422
+
+
 def test_index_upsert_requires_id():
     response = client().post("/v1/index/upsert", headers=auth(), json={"text": "room"})
     assert response.status_code == 422

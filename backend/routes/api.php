@@ -4,17 +4,25 @@ use App\Http\Controllers\Api\AccountController;
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AiEvaluationController;
 use App\Http\Controllers\Api\AiFeedbackController;
+use App\Http\Controllers\Api\AreaSafetyController;
+use App\Http\Controllers\Api\AreaSafetyReportController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ConversationController;
+use App\Http\Controllers\Api\DecisionSupportController;
 use App\Http\Controllers\Api\FavoriteController;
+use App\Http\Controllers\Api\IntelligenceController;
 use App\Http\Controllers\Api\ListingController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\OwnerAnalyticsController;
 use App\Http\Controllers\Api\OwnerListingController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\ProximityController;
+use App\Http\Controllers\Api\RentalExperienceController;
+use App\Http\Controllers\Api\RentalJourneyController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\SavedSearchController;
 use App\Http\Controllers\Api\SearchController;
+use App\Http\Controllers\Api\SystemHealthController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -30,15 +38,23 @@ Route::prefix('v1')->group(function () {
     Route::get('/meta', [ListingController::class, 'meta']);
     Route::get('/listings', [ListingController::class, 'index']);
     Route::get('/listings/featured', [ListingController::class, 'featured']);
+    Route::get('/listings/{listing}/area-safety', AreaSafetyController::class)->middleware('throttle:search');
     Route::get('/listings/{listing}', [ListingController::class, 'show']);
     Route::get('/search', SearchController::class)->middleware('throttle:search');
     Route::post('/assistant/chat', [SearchController::class, 'assistant'])->middleware('throttle:search');
     Route::get('/destinations', [ProximityController::class, 'destinations']);
     Route::get('/proximity', [ProximityController::class, 'search'])->middleware('throttle:search');
+    Route::get('/listings/{listing}/availability', [RentalExperienceController::class, 'availability']);
+    Route::get('/listings/{listing}/price-intelligence', [IntelligenceController::class, 'price']);
+    Route::get('/address/normalize', [IntelligenceController::class, 'address'])->middleware('throttle:search');
+    Route::get('/visit-share/{token}', [RentalExperienceController::class, 'visitShare'])->middleware('throttle:search');
 
     Route::middleware(['auth:sanctum', 'active'])->group(function () {
         Route::put('/profile', [ProfileController::class, 'update']);
         Route::put('/account/password', [AccountController::class, 'password'])->middleware('throttle:login');
+        Route::get('/account/sessions', [AccountController::class, 'sessions']);
+        Route::delete('/account/sessions/{fingerprint}', [AccountController::class, 'revokeSession']);
+        Route::post('/account/sessions/revoke-others', [AccountController::class, 'revokeOtherSessions'])->middleware('throttle:login');
         Route::delete('/account', [AccountController::class, 'archive']);
         Route::get('/notifications', [NotificationController::class, 'index']);
         Route::post('/notifications/read-all', [NotificationController::class, 'readAll']);
@@ -49,8 +65,18 @@ Route::prefix('v1')->group(function () {
         Route::post('/conversations/{conversation}/messages', [ConversationController::class, 'reply'])->middleware('throttle:message');
         Route::post('/conversations/{conversation}/read', [ConversationController::class, 'read']);
         Route::post('/conversations/{conversation}/archive', [ConversationController::class, 'archive']);
+        Route::get('/rental-journey', [RentalJourneyController::class, 'index']);
+        Route::get('/conversations/{conversation}/journey', [RentalJourneyController::class, 'conversation']);
+        Route::post('/viewings/{viewing}/safety-contact', [RentalExperienceController::class, 'visitSafety']);
+        Route::post('/viewings/{viewing}/attendance/{action}', [RentalExperienceController::class, 'attendance'])->whereIn('action', ['check-in', 'check-out', 'no-show']);
+        Route::get('/reservations/{reservation}/agreement', [RentalExperienceController::class, 'agreement']);
+        Route::post('/reservations/{reservation}/agreement/accept', [RentalExperienceController::class, 'acceptAgreement']);
+        Route::get('/reservations/{reservation}/agreement.pdf', [RentalExperienceController::class, 'downloadAgreement']);
+        Route::post('/reservations/{reservation}/disputes', [RentalExperienceController::class, 'storeDispute']);
+        Route::post('/verification-evidence', [RentalExperienceController::class, 'submitVerificationEvidence']);
 
         Route::middleware('role:tenant')->group(function () {
+            Route::post('/decision-support/compare', [DecisionSupportController::class, 'compare'])->middleware('throttle:search');
             Route::post('/ai/feedback', [AiFeedbackController::class, 'store'])->middleware('throttle:search');
             Route::post('/ai/evaluation-samples', [AiEvaluationController::class, 'store'])->middleware('throttle:search');
             Route::get('/favorites', [FavoriteController::class, 'index']);
@@ -62,11 +88,19 @@ Route::prefix('v1')->group(function () {
             Route::get('/my-reviews', [ReviewController::class, 'mine']);
             Route::delete('/reviews/{review}', [ReviewController::class, 'destroy']);
             Route::post('/reviews/{review}/report', [ReviewController::class, 'report']);
+            Route::get('/my-area-safety-reports', [AreaSafetyReportController::class, 'mine']);
+            Route::post('/listings/{listing}/area-safety/reports', [AreaSafetyReportController::class, 'store'])->middleware('throttle:review');
             Route::post('/conversations', [ConversationController::class, 'store'])->middleware('throttle:message');
+            Route::post('/conversations/{conversation}/viewings', [RentalJourneyController::class, 'requestViewing']);
+            Route::post('/viewings/{viewing}/{action}', [RentalJourneyController::class, 'tenantViewingAction'])->whereIn('action', ['cancel', 'accept-alternative']);
+            Route::post('/conversations/{conversation}/reservations', [RentalJourneyController::class, 'requestReservation']);
+            Route::post('/reservations/{reservation}/{action}', [RentalJourneyController::class, 'tenantReservationAction'])->whereIn('action', ['confirm', 'cancel']);
             Route::apiResource('/saved-searches', SavedSearchController::class)->only(['index', 'store', 'destroy']);
         });
         Route::prefix('owner')->middleware('role:owner')->group(function () {
+            Route::get('/analytics', OwnerAnalyticsController::class);
             Route::get('/listings', [OwnerListingController::class, 'index']);
+            Route::get('/listings/{listing}', [OwnerListingController::class, 'show']);
             Route::get('/reviews', [ReviewController::class, 'ownerReviews']);
             Route::get('/listings/{listing}/history', [OwnerListingController::class, 'history']);
             Route::post('/listings', [OwnerListingController::class, 'store']);
@@ -75,9 +109,16 @@ Route::prefix('v1')->group(function () {
             Route::post('/listings/{listing}/deactivate', [OwnerListingController::class, 'deactivate']);
             Route::post('/listings/{listing}/images', [OwnerListingController::class, 'upload'])->middleware('throttle:upload');
             Route::delete('/listings/{listing}/images/{image}', [OwnerListingController::class, 'removeImage']);
+            Route::post('/viewings/{viewing}/{action}', [RentalJourneyController::class, 'ownerViewingAction'])->whereIn('action', ['accept', 'decline', 'propose', 'complete']);
+            Route::post('/reservations/{reservation}/{action}', [RentalJourneyController::class, 'ownerReservationAction'])->whereIn('action', ['accept', 'decline', 'cancel', 'complete']);
+            Route::get('/listings/{listing}/rental-settings', [RentalExperienceController::class, 'ownerSettings']);
+            Route::put('/listings/{listing}/rental-settings', [RentalExperienceController::class, 'updateOwnerSettings']);
+            Route::post('/listings/{listing}/availability-blocks', [RentalExperienceController::class, 'storeBlock']);
+            Route::delete('/availability-blocks/{block}', [RentalExperienceController::class, 'destroyBlock']);
         });
         Route::prefix('admin')->middleware('role:admin')->group(function () {
             Route::get('/dashboard', [AdminController::class, 'dashboard']);
+            Route::get('/system-health', SystemHealthController::class);
             Route::get('/search', [AdminController::class, 'search']);
             Route::get('/listings', [AdminController::class, 'listings']);
             Route::get('/ai/risk-assessments', [AdminController::class, 'riskAssessments']);
@@ -92,8 +133,14 @@ Route::prefix('v1')->group(function () {
             Route::post('/users/{user}/status', [AdminController::class, 'userStatus']);
             Route::get('/reviews', [AdminController::class, 'reviews']);
             Route::post('/reviews/{review}/{action}', [AdminController::class, 'moderateReview'])->whereIn('action', ['hide', 'restore']);
+            Route::get('/area-safety-reports', [AreaSafetyReportController::class, 'index']);
+            Route::post('/area-safety-reports/{report}/{action}', [AreaSafetyReportController::class, 'moderate'])->whereIn('action', ['approve', 'reject']);
             Route::post('/notifications', [AdminController::class, 'notify']);
             Route::get('/audit-logs', [AdminController::class, 'audit']);
+            Route::get('/rental-disputes', [RentalExperienceController::class, 'disputes']);
+            Route::put('/rental-disputes/{dispute}', [RentalExperienceController::class, 'resolveDispute']);
+            Route::get('/verification-evidence', [RentalExperienceController::class, 'verificationEvidence']);
+            Route::put('/verification-evidence/{evidence}', [RentalExperienceController::class, 'reviewVerificationEvidence']);
         });
     });
 });

@@ -8,7 +8,9 @@ use Illuminate\Support\Str;
 
 class ListingRiskService
 {
-    public const VERSION = 'transparent-risk-rules-1.0.0';
+    public const VERSION = 'transparent-risk-rules-1.1.0';
+
+    public function __construct(private readonly ListingImageQualityService $imageQuality) {}
 
     public function assess(Listing $listing): ListingAiRiskAssessment
     {
@@ -60,9 +62,45 @@ class ListingRiskService
                 $score += 32;
             }
         }
+        $qualityScores = $listing->images->pluck('quality_score')->filter(fn ($score) => $score !== null);
+        if ($qualityScores->isNotEmpty() && $qualityScores->avg() < 60) {
+            $flags[] = ['code' => 'weak_image_evidence', 'severity' => 'medium', 'message' => 'Uploaded photos are too dark, compressed or low-detail for confident moderation.'];
+            $evidence['imageQuality'] = ['averageScore' => round($qualityScores->avg()), 'analyzedImages' => $qualityScores->count()];
+            $score += 18;
+        }
+        $perceptualHashes = $listing->images->pluck('perceptual_hash')->filter();
+        if ($perceptualHashes->isNotEmpty()) {
+            $nearDuplicateIds = \DB::table('listing_images')->where('listing_id', '!=', $listing->id)->whereNotNull('perceptual_hash')->get(['id', 'perceptual_hash'])
+                ->filter(fn ($image) => $perceptualHashes->contains(fn ($hash) => ($this->imageQuality->hammingDistance($hash, $image->perceptual_hash) ?? 99) <= 5))
+                ->pluck('id')->values();
+            if ($nearDuplicateIds->isNotEmpty()) {
+                $flags[] = ['code' => 'visually_similar_image', 'severity' => 'high', 'message' => 'A visually similar photo appears on another listing.'];
+                $evidence['nearDuplicateImageIds'] = $nearDuplicateIds->take(10)->all();
+                $score += 28;
+            }
+        }
         if (mb_strlen(trim($listing->description)) < 100) {
             $flags[] = ['code' => 'thin_description', 'severity' => 'low', 'message' => 'Description has too little evidence for a confident quality check.'];
             $score += 8;
+        }
+        $publicCopy = trim($listing->title.' '.$listing->description.' '.($listing->house_rules ?? ''));
+        if (preg_match('/(?:\+?94|0)7\d[\s-]?\d{3}[\s-]?\d{4}|[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/iu', $publicCopy)) {
+            $flags[] = ['code' => 'off_platform_contact', 'severity' => 'medium', 'message' => 'Public listing text appears to contain a phone number or email address.'];
+            $evidence['contactExposure'] = ['detected' => true, 'detail' => 'Contact data is never copied into this assessment.'];
+            $score += 18;
+        }
+        if (preg_match('/https?:\/\/|www\.|(?:wa\.me|t\.me)\//iu', $publicCopy)) {
+            $flags[] = ['code' => 'external_contact_link', 'severity' => 'medium', 'message' => 'Public listing text includes an external link that needs a human safety review.'];
+            $score += 16;
+        }
+        if (preg_match('/(?:send\s+money|bank\s+transfer|pay\s+(?:an?\s+)?(?:advance|deposit))[^.]{0,60}(?:before\s+(?:viewing|visit)|to\s+reserve)|non[-\s]?refundable\s+(?:booking|reservation)\s+fee/iu', $publicCopy)) {
+            $flags[] = ['code' => 'unsafe_payment_instruction', 'severity' => 'high', 'message' => 'Text may request payment before an in-person viewing or describe a non-refundable booking fee.'];
+            $score += 32;
+        }
+        if ((int) $listing->deposit_lkr > max(1, (int) $listing->monthly_price_lkr) * 6) {
+            $flags[] = ['code' => 'extreme_deposit', 'severity' => 'high', 'message' => 'The refundable deposit exceeds six months of listed rent.'];
+            $evidence['depositRatio'] = round((int) $listing->deposit_lkr / max(1, (int) $listing->monthly_price_lkr), 2);
+            $score += 30;
         }
 
         return ListingAiRiskAssessment::updateOrCreate(

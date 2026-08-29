@@ -1,0 +1,10 @@
+import L from 'leaflet';
+import {useEffect,useRef} from 'react';
+import type{Destination,Listing}from'../types';
+import'leaflet/dist/leaflet.css';
+const colours=['#6254e7','#f45b74','#1c9b7c','#e3a329','#2477d4','#8a5cc7','#d85f32','#2b7a4f'];
+export function RoutePreviewMap({destination,listings}:{destination:Destination;listings:Listing[]}){
+ const element=useRef<HTMLDivElement>(null);
+ useEffect(()=>{if(!element.current)return;const map=L.map(element.current,{scrollWheelZoom:false});L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);const bounds:L.LatLngTuple[]=[];const target:L.LatLngTuple=[destination.latitude,destination.longitude];bounds.push(target);L.circleMarker(target,{radius:11,color:'#fff',weight:3,fillColor:'#111b3d',fillOpacity:1}).addTo(map).bindTooltip(destination.name);listings.slice(0,8).forEach((listing,index)=>{const point:L.LatLngTuple=[listing.latitude,listing.longitude];bounds.push(point);const colour=colours[index%colours.length];L.circleMarker(point,{radius:8,color:'#fff',weight:2,fillColor:colour,fillOpacity:1}).addTo(map).bindTooltip(`#${index+1} ${listing.title}`);const geometry=(listing.routeGeometry?.length?listing.routeGeometry:[[listing.latitude,listing.longitude],target]) as L.LatLngTuple[];geometry.forEach(value=>bounds.push(value));L.polyline(geometry,{color:colour,weight:index===0?5:3,opacity:index===0 ? .9 : .55,dashArray:listing.routeMethod?.includes('Offline')?'8 8':undefined}).addTo(map)});map.fitBounds(L.latLngBounds(bounds),{padding:[30,30],maxZoom:14});setTimeout(()=>map.invalidateSize(),0);return()=>{map.remove()}},[destination,listings]);
+ return <div className="route-preview"><header><div><span><i className="bi bi-signpost-split"/> Commute route board</span><h2>See how each shortlist connects.</h2></div><small>Solid routes use OSRM when configured; dashed lines are transparent offline estimates.</small></header><div ref={element} className="route-preview-map" role="region" aria-label={`Routes from matching properties to ${destination.name}`}/></div>;
+}

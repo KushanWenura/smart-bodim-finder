@@ -72,6 +72,21 @@ class ReviewTests(unittest.TestCase):
         self.assertIn("cleanliness", result["aspects"])
         self.assertIn("WiFi", result["aspects"])
 
+    def test_safety_analysis_extracts_multilingual_concerns_without_claiming_crime_risk(self):
+        result = ai.analyze_safety_reports([
+            {"text": "The main road is well lit but the lane is empty at night.", "verified": True},
+            {"text": "රෑට බස් නැහැ සහ පාර අඳුරුයි.", "verified": False},
+            {"text": "இரவில் வெறிச்சோடி, ஆனால் காவல் நிலையம் அருகில் உள்ளது.", "verified": True},
+        ])
+
+        self.assertEqual(3, result["reportCount"])
+        self.assertEqual(2, result["verifiedReportCount"])
+        self.assertGreater(result["concernCount"], 0)
+        self.assertIn("not crime statistics", result["evidencePolicy"])
+        themes = {row["key"]: row for row in result["themes"]}
+        self.assertEqual("concern", themes["night_activity"]["direction"])
+        self.assertGreaterEqual(themes["lighting"]["mentions"], 2)
+
 
 if __name__ == "__main__":
     unittest.main()

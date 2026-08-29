@@ -1,0 +1,42 @@
+{
+  "timestampUtc": "2026-08-25T17:16:32.699100+00:00",
+  "python": "3.12.13",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "preprocessingVersion": "2.0.0",
+  "seed": 42,
+  "source": "datasets\\raw\\sri_lanka_safety_reviews_v1.jsonl",
+  "sourceSha256": "02d64a98ca9814a8e244b04ff94639f44c92c7f6e45d673827713a4c3c742cdf",
+  "licenseSummary": [
+    "CC0-1.0"
+  ],
+  "splitStrategy": "language-stratified-group-aware",
+  "groupField": "groupId",
+  "stratifyField": "language",
+  "sizes": {
+    "train": 168,
+    "validation": 24,
+    "test": 24
+  },
+  "groups": {
+    "train": 42,
+    "validation": 6,
+    "test": 6
+  },
+  "languages": {
+    "train": {
+      "en": 56,
+      "si": 56,
+      "ta": 56
+    },
+    "validation": {
+      "en": 8,
+      "si": 8,
+      "ta": 8
+    },
+    "test": {
+      "en": 8,
+      "si": 8,
+      "ta": 8
+    }
+  }
+}

@@ -230,7 +230,7 @@ class SearchController extends Controller
             if (preg_match($radiusPattern, $radiusText, $distanceMatch)) {
                 $radiusKm = min(50, max(1, (float) $distanceMatch[1]));
             }
-            $eligible = $proximity->annotate($eligible, $destination)->filter(fn ($listing) => (float) $listing->distance_km <= $radiusKm)->values();
+            $eligible = $proximity->annotate($eligible, $destination, $radiusKm, 50);
             $interpreted['radiusKm'] = $radiusKm;
         }
         $ranked = $ai->search($interpretationText, $eligible->map(fn ($listing) => ['id' => $listing->id, 'title' => $listing->title, 'description' => $listing->description, 'area' => $listing->public_area, 'city' => $listing->city, 'facilities' => $listing->facilities->pluck('name')->all()])->all(), 50);

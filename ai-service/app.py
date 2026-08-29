@@ -19,6 +19,7 @@ from query_intent_runtime import QueryIntentRuntime
 
 VERSION = "fixture-tfidf-1.0.0"
 SENTIMENT_VERSION = "fixture-lexicon-1.0.0"
+SAFETY_ASPECT_VERSION = "buddy-safety-aspects-v1.0.0"
 SECRET = os.environ.get("AI_INTERNAL_SECRET", "change-this-in-every-shared-environment")
 PORT = int(os.environ.get("AI_PORT", "5100"))
 HOST = os.environ.get("AI_HOST", "127.0.0.1")
@@ -44,6 +45,58 @@ ASPECTS = {
     "location": {"location", "near", "convenient"},
     "price/value": {"price", "value", "rent", "expensive", "affordable"},
     "utilities": {"electricity", "water", "utilities"},
+}
+
+# This vocabulary is deliberately small and inspectable. It supports the
+# fixture/offline profile and produces evidence labels, never a crime
+# prediction. A trained multilingual classifier can replace it only after a
+# representative, consented dataset passes the documented evaluation gates.
+SAFETY_ASPECTS = {
+    "lighting": {
+        "label": "Street lighting",
+        "supportive": {"well lit", "good lighting", "street lights", "bright at night", "හොඳ ආලෝකය", "වීදි ලාම්පු", "நல்ல வெளிச்சம்", "தெரு விளக்கு"},
+        "concern": {"poor lighting", "no street lights", "very dark", "dark lane", "අඳුරු", "වීදි ලාම්පු නැහැ", "இருட்டு", "தெரு விளக்கு இல்லை"},
+    },
+    "night_activity": {
+        "label": "Evening activity",
+        "supportive": {"busy at night", "people around", "shops open late", "active in the evening", "රෑටත් මිනිස්සු ඉන්නවා", "කඩ විවෘතයි", "இரவில் மக்கள் நடமாட்டம்", "கடைகள் திறந்திருக்கும்"},
+        "concern": {"empty at night", "deserted", "quiet after dark", "isolated at night", "රෑට පාළුයි", "රාත්‍රියේ නිහඬයි", "இரவில் வெறிச்சோடி", "தனிமையாக உள்ளது"},
+    },
+    "transport": {
+        "label": "Late transport",
+        "supportive": {"buses run late", "easy to get a bus", "transport available", "three wheeler available", "රෑටත් බස් තියෙනවා", "ප්‍රවාහනය පහසුයි", "இரவு பேருந்து உள்ளது", "போக்குவரத்து வசதி"},
+        "concern": {"no buses after", "transport stops early", "hard to find transport", "no late transport", "රෑට බස් නැහැ", "ප්‍රවාහනය අමාරුයි", "இரவில் பேருந்து இல்லை", "போக்குவரத்து கிடைக்காது"},
+    },
+    "isolation": {
+        "label": "Isolation",
+        "supportive": {"houses nearby", "neighbours around", "visible from main road", "populated lane", "අසල්වැසියන් ඉන්නවා", "ගෙවල් ළඟයි", "அருகில் வீடுகள்", "அக்கம் பக்கத்தில் மக்கள்"},
+        "concern": {"isolated road", "lonely lane", "far from houses", "hidden alley", "පාළු පාර", "ගෙවල් වලින් දුරයි", "தனிமையான சாலை", "ஒதுக்குப்புறமான வழி"},
+    },
+    "harassment": {
+        "label": "Harassment concerns",
+        "supportive": {"no harassment", "felt respected", "people were helpful", "කිසිදු හිරිහැරයක් නැහැ", "ගෞරවයෙන් හැසිරුණා", "தொந்தரவு இல்லை", "மரியாதையாக நடந்தனர்"},
+        "concern": {"harassed", "catcalling", "followed me", "unwanted attention", "හිරිහැර", "පසුපස ආවා", "தொந்தரவு", "பின்தொடர்ந்தார்"},
+    },
+    "theft": {
+        "label": "Theft concerns",
+        "supportive": {"no theft", "belongings were secure", "secure parking", "හොරකම් නැහැ", "බඩු ආරක්ෂිතයි", "திருட்டு இல்லை", "பொருட்கள் பாதுகாப்பாக"},
+        "concern": {"theft", "stolen", "break in", "phone snatching", "හොරකම", "සොරකම් කළා", "திருட்டு", "பறிப்பு"},
+    },
+    "road_safety": {
+        "label": "Road and walking safety",
+        "supportive": {"safe crossing", "walkable pavement", "low traffic", "good footpath", "පදික මාර්ගය හොඳයි", "පාර මාරුවීම පහසුයි", "நடைபாதை உள்ளது", "சாலை கடக்க வசதி"},
+        "concern": {"dangerous crossing", "no pavement", "speeding vehicles", "heavy traffic", "පදික මාර්ග නැහැ", "වේගයෙන් වාහන යනවා", "நடைபாதை இல்லை", "வேகமாக வாகனங்கள்"},
+    },
+    "flooding": {
+        "label": "Flooding and drainage",
+        "supportive": {"does not flood", "good drainage", "road stayed dry", "ගංවතුර නැහැ", "ජලාපවහනය හොඳයි", "வெள்ளம் இல்லை", "வடிகால் நன்றாக"},
+        "concern": {"road floods", "waterlogging", "poor drainage", "flooded after rain", "පාර යට වෙනවා", "ජලාපවහනය නරකයි", "சாலை வெள்ளம்", "மழையில் நீர் தேங்கும்"},
+    },
+    "emergency_access": {
+        "label": "Access to help",
+        "supportive": {"police nearby", "hospital nearby", "quick emergency access", "pharmacy open late", "පොලිසිය ළඟයි", "රෝහල ළඟයි", "காவல் நிலையம் அருகில்", "மருத்துவமனை அருகில்"},
+        "concern": {"far from hospital", "no emergency help", "police are far", "emergency access is difficult", "ambulance access is difficult", "රෝහල දුරයි", "හදිසි සේවා අමාරුයි", "மருத்துவமனை தூரம்", "அவசர உதவி இல்லை"},
+    },
 }
 
 
@@ -164,6 +217,60 @@ def summarize_reviews(reviews: list[str]) -> dict[str, Any]:
     return {"summary": summary, "sampleSize": len(clean_reviews), "aspects": {"praised": praised, "concerns": concerns}, "modelVersion": SENTIMENT_VERSION, "analyses": analyses}
 
 
+def analyze_safety_reports(reports: list[Any]) -> dict[str, Any]:
+    """Extract safety themes without converting opinions into verified facts."""
+    normalized = []
+    for item in reports[:200]:
+        if isinstance(item, dict):
+            text = str(item.get("text", ""))[:4000].strip()
+            verified = bool(item.get("verified", False))
+        else:
+            text = str(item)[:4000].strip()
+            verified = False
+        if text:
+            normalized.append({"text": text, "verified": verified})
+
+    themes = []
+    for key, definition in SAFETY_ASPECTS.items():
+        supportive = concern = verified_mentions = 0
+        for report in normalized:
+            lowered = report["text"].lower()
+            concern_hit = any(phrase in lowered for phrase in definition["concern"])
+            # Concern phrases such as "no street lights" may contain a shorter
+            # supportive phrase ("street lights"). Prefer the explicit caution.
+            supportive_hit = not concern_hit and any(phrase in lowered for phrase in definition["supportive"])
+            if supportive_hit:
+                supportive += 1
+            if concern_hit:
+                concern += 1
+            if report["verified"] and (supportive_hit or concern_hit):
+                verified_mentions += 1
+        mentions = supportive + concern
+        if mentions:
+            themes.append({
+                "key": key,
+                "label": definition["label"],
+                "supportive": supportive,
+                "concerns": concern,
+                "mentions": mentions,
+                "verifiedMentions": verified_mentions,
+                "direction": "concern" if concern > supportive else "supportive" if supportive > concern else "mixed",
+            })
+
+    themes.sort(key=lambda row: (-row["concerns"], -row["mentions"], row["key"]))
+    verified_count = sum(report["verified"] for report in normalized)
+    return {
+        "reportCount": len(normalized),
+        "verifiedReportCount": verified_count,
+        "themes": themes,
+        "concernCount": sum(theme["concerns"] for theme in themes),
+        "languageMix": dict(Counter(detect_language(report["text"]) for report in normalized)),
+        "modelVersion": SAFETY_ASPECT_VERSION,
+        "method": "Transparent multilingual safety-aspect extraction",
+        "evidencePolicy": "Opinion themes provide cautions and context. They are not crime statistics or proof that an area is safe.",
+    }
+
+
 def extract_constraints(query: str) -> dict[str, Any]:
     result: dict[str, Any] = {}
     lowered = query.lower()
@@ -251,6 +358,15 @@ def review_summarize():
     if not isinstance(reviews, list) or len(reviews) > 500:
         raise ValueError("reviews must be an array with at most 500 items")
     return jsonify(summarize_reviews(reviews))
+
+
+@app.post("/v1/safety/analyze")
+def safety_analyze():
+    body = request.get_json() or {}
+    reports = body.get("reports", [])
+    if not isinstance(reports, list) or len(reports) > 200:
+        raise ValueError("reports must be an array with at most 200 items")
+    return jsonify(analyze_safety_reports(reports))
 
 
 @app.post("/v1/index/upsert")

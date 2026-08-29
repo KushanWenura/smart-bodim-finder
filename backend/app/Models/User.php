@@ -14,7 +14,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['role', 'name', 'email', 'phone', 'avatar_path', 'status', 'password'])]
+#[Fillable(['role', 'name', 'email', 'phone', 'avatar_path', 'status', 'password', 'preferred_locale', 'notification_email_enabled'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -41,6 +41,31 @@ class User extends Authenticatable
         return $this->hasMany(Review::class, 'tenant_id');
     }
 
+    public function tenantViewings(): HasMany
+    {
+        return $this->hasMany(ViewingRequest::class, 'tenant_id');
+    }
+
+    public function ownerViewings(): HasMany
+    {
+        return $this->hasMany(ViewingRequest::class, 'owner_id');
+    }
+
+    public function tenantReservations(): HasMany
+    {
+        return $this->hasMany(Reservation::class, 'tenant_id');
+    }
+
+    public function ownerReservations(): HasMany
+    {
+        return $this->hasMany(Reservation::class, 'owner_id');
+    }
+
+    public function verificationEvidence(): HasMany
+    {
+        return $this->hasMany(VerificationEvidence::class);
+    }
+
     public function isRole(string $role): bool
     {
         return $this->role === $role && $this->status === 'active';
@@ -55,6 +80,8 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'phone_verified_at' => 'datetime',
+            'notification_email_enabled' => 'boolean',
             'password' => 'hashed',
         ];
     }

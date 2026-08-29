@@ -34,7 +34,7 @@ export default function Home() {
   return <PublicLayout>
     <section className="bb-home-hero"><div className="container bb-home-grid">
       <div className="bb-home-copy">
-        <span className="bb-pill"><BuddyMark className="is-mini" /> Sri Lanka’s friendly AI stay companion</span>
+        <span className="bb-pill"><BuddyMark className="is-mini" /> Sri Lanka’s friendly smart stay companion</span>
         <h1>A better bodim starts with <em>a better buddy.</em></h1>
         <p>Tell us where you study or work, what you can spend, and what matters at home. Buddy checks every must-have before ranking the best verified matches.</p>
         <form className="bb-home-command" onSubmit={submit}>

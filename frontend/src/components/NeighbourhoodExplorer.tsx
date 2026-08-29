@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import type { NearbyPlace } from '../types';
 import { MapView } from './MapView';
+import { BuddyMark } from './Shell';
 
 const details: Record<string, { label: string; icon: string; colour: string }> = {
   bus_station: { label: 'Bus stops', icon: 'bi-bus-front', colour: '#2477d4' },
@@ -23,10 +24,18 @@ export function NeighbourhoodExplorer({ latitude, longitude, label, places, auto
   const available = useMemo(() => order.filter(type => places.some(place => place.type === type)), [places]);
   const visible = selected === 'all' ? places : places.filter(place => place.type === selected);
   const openExplorer = useCallback(() => { setOpen(true); window.setTimeout(() => document.getElementById('neighbourhood-explorer')?.scrollIntoView?.({ behavior: 'smooth', block: 'start' }), 50); }, []);
-  useEffect(() => { const listener = () => openExplorer(); window.addEventListener('smartbodim:open-neighbourhood', listener); return () => window.removeEventListener('smartbodim:open-neighbourhood', listener); }, [openExplorer]);
+  useEffect(() => {
+    const listener = (event: Event) => {
+      const requestedType = (event as CustomEvent<{ type?: string }>).detail?.type;
+      if (requestedType && places.some(place => place.type === requestedType)) setSelected(requestedType);
+      openExplorer();
+    };
+    window.addEventListener('smartbodim:open-neighbourhood', listener);
+    return () => window.removeEventListener('smartbodim:open-neighbourhood', listener);
+  }, [openExplorer, places]);
 
   return <section className="sb-detail-section sb-neighbourhood" id="neighbourhood-explorer">
-    <header className="sb-neighbourhood-head"><div><span className="sb-kicker"><i className="bi bi-stars" /> Buddy neighbourhood view</span><h2>See what your daily life looks like here.</h2><p>Compare transport, shopping, healthcare, food, banking, safety and daily services around the approximate property area.</p></div><button className="btn sb-nearby-ai-button" aria-expanded={open} onClick={() => open ? setOpen(false) : openExplorer()}><i className="bi bi-stars" />{open ? 'Hide nearby map' : 'Explore nearby with Buddy'}<i className={`bi ${open ? 'bi-chevron-up' : 'bi-arrow-right'}`} /></button></header>
+    <header className="sb-neighbourhood-head"><div><span className="sb-kicker"><BuddyMark className="is-symbol" /> Buddy neighbourhood view</span><h2>See what your daily life looks like here.</h2><p>Compare transport, shopping, healthcare, food, banking, safety and daily services around the approximate property area.</p></div><button className="btn sb-nearby-ai-button" aria-expanded={open} onClick={() => open ? setOpen(false) : openExplorer()}><BuddyMark className="is-symbol" />{open ? 'Hide nearby map' : 'Explore nearby with Buddy'}<i className={`bi ${open ? 'bi-chevron-up' : 'bi-arrow-right'}`} /></button></header>
     {!open && <div className="sb-nearby-preview">{places.map(place => { const item = details[place.type] || { label: place.type.replaceAll('_', ' '), icon: 'bi-geo-alt', colour: '#16745e' }; return <article key={place.type}><span style={{ '--place-colour': item.colour } as React.CSSProperties}><i className={`bi ${item.icon}`} /></span><div><small>{item.label}</small><strong>{place.name}</strong></div><b>{distance(place.distanceM)}</b></article>; })}</div>}
     {open && <div className="sb-nearby-explorer">
       <div className="sb-ai-method"><span><i className="bi bi-cpu" /></span><div><strong>How this result is produced</strong><p>Buddy AI helps match the property to your request. Nearby-place distances are then calculated from coordinates, so the map remains clear and verifiable.</p></div></div>

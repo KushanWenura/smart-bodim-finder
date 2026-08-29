@@ -11,6 +11,7 @@ ai-service/.venv312/
 ai-service/.pytest-tmp/
 storage/data.json
 storage/ai-index/
+storage/backups/
 storage/uploads/*
 !storage/uploads/.gitkeep
 models/*
@@ -26,10 +27,13 @@ datasets/raw/*
 !datasets/raw/fixture_search_pairs.jsonl
 !datasets/raw/smart_bodim_search_pairs.jsonl
 !datasets/raw/query_intent_examples.jsonl
+!datasets/raw/sri_lanka_safety_reviews_v1.jsonl
 datasets/processed/*
 !datasets/processed/.gitkeep
 !datasets/processed/smart-bodim-v1/
 !datasets/processed/smart-bodim-v1/**
+!datasets/processed/safety-v1/
+!datasets/processed/safety-v1/**
 __pycache__/
 .pytest_cache/
 *.pyc
@@ -42,3 +46,21 @@ frontend/vite.config.d.ts
 *.zip
 Run/.pids.json
 Run/logs/
+.pnpm-store/
+
+# Local editor, operating-system and test/build caches
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/
+.eslintcache
+.coverage
+coverage/
+htmlcov/
+.nyc_output/
+frontend/.vite/
+
+# Machine-specific environment overrides (examples remain tracked)
+.env.local
+.env.*.local

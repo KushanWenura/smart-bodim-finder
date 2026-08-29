@@ -5,7 +5,9 @@ $backendRoot = Join-Path $projectRoot 'backend'
 $frontendRoot = Join-Path $projectRoot 'frontend'
 $aiRoot = Join-Path $projectRoot 'ai-service'
 $pidFile = Join-Path $PSScriptRoot '.pids.json'
+$logRoot = Join-Path $PSScriptRoot 'logs'
 $env:XDEBUG_MODE = 'off'
+New-Item -ItemType Directory -Path $logRoot -Force | Out-Null
 
 if (Test-Path -LiteralPath $pidFile) {
     try {
@@ -47,6 +49,12 @@ if (-not $pnpm) {
     if (Test-Path -LiteralPath $bundledPnpm) { $pnpm = $bundledPnpm }
 }
 
+$node = (Get-Command node -ErrorAction SilentlyContinue).Source
+if (-not $node) {
+    $bundledNode = 'C:\Users\User\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe'
+    if (Test-Path -LiteralPath $bundledNode) { $node = $bundledNode }
+}
+
 $systemPython = (Get-Command python -ErrorAction SilentlyContinue).Source
 $python = @(
     (Join-Path $aiRoot '.venv312\Scripts\python.exe'),
@@ -55,6 +63,7 @@ $python = @(
 
 if (-not $php) { throw 'PHP was not found. Install PHP/WAMP or add php.exe to PATH.' }
 if (-not $pnpm) { throw 'pnpm was not found. Install Node.js and run: corepack enable' }
+if (-not $node) { throw 'Node.js was not found. Install Node.js or add node.exe to PATH.' }
 if (-not $python -and -not $systemPython) { throw 'Python 3.12 was not found. Install Python or add python.exe to PATH.' }
 
 if (-not (Test-Path -LiteralPath (Join-Path $backendRoot 'vendor\autoload.php'))) {
@@ -65,12 +74,25 @@ if (-not (Test-Path -LiteralPath (Join-Path $backendRoot 'vendor\autoload.php'))
     if ($LASTEXITCODE -ne 0) { throw 'Composer dependency installation failed.' }
 }
 
-if (-not (Test-Path -LiteralPath (Join-Path $frontendRoot 'node_modules'))) {
-    Write-Host 'First run: installing frontend dependencies…' -ForegroundColor Cyan
+function Test-FrontendRuntime {
+    $viteCli = Join-Path $frontendRoot 'node_modules\vite\bin\vite.js'
+    if (-not (Test-Path -LiteralPath $viteCli)) { return $false }
+    & $node $viteCli --version *> $null
+    return $LASTEXITCODE -eq 0
+}
+
+if (-not (Test-FrontendRuntime)) {
+    Write-Host 'Installing or repairing frontend dependencies...' -ForegroundColor Cyan
+    $previousCI = $env:CI
+    $env:CI = 'true'
     Push-Location $frontendRoot
-    try { & $pnpm install }
-    finally { Pop-Location }
+    try { & $pnpm install --force --frozen-lockfile }
+    finally {
+        Pop-Location
+        if ($null -eq $previousCI) { Remove-Item Env:CI -ErrorAction SilentlyContinue } else { $env:CI = $previousCI }
+    }
     if ($LASTEXITCODE -ne 0) { throw 'Frontend dependency installation failed.' }
+    if (-not (Test-FrontendRuntime)) { throw 'Frontend dependencies were installed, but Vite still cannot start. Delete frontend\node_modules and run pnpm install.' }
 }
 
 if (-not $python) {
@@ -111,11 +133,13 @@ $env:SEARCH_MODEL_VERSION = 'smart-bodim-minilm-v1'
 $env:LOAD_SENTIMENT_MODEL = '0'
 $env:AI_INTERNAL_SECRET = 'change-this-in-every-shared-environment'
 
+$viteCli = Join-Path $frontendRoot 'node_modules\vite\bin\vite.js'
 $processes = @(
-    Start-Process -FilePath $php -ArgumentList @('artisan', 'serve', '--host=127.0.0.1', '--port=8000') -WorkingDirectory $backendRoot -WindowStyle Hidden -PassThru
-    Start-Process -FilePath $php -ArgumentList @('artisan', 'queue:work', '--tries=3') -WorkingDirectory $backendRoot -WindowStyle Hidden -PassThru
-    Start-Process -FilePath $python -ArgumentList @('app.py') -WorkingDirectory $aiRoot -WindowStyle Hidden -PassThru
-    Start-Process -FilePath $pnpm -ArgumentList @('dev', '--host', '127.0.0.1') -WorkingDirectory $frontendRoot -WindowStyle Hidden -PassThru
+    Start-Process -FilePath $php -ArgumentList @('artisan', 'serve', '--host=127.0.0.1', '--port=8000') -WorkingDirectory $backendRoot -WindowStyle Hidden -RedirectStandardOutput (Join-Path $logRoot 'api.out.log') -RedirectStandardError (Join-Path $logRoot 'api.error.log') -PassThru
+    Start-Process -FilePath $php -ArgumentList @('artisan', 'queue:work', '--tries=3') -WorkingDirectory $backendRoot -WindowStyle Hidden -RedirectStandardOutput (Join-Path $logRoot 'queue.out.log') -RedirectStandardError (Join-Path $logRoot 'queue.error.log') -PassThru
+    Start-Process -FilePath $php -ArgumentList @('artisan', 'schedule:work') -WorkingDirectory $backendRoot -WindowStyle Hidden -RedirectStandardOutput (Join-Path $logRoot 'scheduler.out.log') -RedirectStandardError (Join-Path $logRoot 'scheduler.error.log') -PassThru
+    Start-Process -FilePath $python -ArgumentList @('app.py') -WorkingDirectory $aiRoot -WindowStyle Hidden -RedirectStandardOutput (Join-Path $logRoot 'ai.out.log') -RedirectStandardError (Join-Path $logRoot 'ai.error.log') -PassThru
+    Start-Process -FilePath $node -ArgumentList @("`"$viteCli`"", '--host', '127.0.0.1', '--port', '5173') -WorkingDirectory $frontendRoot -WindowStyle Hidden -RedirectStandardOutput (Join-Path $logRoot 'frontend.out.log') -RedirectStandardError (Join-Path $logRoot 'frontend.error.log') -PassThru
 )
 
 @{
@@ -123,25 +147,62 @@ $processes = @(
     processIds = @($processes.Id)
 } | ConvertTo-Json | Set-Content -LiteralPath $pidFile -Encoding UTF8
 
-Write-Host 'Starting services and loading the trained search model…' -ForegroundColor Cyan
-$ready = $false
-$deadline = (Get-Date).AddSeconds(90)
+function Test-Endpoint([string] $Uri) {
+    try {
+        return (Invoke-WebRequest -Uri $Uri -UseBasicParsing -TimeoutSec 2).StatusCode -eq 200
+    } catch {
+        return $false
+    }
+}
+
+Write-Host 'Starting Website, API and trained AI services...' -ForegroundColor Cyan
+$websiteReady = $false
+$apiReady = $false
+$aiReady = $false
+$deadline = (Get-Date).AddSeconds(120)
 do {
     Start-Sleep -Seconds 2
+    $websiteReady = Test-Endpoint 'http://127.0.0.1:5173/'
+    $apiReady = Test-Endpoint 'http://127.0.0.1:8000/api/v1/health'
     try {
         $health = Invoke-RestMethod -Uri 'http://127.0.0.1:5100/health' -TimeoutSec 2
-        $ready = $health.service -eq 'healthy' -and $health.modelReady -and $health.queryIntentReady
+        $aiReady = $health.service -eq 'healthy' -and $health.modelReady -and $health.queryIntentReady
     } catch {
-        $ready = $false
+        $aiReady = $false
     }
-} while (-not $ready -and (Get-Date) -lt $deadline -and -not $processes[2].HasExited)
+    $criticalProcessExited = $processes[0].HasExited -or $processes[4].HasExited
+} while (-not $criticalProcessExited -and -not ($websiteReady -and $apiReady -and ($aiReady -or $processes[3].HasExited)) -and (Get-Date) -lt $deadline)
 
-if ($ready) {
-    Write-Host 'BodimBuddy.lk started. Search and query-intent models are ready.' -ForegroundColor Green
-} elseif ($processes[2].HasExited) {
-    Write-Warning 'The website started, but the AI process exited. Search will use its safe fallback until the AI service is restarted.'
+if (-not $websiteReady -or -not $apiReady) {
+    $failed = @()
+    if (-not $websiteReady) { $failed += 'Website' }
+    if (-not $apiReady) { $failed += 'API' }
+    Write-Host ''
+    Write-Host ('Startup failed: ' + ($failed -join ' and ') + ' did not become ready.') -ForegroundColor Red
+    foreach ($name in @('frontend.error.log', 'api.error.log')) {
+        $path = Join-Path $logRoot $name
+        if ((Test-Path -LiteralPath $path) -and (Get-Item -LiteralPath $path).Length -gt 0) {
+            Write-Host ("--- $name ---") -ForegroundColor Yellow
+            Get-Content -LiteralPath $path -Tail 12
+        }
+    }
+    & (Join-Path $PSScriptRoot 'stop-all.ps1')
+    throw 'BodimBuddy.lk did not start. Read Run\logs\frontend.error.log and Run\logs\api.error.log for details.'
+}
+
+if ($aiReady) {
+    Push-Location $backendRoot
+    try { & $php artisan ai:index-rebuild --sync }
+    finally { Pop-Location }
+    if ($LASTEXITCODE -ne 0) {
+        Write-Warning 'The trained model is ready, but the semantic listing index could not be synchronized. Structured search remains available.'
+    } else {
+        Write-Host 'BodimBuddy.lk started. Search, query-intent and listing index data are ready.' -ForegroundColor Green
+    }
+} elseif ($processes[3].HasExited) {
+    Write-Warning 'Website and API are ready, but the AI process exited. Search will use its safe fallback. See Run\logs\ai.error.log.'
 } else {
-    Write-Warning 'The website started, but the trained model is still loading. Refresh the site in a moment.'
+    Write-Warning 'Website and API are ready, but the trained model is still loading. Refresh the site in a moment.'
 }
 Write-Host 'Website: http://127.0.0.1:5173'
 Write-Host 'API:     http://127.0.0.1:8000/api/v1/health'

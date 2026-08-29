@@ -40,6 +40,25 @@ class AiServiceClient
         }
     }
 
+    public function analyzeSafetyReports(array $reports): array
+    {
+        try {
+            return ['online' => true] + $this->request('/v1/safety/analyze', ['reports' => $reports]);
+        } catch (\Throwable) {
+            return [
+                'online' => false,
+                'reportCount' => count($reports),
+                'verifiedReportCount' => 0,
+                'themes' => [],
+                'concernCount' => 0,
+                'languageMix' => [],
+                'modelVersion' => 'unavailable',
+                'method' => 'AI theme extraction unavailable',
+                'evidencePolicy' => 'Structured ratings remain available; no text theme is inferred while the AI service is offline.',
+            ];
+        }
+    }
+
     public function indexUpsert(int $id, string $text): array
     {
         return $this->request('/v1/index/upsert', compact('id', 'text'));
@@ -48,6 +67,11 @@ class AiServiceClient
     public function indexDelete(int $id): array
     {
         return $this->request('/v1/index/delete', compact('id'));
+    }
+
+    public function indexRebuild(array $listings): array
+    {
+        return $this->request('/v1/index/rebuild', compact('listings'));
     }
 
     public function health(): array
