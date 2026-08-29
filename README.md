@@ -65,11 +65,11 @@ Create a local database and upload backup:
 
 ## Local assessment accounts
 
-| Role | Email | Password |
-|---|---|---|
-| Tenant | `tenant@smartbodim.lk` | `Tenant@123` |
-| Owner | `owner@smartbodim.lk` | `Owner@123` |
-| Administrator | `admin@smartbodim.lk` | `Admin@123` |
+| Role          | Email                  | Password     |
+| ------------- | ---------------------- | ------------ |
+| Tenant        | `tenant@smartbodim.lk` | `Tenant@123` |
+| Owner         | `owner@smartbodim.lk`  | `Owner@123`  |
+| Administrator | `admin@smartbodim.lk`  | `Admin@123`  |
 
 These accounts and all included listings are synthetic assessment data. Do not use these credentials in production.
 

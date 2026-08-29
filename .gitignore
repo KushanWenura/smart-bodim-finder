@@ -61,6 +61,10 @@ htmlcov/
 .nyc_output/
 frontend/.vite/
 
+# Generated exports and temporary working files
+output/
+tmp/
+
 # Machine-specific environment overrides (examples remain tracked)
 .env.local
 .env.*.local
